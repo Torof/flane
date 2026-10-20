@@ -4,6 +4,9 @@ Les choix structurants, avec leurs raisons. Une décision n'est jamais effacée 
 
 ---
 
+## D-015 — Identifiant de l'appli : `app.flane` · 2026-10-20 · Acceptée
+Identifiant de paquet Android `app.flane` ; nom affiché « Flâne » ; dépôt GitHub `flane`. **Pourquoi** : l'identifiant est définitif une fois publié sur Google Play ; il doit donc être court, sans accent et sans référence à un pays, pour une appli qui commence en France mais vise l'international. `fr.flane` écarté pour cette raison ; `com.flane.app` et `io.flane` écartés car plus longs sans avantage. Correspond au domaine `flane.app`, non acheté à ce jour. **Vigilance** : vérifier à la première publication (T5.4) qu'aucune appli ne porte déjà cet identifiant ; envisager l'achat du domaine `flane.app`.
+
 ## D-014 — Méthode de construction · 2026-10-20 · Acceptée
 Cycle en sept temps par tranche, jalons d'usage plutôt que sprints, une seule tranche en cours, budget par tranche, parking, journal de session, définition de « fini ». Claude fait respecter la méthode ; les exceptions sont consignées. **Pourquoi** : construire à deux (humain et IA) demande de la continuité entre sessions et un contradicteur, pas des rituels d'équipe. Détail : `docs/METHODE.md`.
 
