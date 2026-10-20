@@ -4,10 +4,11 @@ Statuts : **Idée** → **Prête** (fiche validée) → **En cours** → **À te
 
 ## En cours
 
-**T0.3 — Squelette de l'appli Expo** (fiche : `docs/tranches/T0.3-app-skeleton.md`, validée le 2026-10-20, branche `feat/T0.3-app-skeleton`) : construite, auditée, relue ; pull request ouverte, à tester sur le téléphone (porte Observer). Ensuite : T0.2 (vérifications automatiques, qui reprendront `npm run check`).
+**T0.5 — Mises à jour instantanées pour la version de test, et version par tranche** (fiche : `docs/tranches/T0.5-instant-updates.md`, validée le 2026-10-20 avec D-023, branche `feat/T0.5-instant-updates`) : construite, auditée, relue ; pull request ouverte, porte Observer en deux temps (APK, puis mise à jour publiée). Ensuite : T0.2 (vérifications automatiques), puis T0.4.
 
 ## Questions ouvertes
 
+- [ ] **Double authentification du compte Expo** : remise à plus tard le 2026-10-20. À activer avant la première donnée personnelle stockée par la version de test, en même temps que la signature des mises à jour (déclencheur dans `docs/SECURITE.md`).
 - [ ] **Dépôt de marque « Flâne » (INPI)** : quand ? Depuis le passage en public (D-019), le nom est la seule chose que la licence ne protège pas. Prévu en T5.5 ; à avancer si possible.
 - [x] **Région du premier paquet** (jalon 1) : les Hautes-Alpes (05). *Répondu le 2026-10-20.*
 - [x] **Trajet de référence** : Briançon–Embrun (trajet connu par cœur) ; trajet long : Briançon–Marseille. *Répondu le 2026-10-20.*
@@ -24,8 +25,9 @@ Statuts : **Idée** → **Prête** (fiche validée) → **En cours** → **À te
 | T0.1 | Dépôt et conventions : hooks git locaux dans `.githooks/` (secrets avec gitleaks, format des commits, pré-push), `.editorconfig`, licence AGPL-3.0 et passage en public, modèles d'issues et de PR, réglages GitHub (règle sur `main`, recherche de secrets, alertes), D-017 à D-019. Le garde-fou de Claude livré ici a été retiré ensuite (D-022) | Faite |
 | T0.1b | Kit Claude : mode « accept edits », D-021 (qui décide quoi). La liste `allow` figée et le garde-fou durci ont été retirés (D-022) | Faite, puis simplifiée |
 | T0.2 | Vérifications automatiques (GitHub Actions) : types, lint, tests, audit des dépendances, recherche de secrets, licences ; exigées par la règle sur `main` ; Dependabot ; résumé court des échecs pour Claude | Idée |
-| T0.3 | Squelette de l'appli Expo : TypeScript strict, ESLint et Prettier, fichiers de traduction, notice SPDX en tête des fichiers, `.npmrc` (`ignore-scripts`, `save-exact`), `.nvmrc`, trois onglets vides, variantes `app.flane.dev` / `app.flane`, APK `preview` et client de développement par EAS Build | À tester sur la route |
-| T0.4 | Historique des versions automatique (à partir des messages de commit) et version par jalon | Idée |
+| T0.3 | Squelette de l'appli Expo : TypeScript strict, ESLint et Prettier, fichiers de traduction, notice SPDX en tête des fichiers, `.npmrc` (`ignore-scripts`, `save-exact`), `.nvmrc`, trois onglets vides, variantes `app.flane.dev` / `app.flane`, APK `preview` et client de développement par EAS Build | Faite |
+| T0.5 | Mises à jour instantanées (EAS Update) pour la variante de test `app.flane.dev`, version native visible, une version par tranche (D-023) ; passée avant T0.2 à la demande de l'utilisateur pour accélérer la boucle de test | À tester sur la route |
+| T0.4 | Historique des versions automatique (à partir des messages de commit) et étiquettes Git par version | Idée |
 
 ## Jalon 1 — Je vois les bons coins de ma région
 

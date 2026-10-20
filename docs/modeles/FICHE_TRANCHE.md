@@ -61,6 +61,7 @@ Ce que cette tranche prépare pour la suite (partage, avis, iOS), sans le dével
 - [ ] Nouveaux termes : dans le glossaire, et dans les noms du code
 - [ ] Nouvelles dépendances : justifiées, licence vérifiée
 - [ ] Nouvelles permissions Android : nécessaires et justifiées
+- [ ] Mises à jour instantanées : la tranche franchit-elle le déclencheur de signature (permission sensible, donnée personnelle stockée, second appareil ou canal) ? Si oui, la signature vient d'abord (`docs/SECURITE.md`)
 - [ ] Ce que la tranche laisse en place pour la suite (identifiants stables, actions, affichage séparé)
 - [ ] Ce que l'utilisateur devra constater à l'étape Observer, et comment
 
@@ -76,5 +77,6 @@ Ce que cette tranche prépare pour la suite (partage, avis, iOS), sans le dével
 - [ ] Audit de sécurité : aucun point bloquant ouvert
 - [ ] Relecture : aucun point bloquant ouvert
 - [ ] `DONNEES.md`, glossaire, décisions à jour si nécessaire
+- [ ] Version montée dans `app/package.json` (une par tranche, voir `docs/CONVENTIONS.md`) ; nouvel APK si la version native change
 - [ ] Journal et backlog à jour
 - [ ] Intégrée à `main` par pull request

@@ -41,7 +41,41 @@ Le format est vérifié par le hook `commit-msg`. Seules exceptions : `Revert "�
 
 ## Versions
 
-Une version par jalon : `0.0.1` à la fin du jalon 0, `0.1.0` à la fin du jalon 1, `0.2.0` à la fin du jalon 2, etc. Les corrections entre deux jalons : `0.1.1`, `0.1.2`. Chaque version est étiquetée dans Git (`v0.1.0`).
+Trois numéros, trois rôles.
+
+**La version de l'appli** (`app/package.json`, seule source ; `app.config.ts` la lit, « À propos » l'affiche) monte à chaque tranche intégrée, dans la pull request de la tranche. Le dernier chiffre compte les tranches, celui du milieu les jalons terminés, le premier reste `0` jusqu'à la première publication.
+
+| Événement | Version |
+| --- | --- |
+| T0.3 (première appli) | `0.0.1` |
+| T0.5 | `0.0.2` |
+| T0.2, puis T0.4 | `0.0.3`, `0.0.4` si elles changent quelque chose dans `app/` (scripts, dépendances) ; sinon pas de version |
+| Fin du jalon 0 | la version courante est étiquetée `v0.0.4` ; pas de numéro à part |
+| Première tranche du jalon 1 (T1.1) | `0.1.0` (le jalon précédent est terminé) |
+| T1.2, T1.3… | `0.1.1`, `0.1.2`… |
+| Correctif urgent entre deux tranches | une tranche `fix/` comme les autres : `0.1.3` |
+| Tranche redécoupée (T1.2b) | une version comme une autre |
+| Tranche qui ne change rien dans `app/` (méthode, documentation, outils du dépôt, vérifications GitHub) | pas de version |
+| Première publication sur Google Play | `1.0.0` (T5.4) |
+
+Chaque version est étiquetée dans Git (`v0.1.0`) et l'historique des versions se fabrique à partir des messages de commit (T0.4).
+
+**La version native** (`runtimeVersion`, calculée par empreinte des modules natifs : `@expo/fingerprint`) ne change que quand un module natif entre ou sort, ou qu'un réglage natif de `app.config.ts` change. C'est elle qui dit « il faut un nouvel APK » : une mise à jour instantanée ne s'applique qu'aux APK de la même version native. « À propos » en montre les huit premiers caractères. Elle ne dépend pas de la version de l'appli (test `app/src/config.test.ts`).
+
+**Le `versionName` Android** est la version de l'appli au moment où l'APK a été compilé. Après des mises à jour instantanées, Android affiche donc une version plus ancienne que « À propos » : c'est normal, « À propos » dit la vérité.
+
+**Publier une mise à jour instantanée** (porte Observer seulement, après l'audit) :
+
+```sh
+cd app
+git status --porcelain            # vide : arbre propre (eas.json l'exige aussi : requireCommit)
+git rev-parse HEAD                # doit être le commit de tête de la pull request :
+gh pr view --json headRefOid -q .headRefOid
+APP_VARIANT=preview EXPO_NO_TELEMETRY=1 eas update --channel preview --platform android --message "T0.x <hash court>" --non-interactive
+eas update:view <id>              # gitCommitHash = le même commit
+```
+
+Seule la variante `preview` (`app.flane.dev`) reçoit des mises à jour (D-023). Republier après chaque correction de l'audit ou de la relecture. Si la pull request est refusée : `eas update:republish` du dernier état de `main`. Après chaque compilation EAS, comparer l'empreinte du build à l'empreinte locale (`eas fingerprint:compare --build-id <id>`).
 
 ## Structure du dépôt (validée en T0.1)
 

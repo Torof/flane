@@ -32,7 +32,7 @@ EXPO_NO_TELEMETRY=1 eas build -p android -e preview        # APK autonome « Fl�
 EXPO_NO_TELEMETRY=1 eas build -p android -e development    # client de développement, pour coder avec Metro
 ```
 
-Les deux profils produisent la variante `app.flane.dev` ; `app.flane` est réservé à la version publiée (profil `production`, sans clé pour l'instant : T5.4). Le keystore et `app/credentials.json` restent sur ce PC, ignorés par git : ne les copier nulle part. Pour couper la télémétrie des outils Expo dans votre shell : `export EXPO_NO_TELEMETRY=1`. Pour lire les permissions d'un APK produit : `python3 -I tools/dev/read-manifest.py fichier.apk`.
+À chaque tranche, la version de test reçoit le nouveau code par mise à jour instantanée (`eas update --channel preview`, voir `docs/CONVENTIONS.md`) ; un nouvel APK n'est nécessaire que quand la version native change. Les deux profils produisent la variante `app.flane.dev` ; `app.flane` est réservé à la version publiée (profil `production`, sans clé pour l'instant : T5.4). Le keystore et `app/credentials.json` restent sur ce PC, ignorés par git : ne les copier nulle part. Pour couper la télémétrie des outils Expo dans votre shell : `export EXPO_NO_TELEMETRY=1`. Pour lire les permissions d'un APK produit : `python3 -I tools/dev/read-manifest.py fichier.apk`.
 
 ## Contribuer au dépôt
 
