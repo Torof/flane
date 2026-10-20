@@ -20,10 +20,16 @@ const isProduction = variant === 'production';
 
 const EAS_PROJECT_ID = '77f1c432-03e1-482a-9767-d4e73a41def1';
 
-/** Only the test variant receives instant updates (D-023). */
-export function updatesEnabledFor(v: Variant): boolean {
-  return v === 'preview';
-}
+// Permissions Expo's defaults add and Flâne does not want (found in the built
+// manifests, see the T0.3 and T0.5 sheets). The development client keeps
+// ACCESS_NETWORK_STATE for Metro; expo-updates only uses it in WIFI_ONLY mode.
+const blockedPermissions = [
+  'android.permission.READ_EXTERNAL_STORAGE',
+  'android.permission.WRITE_EXTERNAL_STORAGE',
+  'android.permission.SYSTEM_ALERT_WINDOW',
+  'android.permission.VIBRATE',
+  ...(variant === 'development' ? [] : ['android.permission.ACCESS_NETWORK_STATE']),
+];
 
 export default ({ config }: ConfigContext): ExpoConfig => ({
   ...config,
@@ -39,7 +45,8 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   runtimeVersion: { policy: 'fingerprint' },
   updates: {
     url: `https://u.expo.dev/${EAS_PROJECT_ID}`,
-    enabled: updatesEnabledFor(variant),
+    // Only the test variant receives instant updates (D-023).
+    enabled: variant === 'preview',
     checkAutomatically: 'ON_LOAD',
     // Never wait for the network at start-up: a downloaded update applies on the next launch.
     fallbackToCacheTimeout: 0,
@@ -52,15 +59,9 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       backgroundImage: './assets/android-icon-background.png',
       monochromeImage: './assets/android-icon-monochrome.png',
     },
-    // Only INTERNET is wanted. The four below were found in the first built
-    // manifest (added by Expo's defaults) and are removed; see the T0.3 sheet.
+    // Only INTERNET is wanted.
     permissions: [],
-    blockedPermissions: [
-      'android.permission.READ_EXTERNAL_STORAGE',
-      'android.permission.WRITE_EXTERNAL_STORAGE',
-      'android.permission.SYSTEM_ALERT_WINDOW',
-      'android.permission.VIBRATE',
-    ],
+    blockedPermissions,
     // Android auto-backup would copy the app's private data to Google Drive.
     // Nothing is stored yet; off from the start so that it never happens (docs/DONNEES.md).
     allowBackup: false,

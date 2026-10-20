@@ -7,13 +7,14 @@ import { TripScreen } from './TripScreen';
 const mockConstants: { expoConfig: { version?: string } | null } = {
   expoConfig: { version: '1.2.3' },
 };
-// The getter reads the state at call time, after the hoisted mock factory has run.
+const NATIVE_VERSION = 'd2d3412e6003c7632900308047f5ea000a6aa552';
 jest.mock('expo-updates', () => ({
   isEnabled: true,
   isEmbeddedLaunch: true,
   createdAt: null,
   runtimeVersion: 'd2d3412e6003c7632900308047f5ea000a6aa552',
 }));
+// expo-constants: the getter reads the state at call time, after the hoisted mock factory has run.
 jest.mock('expo-constants', () => ({
   __esModule: true,
   default: {
@@ -38,7 +39,7 @@ describe('tab screens', () => {
     const { getByRole, getByText } = await render(<AboutScreen />);
     expect(getByRole('header', { name: 'À propos' })).toBeTruthy();
     expect(getByText('Version 1.2.3')).toBeTruthy();
-    expect(getByText('Version native d2d3412e')).toBeTruthy();
+    expect(getByText(`Version native ${NATIVE_VERSION.slice(0, 8)}`)).toBeTruthy();
     expect(getByText('Code embarqué')).toBeTruthy();
     expect(getByText(/AGPL-3.0-or-later/)).toBeTruthy();
     expect(getByText(/github.com\/Torof\/flane/)).toBeTruthy();
@@ -46,9 +47,9 @@ describe('tab screens', () => {
   });
 
   it('About says when an update has been received, and when updates are off', () => {
-    const receivedAt = new Date(2026, 9, 20, 18, 0);
-    expect(updateLine({ kind: 'received', nativeVersion: 'd2d3412e', receivedAt })).toBe(
-      `Mise à jour du ${receivedAt.toLocaleString('fr-FR')}`,
+    const publishedAt = new Date(2026, 9, 20, 18, 0);
+    expect(updateLine({ kind: 'received', nativeVersion: 'd2d3412e', publishedAt })).toBe(
+      'Mise à jour publiée le 20/10/2026 18:00',
     );
     expect(updateLine({ kind: 'disabled', nativeVersion: '?' })).toBe(
       'Mises à jour instantanées désactivées',

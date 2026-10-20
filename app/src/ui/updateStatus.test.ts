@@ -18,15 +18,15 @@ describe('updateStatusFrom', () => {
   });
 
   it('reports a received update with its date', () => {
-    const receivedAt = new Date('2026-10-20T18:00:00Z');
+    const publishedAt = new Date('2026-10-20T18:00:00Z');
     expect(
       updateStatusFrom({
         isEnabled: true,
         isEmbeddedLaunch: false,
-        createdAt: receivedAt,
+        createdAt: publishedAt,
         runtimeVersion: nativeVersion,
       }),
-    ).toEqual({ kind: 'received', nativeVersion: 'd2d3412e', receivedAt });
+    ).toEqual({ kind: 'received', nativeVersion: 'd2d3412e', publishedAt });
   });
 
   it('treats a non-embedded launch without a date as embedded code', () => {
