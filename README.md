@@ -10,7 +10,7 @@ Flâne est une appli mobile (Android d'abord) qui suggère les bons arrêts sur 
 
 ## Contribuer au dépôt
 
-Après avoir cloné : `tools/dev/setup.sh` active les hooks git du projet (format des commits, recherche de secrets) et installe l'outil gitleaks dans `~/.local/bin`. Méthode, conventions et outils : [`docs/METHODE.md`](docs/METHODE.md), [`docs/CONVENTIONS.md`](docs/CONVENTIONS.md), [`docs/OUTILLAGE.md`](docs/OUTILLAGE.md).
+Après avoir cloné : `tools/dev/setup.sh` active les hooks git du projet (format des commits, recherche de secrets) et installe l'outil gitleaks dans `~/.local/bin`. Méthode et conventions : [`docs/METHODE.md`](docs/METHODE.md), [`docs/CONVENTIONS.md`](docs/CONVENTIONS.md).
 
 ## Licence
 

@@ -11,18 +11,10 @@ Fixées une fois pour toutes, pour ne plus y penser. Validées à la tranche T0.
 
 ## Branches
 
-- `main` : toujours stable. Jamais de modification directe. Trois verrous, qui se recouvrent : le garde-fou de Claude (`.claude/hooks/`, bloque commit, merge, rebase et push vers `main` et `--no-verify` ; un push forcé est demandé à l'utilisateur, jamais silencieux, et consigné dans le journal), les hooks git locaux (`.githooks/`, activés par `tools/dev/setup.sh`), et la règle GitHub sur `main` (pas de push direct, pas de push forcé, pas de suppression ; disponible depuis le passage en public, D-019). La protection de branche GitHub était refusée sur le dépôt privé gratuit (« Upgrade to GitHub Pro or make this repository public »), constaté le 2026-10-20.
+- `main` : toujours stable. Jamais de modification directe. Deux verrous : les hooks git locaux (`.githooks/`, activés par `tools/dev/setup.sh`) et la règle GitHub sur `main` (pas de push direct, pas de push forcé, pas de suppression ; disponible depuis le passage en public, D-019). Un push forcé sur une branche de travail est demandé à l'utilisateur et consigné dans le journal.
 - Une branche par tranche : `feat/T1.2-osm-extract`, `fix/T2.4-route-timeout`, `chore/T0.2-ci`.
 - Documentation hors tranche (journal entre deux tranches, réponses aux questions ouvertes, bilan de jalon) : branche `docs/meta-AAAA-MM-JJ`.
 - Intégration par pull request, après la définition de « fini ». Le journal et le backlog sont mis à jour dans la pull request elle-même, avant l'intégration. Fusion par merge uniquement, squash et rebase désactivés (D-018) ; la branche est supprimée après fusion.
-
-## Commandes de Claude
-
-Les commandes que Claude lance passent par la liste `allow` de `.claude/settings.json` (sans demande) et par le garde-fou (qui garde la priorité). Pour rester dans les formes reconnues :
-- pas de `cd … &&` en tête : le dossier courant persiste entre les commandes ;
-- message de commit par plusieurs `-m` (sujet, corps, `Co-Authored-By`), sans substitution `$(…)` ;
-- corps de pull request ou d'issue par `--body-file` depuis le brouillon de Claude (`/tmp/claude-*`), jamais depuis un fichier du projet ou du poste ;
-- lecture des fichiers par les outils de Claude Code (Read, Grep, Glob), pas par `cat` ou `find`.
 
 ## Suivi
 
@@ -59,10 +51,10 @@ flane/
 ├── README.md
 ├── LICENSE                AGPL-3.0
 ├── docs/                  documentation, modèles, fiches, bilans, carnet de route
-├── .claude/               compétences, agents, garde-fous de Claude Code
+├── .claude/               compétences, agents et réglages de Claude Code
 ├── .githooks/             hooks git locaux (format des commits, secrets, pré-push)
 ├── .github/               vérifications automatiques, modèles d'issues et de PR
-├── tools/dev/             installation des garde-fous (setup.sh), banc de tests des hooks
+├── tools/dev/             installation des hooks et de gitleaks (setup.sh)
 ├── app/                   l'appli Expo (React Native, TypeScript) — naît en T0.3
 │   └── src/
 │       ├── domain/        modèle de données (Trip, Stop, Place, StopRequest…), sans dépendance à l'interface

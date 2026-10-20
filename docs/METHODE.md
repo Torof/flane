@@ -23,7 +23,7 @@ Une méthode pour construire à deux (l'utilisateur et Claude) : les forces de l
 | 3. Choisir | L'utilisateur valide explicitement | Date de validation dans la fiche |
 | 4. Construire | Branche dédiée, petits morceaux, tests | Le code fait ce que dit la fiche, les tests passent |
 | 5. Observer | L'utilisateur constate le résultat : sur son téléphone (simulateur, banc d'essai), ou, pour une tranche sans appli (jalon 0, données), en vérifiant lui-même le résultat (dépôt, visualiseur, rapport) | L'utilisateur confirme le comportement |
-| 6. Sécuriser | `auditeur-securite` et `relecteur` ; vérifications automatiques | Aucun point bloquant ouvert |
+| 6. Sécuriser | `auditeur-securite` et `relecteur` ; vérifications automatiques. Enchaîné par Claude sans demander, avant la pull request | Aucun point bloquant ouvert |
 | 7. Valider et consigner | Définition de « fini », intégration, documentation | Toutes les cases de « fini » cochées |
 
 Une étape n'est jamais commencée avant que la précédente soit cochée.
@@ -90,7 +90,7 @@ L'utilisateur reste le décideur. Une étape peut être sautée, mais **jamais e
 ## Économiser le contexte, sans perdre en qualité
 
 - Une session ne traite qu'une seule tranche ; `/clear` entre deux sessions ou après une pause de plus d'une heure. Le journal assure la continuité.
-- Mode « accept edits » par défaut (D-020) : les garde-fous (hook de Claude, hooks git, règle GitHub, accord demandé sur les dossiers protégés) tiennent lieu de relecture pas à pas. Mode plan pour les discussions d'architecture.
+- Mode « accept edits », commandes courantes autorisées (D-022) : l'utilisateur n'est sollicité qu'aux trois portes. La relecture pas à pas est remplacée par les tests, l'audit et la pull request. Mode plan pour les discussions d'architecture.
 - `CLAUDE.md` reste court (moins de 200 lignes). Les procédures détaillées vivent dans les compétences (`.claude/skills/`) et ne se chargent qu'à la demande.
 - Les sorties verbeuses (tests, journaux) passent par des sous-agents ou des filtres (hooks) qui ne remontent que l'essentiel.
 - Le mode plan pour toute tâche complexe : Claude explore et propose avant de modifier.
@@ -99,4 +99,4 @@ L'utilisateur reste le décideur. Une étape peut être sautée, mais **jamais e
 
 ## Les outils de développement
 
-La méthode est vérifiée par la machine autant que possible : hooks locaux, vérifications automatiques, agents. Les outils d'atelier (garde-fous, vérifications) se construisent au jalon 0, car le reste s'appuie dessus ; les outils du produit (simulateur, visualiseur, banc d'essai, écouteur de phrases…) arrivent avec les tranches qui en ont besoin. L'inventaire complet, avec l'état et la tranche propriétaire de chaque outil, vit dans `docs/OUTILLAGE.md`.
+La méthode est vérifiée par la machine autant que possible, mais l'outillage reste minimal : hooks git locaux (format des commits, gitleaks, tests avant push), règle GitHub sur `main`, vérifications automatiques (T0.2), agents. Le garde-fou qui analysait chaque commande de Claude a été retiré (D-022) : il coûtait plus d'attention qu'il n'apportait de sécurité. Les outils du produit (simulateur, visualiseur, banc d'essai, écouteur de phrases…) arrivent avec les tranches qui en ont besoin.

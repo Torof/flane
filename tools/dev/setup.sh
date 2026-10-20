@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Installe les garde-fous locaux de Flâne, à lancer après chaque clonage :
+# Installe les hooks git locaux de Flâne, à lancer après chaque clonage :
 #   - active les hooks git du dépôt (.githooks/) ;
 #   - installe gitleaks (version épinglée, somme de contrôle vérifiée) dans ~/.local/bin ;
 #   - affiche l'état.
@@ -19,14 +19,7 @@ git config core.hooksPath .githooks
 chmod +x .githooks/* tools/dev/*.sh 2>/dev/null || true
 echo "hooks git   : actifs (core.hooksPath = .githooks)"
 
-# 2. python3, requis par le garde-fou de Claude et par pre-commit.
-if command -v python3 >/dev/null 2>&1; then
-  echo "python3     : $(python3 --version 2>&1)"
-else
-  echo "python3     : ABSENT. Le garde-fou de Claude bloquera toute commande tant qu'il manque." >&2
-fi
-
-# 3. gitleaks.
+# 2. gitleaks.
 bin_dir="$HOME/.local/bin"
 current=""
 if command -v gitleaks >/dev/null 2>&1; then

@@ -63,7 +63,6 @@ Ce que cette tranche prépare pour la suite (partage, avis, iOS), sans le dével
 - [ ] Nouvelles permissions Android : nécessaires et justifiées
 - [ ] Ce que la tranche laisse en place pour la suite (identifiants stables, actions, affichage séparé)
 - [ ] Ce que l'utilisateur devra constater à l'étape Observer, et comment
-- [ ] `docs/OUTILLAGE.md` à mettre à jour si la tranche livre un outil
 
 ## Objections de l'avocat du diable
 
