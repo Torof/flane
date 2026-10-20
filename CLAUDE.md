@@ -15,7 +15,7 @@ Le **produit** se décide ensemble : ce que fait l'appli, pourquoi, l'interface,
 3. **Porte Choisir** — l'utilisateur dit oui. Sans ce oui, pas de code. Un « oui » vaut pour le plan présenté juste avant ; « parking » veut dire « note l'idée, ne la traite pas ».
 4. **Construction automatique** — Claude enchaîne seul, sans rien demander : branche, code par petits morceaux, tests, vérifications, audit par `auditeur-securite`, relecture par `relecteur`, corrections, journal et backlog, pull request. Il ne s'arrête que pour ce qui sort du périmètre de la fiche.
 5. **Porte Observer** — l'utilisateur teste sur son téléphone et lit le résumé de la pull request : ce qui a été fait, ce que l'audit a trouvé. Claude met « ne fusionnez pas encore » tant que l'audit n'est pas fini.
-6. **Porte Intégrer** — l'utilisateur fusionne, ou le délègue tranche par tranche. Jamais de fusion sans son accord.
+6. **Porte Intégrer** — dès que l'utilisateur a confirmé le comportement à la porte Observer et que la définition de « fini » est cochée, Claude fusionne lui-même (par merge) et le dit ; il ne demande plus (D-024). Les pull requests de pure documentation (`docs/meta-*`) sont fusionnées directement.
 
 Une seule tranche en cours à la fois. Toute idée nouvelle va au parking (`docs/BACKLOG.md`). Budget dépassé : on s'arrête et on réduit le contenu. Un saut d'étape est possible mais jamais silencieux : signalé, discuté, consigné dans le journal. Détail : `docs/METHODE.md`.
 
@@ -45,7 +45,7 @@ L'utilisateur parle français et anglais : répondre dans la langue de son derni
 
 - **Début** : `/debut`. **Fin** : `/fin`. Une session traite une seule tranche. Après une pause de plus d'une heure : `/fin`, `/clear`, `/debut`.
 - Sur un nouveau clone : `tools/dev/setup.sh` (hooks git et gitleaks).
-- Claude Code tourne en mode « accept edits », avec les commandes courantes autorisées. Seuls demandent un accord : la fusion d'une pull request, un push forcé, une suppression récursive. Jamais `bypassPermissions` ni `--dangerously-skip-permissions`.
+- Claude Code tourne en mode « accept edits », avec les commandes courantes autorisées. Seuls demandent un accord : un push forcé, une suppression récursive. La fusion d'une pull request n'en demande plus (D-024) ; la règle `ask` de `.claude/settings.json` peut être retirée par l'utilisateur. Jamais `bypassPermissions` ni `--dangerously-skip-permissions`.
 - Messages de commit : plusieurs `-m`, format Conventional Commits avec le scope de la tranche (`docs/CONVENTIONS.md`). Corps de pull request par `--body-file` depuis le brouillon de Claude.
 
 ## Où trouver quoi (lire à la demande, pas tout d'un coup)
