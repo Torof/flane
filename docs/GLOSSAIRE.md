@@ -65,7 +65,7 @@ Attention au mot **« étape »**, qui a trois sens. Pour lever l'ambiguïté :
 | Simulateur de trajet | L'outil qui rejoue un trajet enregistré. |
 | Porte | L'un des trois moments où la validation de l'utilisateur est obligatoire : Choisir, Observer, Intégrer (D-016). Entre les portes, Claude enchaîne seul. |
 | Garde-fou | Un contrôle automatique qui bloque une action interdite : hook git (`.githooks/`), règle GitHub sur `main`. Le hook de Claude Code qui analysait chaque commande a été retiré (D-022). |
-| Variante | Une version de l'appli construite avec son propre identifiant Android : `app.flane.dev` pour le développement et les essais, `app.flane` pour la publication (D-015). Les deux cohabitent sur un téléphone. | `APP_VARIANT` dans `app/app.config.ts` |
+| Variante | Une version de l'appli construite avec son propre identifiant Android : `app.flane.dev` pour le développement et les essais, `app.flane` pour la publication (D-015). Les deux cohabitent sur un téléphone. Choisie par `APP_VARIANT` dans `app/app.config.ts`. |
 | Client de développement | L'appli compilée avec `expo-dev-client` : elle charge le code depuis le PC (Metro) et accepte les modules natifs. Ne marche pas sans le PC. Profil EAS `development`. |
 | APK d'essai | L'appli compilée avec le code embarqué, installable et utilisable sans PC. C'est elle qu'on teste à la porte Observer. Profil EAS `preview`. |
 | Boîte de réception | GitHub Issues : les retours et idées venus de l'extérieur, vidés vers le backlog ou le parking à chaque début de session (D-017). |

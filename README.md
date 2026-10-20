@@ -21,16 +21,18 @@ npm run check             # types, lint, formatage, notices SPDX, tests
 npm start                 # serveur de développement (Metro)
 ```
 
-Compilation par EAS Build (compte Expo nécessaire, `eas login`) :
+Tests seuls : `npm test`. Inventaire des licences de production : `npm run licenses`.
+
+Compilation par EAS Build (compte Expo nécessaire, `eas login` ; eas-cli 16.27.0 utilisé ici) :
 
 ```sh
-tools/dev/make-dev-keystore.sh                 # une fois : keystore de développement, hors dépôt
+tools/dev/make-dev-keystore.sh                 # une fois, avant la première compilation : keystore de développement
 cd app
-eas build -p android -e preview                # APK autonome « Flâne (dev) », pour tester sans PC
-eas build -p android -e development            # client de développement, pour coder avec Metro
+EXPO_NO_TELEMETRY=1 eas build -p android -e preview        # APK autonome « Flâne (dev) », pour tester sans PC
+EXPO_NO_TELEMETRY=1 eas build -p android -e development    # client de développement, pour coder avec Metro
 ```
 
-Les deux profils produisent la variante `app.flane.dev` ; `app.flane` est réservé à la version publiée. Pour couper la télémétrie des outils Expo dans votre shell : `export EXPO_NO_TELEMETRY=1`.
+Les deux profils produisent la variante `app.flane.dev` ; `app.flane` est réservé à la version publiée (profil `production`, sans clé pour l'instant : T5.4). Le keystore et `app/credentials.json` restent sur ce PC, ignorés par git : ne les copier nulle part. Pour couper la télémétrie des outils Expo dans votre shell : `export EXPO_NO_TELEMETRY=1`.
 
 ## Contribuer au dépôt
 

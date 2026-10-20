@@ -3,8 +3,9 @@
 # Checks that every code file carries the SPDX licence notice in its first two
 # lines (after an optional shebang). Usage: check-spdx.sh [root-directory]
 # Code files: *.ts *.tsx *.js *.mjs *.cjs *.sh and the git hooks in .githooks/.
-# Skipped: node_modules, android, ios, .expo, dist, coverage, .git, and
-# generated files (expo-env.d.ts). Exit code 1 if at least one notice is missing.
+# Skipped: any directory named node_modules, android, ios, .expo, dist, coverage
+# or .git (at any depth), and declaration files (*.d.ts: generated, or typings
+# copied from elsewhere). Exit code 1 if at least one notice is missing.
 set -euo pipefail
 
 root="${1:-.}"

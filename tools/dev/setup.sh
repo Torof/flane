@@ -23,13 +23,16 @@ echo "hooks git   : actifs (core.hooksPath = .githooks)"
 
 # 2. Node : la version de app/.nvmrc, par nvm quand il est là. Node 22.15.0
 #    ne retrouve pas ses modules dans un chemin qui contient un accent (« Flâne »).
+#    nvm.sh ne supporte pas `set -u` : il tourne dans un sous-shell sans ces options.
 if [ -f app/.nvmrc ]; then
   wanted="$(tr -d '[:space:]' < app/.nvmrc)"
-  if [ -s "${NVM_DIR:-$HOME/.nvm}/nvm.sh" ]; then
-    # shellcheck disable=SC1091
-    . "${NVM_DIR:-$HOME/.nvm}/nvm.sh"
-    nvm install "$wanted" >/dev/null 2>&1 && echo "node        : $wanted installé (nvm use dans app/ pour l'activer)" \
-      || echo "node        : installation de $wanted par nvm impossible ; installer Node $wanted à la main." >&2
+  nvm_sh="${NVM_DIR:-$HOME/.nvm}/nvm.sh"
+  if [ -s "$nvm_sh" ]; then
+    if (set +eu; . "$nvm_sh" >/dev/null; nvm install "$wanted" 2>&1 | tail -n 1); then
+      echo "node        : $wanted disponible (dans app/ : nvm use)"
+    else
+      echo "node        : installation de $wanted par nvm échouée ; installer Node $wanted à la main." >&2
+    fi
   else
     echo "node        : nvm absent ; utiliser Node $wanted (app/.nvmrc)."
   fi

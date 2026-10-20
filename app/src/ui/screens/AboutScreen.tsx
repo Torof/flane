@@ -2,11 +2,12 @@
 import Constants from 'expo-constants';
 import { StyleSheet, Text } from 'react-native';
 import { Screen } from '@/ui/components/Screen';
+import { colors } from '@/ui/theme';
 import { t } from '@/i18n/t';
 
 /** Reads the version from the app configuration, never from a translated string. */
 export function appVersion(): string {
-  return Constants.expoConfig?.version ?? '?';
+  return Constants.expoConfig?.version ?? t('about.versionUnknown');
 }
 
 export function AboutScreen() {
@@ -26,6 +27,6 @@ const styles = StyleSheet.create({
   line: {
     fontSize: 15,
     lineHeight: 22,
-    color: '#555555',
+    color: colors.textMuted,
   },
 });

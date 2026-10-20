@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 import type { ConfigContext, ExpoConfig } from 'expo/config';
+import { version } from './package.json';
 
 /**
  * Build variant. `development` and `preview` share the `app.flane.dev`
@@ -21,7 +22,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   ...config,
   name: isProduction ? 'Flâne' : 'Flâne (dev)',
   slug: 'flane',
-  version: '0.0.1',
+  version,
   orientation: 'portrait',
   icon: './assets/icon.png',
   scheme: 'flane',
@@ -38,11 +39,13 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     // shows up in the built manifest is listed in blockedPermissions.
     permissions: [],
     blockedPermissions: [],
+    // Android auto-backup would copy the app's private data to Google Drive.
+    // Nothing is stored yet; off from the start so that it never happens (docs/DONNEES.md).
+    allowBackup: false,
     predictiveBackGestureEnabled: false,
   },
   plugins: ['expo-router'],
   extra: {
-    variant,
     eas: {
       projectId: '77f1c432-03e1-482a-9767-d4e73a41def1',
     },

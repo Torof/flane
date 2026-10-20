@@ -4,8 +4,10 @@
 # and the credentials.json EAS reads (credentialsSource: local). Both files stay
 # out of git (.gitignore). Losing them only means regenerating and reinstalling
 # the development app. The release keystore is a separate matter (T5.4).
-# Usage: tools/dev/make-dev-keystore.sh   (idempotent: does nothing if present)
+# The keystore is PKCS12 (the format EAS expects); the .jks name is EAS's convention.
+# Usage: tools/dev/make-dev-keystore.sh   (idempotent: does nothing if both files exist)
 set -euo pipefail
+umask 077
 
 root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 app="$root/app"
@@ -18,18 +20,27 @@ if [ -f "$keystore" ] && [ -f "$credentials" ]; then
   echo "dev keystore: already present ($keystore)"
   exit 0
 fi
+if [ -f "$keystore" ] || [ -f "$credentials" ]; then
+  echo "dev keystore: only one of $keystore and $credentials exists. Remove both, then run again." >&2
+  exit 1
+fi
 
-command -v keytool >/dev/null 2>&1 || { echo "keytool (Java) is required." >&2; exit 1; }
+for tool in keytool python3; do
+  command -v "$tool" >/dev/null 2>&1 || { echo "$tool is required." >&2; exit 1; }
+done
 
 mkdir -p "$dir"
 chmod 700 "$dir"
-password="$(python3 -c 'import secrets; print(secrets.token_urlsafe(24))')"
+FLANE_DEV_KEYSTORE_PASSWORD="$(python3 -c 'import secrets; print(secrets.token_urlsafe(24))')"
+export FLANE_DEV_KEYSTORE_PASSWORD
+password="$FLANE_DEV_KEYSTORE_PASSWORD"
 
-keytool -genkeypair -v \
+# The password is read from the environment, so it never appears in `ps`.
+keytool -genkeypair \
   -keystore "$keystore" -storetype PKCS12 \
   -alias "$alias" -keyalg RSA -keysize 2048 -validity 10000 \
-  -storepass "$password" -keypass "$password" \
-  -dname "CN=Flane dev, O=Flane, C=FR" >/dev/null 2>&1
+  -storepass:env FLANE_DEV_KEYSTORE_PASSWORD -keypass:env FLANE_DEV_KEYSTORE_PASSWORD \
+  -dname "CN=Flane dev, O=Flane, C=FR" >/dev/null
 
 cat > "$credentials" <<JSON
 {

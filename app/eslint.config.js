@@ -14,14 +14,21 @@ const platformAndInterface = [
   'expo/*',
   'expo-*',
   '@expo/*',
+  '@react-native-*/*',
+  '@react-native/*',
+  '@react-navigation/*',
+  '@maplibre/*',
   '@/app',
   '@/app/*',
   '@/ui',
   '@/ui/*',
   '@/services',
   '@/services/*',
+  '**/app',
   '**/app/*',
+  '**/ui',
   '**/ui/*',
+  '**/services',
   '**/services/*',
 ];
 
@@ -45,7 +52,17 @@ module.exports = [
   },
   {
     files: ['src/domain/**', 'src/engine/**'],
+    plugins: { '@typescript-eslint': typescriptPlugin },
     rules: {
+      // require() and import() would bypass no-restricted-imports.
+      '@typescript-eslint/no-require-imports': 'error',
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector: 'ImportExpression',
+          message: 'No dynamic import in the domain or the engine (docs/CONVENTIONS.md).',
+        },
+      ],
       'no-restricted-imports': [
         'error',
         {

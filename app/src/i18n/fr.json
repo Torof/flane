@@ -11,5 +11,6 @@
   "about.version": "Version",
   "about.license": "Logiciel libre sous licence AGPL-3.0-or-later.",
   "about.source": "Code source : github.com/Torof/flane",
-  "about.osm": "Données cartographiques © les contributeurs d'OpenStreetMap, sous licence ODbL."
+  "about.osm": "Données cartographiques © les contributeurs d'OpenStreetMap, sous licence ODbL.",
+  "about.versionUnknown": "inconnue"
 }

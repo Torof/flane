@@ -31,9 +31,6 @@
     },
     "production": {
       "node": "24.22.0",
-      "android": {
-        "credentialsSource": "local"
-      },
       "env": {
         "APP_VARIANT": "production",
         "EXPO_NO_TELEMETRY": "1"
