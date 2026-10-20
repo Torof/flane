@@ -14,6 +14,7 @@ Chaque donnée que Flâne touche, où elle vit, pourquoi, et combien de temps. C
 | Notes personnelles (« j'aime », « pas pour moi ») | Apprendre les goûts | Stockage privé de l'appli | Non | Jusqu'à suppression par l'utilisateur |
 | Journaux techniques | Diagnostiquer les bugs | Stockage privé de l'appli | Seulement si l'utilisateur les exporte lui-même | Rotation courte (à définir) ; **jamais de position** |
 | Adresse IP | Effet technique de toute connexion | — | Visible par le serveur de paquets (avec la région demandée) et par le serveur d'itinéraire | À limiter côté serveur (pas de journalisation ou journalisation courte) |
+| Appel au serveur de mises à jour (variante de test `app.flane.dev` seulement, D-023) | Recevoir le code de la nouvelle tranche sans réinstaller | — | Oui, vers les serveurs d'Expo (EAS Update), à chaque ouverture : version native, plateforme, canal, version de l'appli, un identifiant aléatoire propre à l'installation, adresse IP. Expo en tire des comptes de lancements par mise à jour. Jamais de position ni de trajet. La variante publiée `app.flane` n'appelle pas ce serveur ; décision en T5.4 | Côté Expo, selon leur politique ; l'identifiant d'installation disparaît avec l'appli |
 
 Aucun compte utilisateur, aucun identifiant publicitaire, aucun outil de statistiques.
 

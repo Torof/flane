@@ -18,6 +18,13 @@ function readVariant(raw: string | undefined): Variant {
 const variant = readVariant(process.env.APP_VARIANT);
 const isProduction = variant === 'production';
 
+const EAS_PROJECT_ID = '77f1c432-03e1-482a-9767-d4e73a41def1';
+
+/** Only the test variant receives instant updates (D-023). */
+export function updatesEnabledFor(v: Variant): boolean {
+  return v === 'preview';
+}
+
 export default ({ config }: ConfigContext): ExpoConfig => ({
   ...config,
   name: isProduction ? 'Flâne' : 'Flâne (dev)',
@@ -27,6 +34,16 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   icon: './assets/icon.png',
   scheme: 'flane',
   userInterfaceStyle: 'light',
+  // The native fingerprint: changes only when a native module or a native
+  // setting changes, and then a new APK is needed (docs/CONVENTIONS.md).
+  runtimeVersion: { policy: 'fingerprint' },
+  updates: {
+    url: `https://u.expo.dev/${EAS_PROJECT_ID}`,
+    enabled: updatesEnabledFor(variant),
+    checkAutomatically: 'ON_LOAD',
+    // Never wait for the network at start-up: a downloaded update applies on the next launch.
+    fallbackToCacheTimeout: 0,
+  },
   android: {
     package: isProduction ? 'app.flane' : 'app.flane.dev',
     adaptiveIcon: {
@@ -52,7 +69,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   plugins: ['expo-router'],
   extra: {
     eas: {
-      projectId: '77f1c432-03e1-482a-9767-d4e73a41def1',
+      projectId: EAS_PROJECT_ID,
     },
   },
 });

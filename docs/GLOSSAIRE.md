@@ -68,6 +68,9 @@ Attention au mot **« étape »**, qui a trois sens. Pour lever l'ambiguïté :
 | Variante | Une version de l'appli construite avec son propre identifiant Android : `app.flane.dev` pour le développement et les essais, `app.flane` pour la publication (D-015). Les deux cohabitent sur un téléphone. Choisie par `APP_VARIANT` dans `app/app.config.ts`. |
 | Client de développement | L'appli compilée avec `expo-dev-client` : elle charge le code depuis le PC (Metro) et accepte les modules natifs. Ne marche pas sans le PC. Profil EAS `development`. |
 | APK d'essai | L'appli compilée avec le code embarqué, installable et utilisable sans PC. C'est elle qu'on teste à la porte Observer. Profil EAS `preview`. |
+| Mise à jour instantanée | Le code JavaScript d'une tranche livré à l'APK d'essai sans réinstallation (EAS Update, `expo-updates`), publié par Claude à la porte Observer sur le canal `preview`. Réservé à `app.flane.dev` (D-023). |
+| Version native | L'empreinte des modules natifs de l'APK (`runtimeVersion`). Une mise à jour instantanée ne s'applique qu'à la même version native ; quand elle change, il faut un nouvel APK. Visible dans « À propos ». |
+| Canal | Le nom sous lequel un APK reçoit ses mises à jour instantanées (`preview`). Un futur canal `beta` servira aux testeurs amis. |
 | Boîte de réception | GitHub Issues : les retours et idées venus de l'extérieur, vidés vers le backlog ou le parking à chaque début de session (D-017). |
 
 ## L'étape 2 (pour mémoire)

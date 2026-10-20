@@ -22,7 +22,7 @@ Une méthode pour construire à deux (l'utilisateur et Claude) : les forces de l
 | 2. Discuter | On confronte la fiche ; `avocat-du-diable` l'attaque | Les objections ont une réponse |
 | 3. Choisir | L'utilisateur valide explicitement | Date de validation dans la fiche |
 | 4. Construire | Branche dédiée, petits morceaux, tests | Le code fait ce que dit la fiche, les tests passent |
-| 5. Observer | L'utilisateur constate le résultat : sur son téléphone (simulateur, banc d'essai), ou, pour une tranche sans appli (jalon 0, données), en vérifiant lui-même le résultat (dépôt, visualiseur, rapport) | L'utilisateur confirme le comportement |
+| 5. Observer | L'utilisateur constate le résultat : sur son téléphone (par la mise à jour instantanée de la version de test, publiée par Claude depuis le dernier commit de la pull request ; un nouvel APK seulement quand la version native change, et la pull request le dit), ou, pour une tranche sans appli (jalon 0, données), en vérifiant lui-même le résultat (dépôt, visualiseur, rapport) | L'utilisateur confirme le comportement |
 | 6. Sécuriser | `auditeur-securite` et `relecteur` ; vérifications automatiques. Enchaîné par Claude sans demander, avant la pull request | Aucun point bloquant ouvert |
 | 7. Valider et consigner | Définition de « fini », intégration, documentation | Toutes les cases de « fini » cochées |
 

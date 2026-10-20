@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 import { render } from '@testing-library/react-native';
-import { AboutScreen, appVersion } from './AboutScreen';
+import { AboutScreen, appVersion, updateLine } from './AboutScreen';
 import { PreferencesScreen } from './PreferencesScreen';
 import { TripScreen } from './TripScreen';
 
@@ -8,6 +8,12 @@ const mockConstants: { expoConfig: { version?: string } | null } = {
   expoConfig: { version: '1.2.3' },
 };
 // The getter reads the state at call time, after the hoisted mock factory has run.
+jest.mock('expo-updates', () => ({
+  isEnabled: true,
+  isEmbeddedLaunch: true,
+  createdAt: null,
+  runtimeVersion: 'd2d3412e6003c7632900308047f5ea000a6aa552',
+}));
 jest.mock('expo-constants', () => ({
   __esModule: true,
   default: {
@@ -32,9 +38,21 @@ describe('tab screens', () => {
     const { getByRole, getByText } = await render(<AboutScreen />);
     expect(getByRole('header', { name: 'À propos' })).toBeTruthy();
     expect(getByText('Version 1.2.3')).toBeTruthy();
+    expect(getByText('Version native d2d3412e')).toBeTruthy();
+    expect(getByText('Code embarqué')).toBeTruthy();
     expect(getByText(/AGPL-3.0-or-later/)).toBeTruthy();
     expect(getByText(/github.com\/Torof\/flane/)).toBeTruthy();
     expect(getByText(/OpenStreetMap/)).toBeTruthy();
+  });
+
+  it('About says when an update has been received, and when updates are off', () => {
+    const receivedAt = new Date(2026, 9, 20, 18, 0);
+    expect(updateLine({ kind: 'received', nativeVersion: 'd2d3412e', receivedAt })).toBe(
+      `Mise à jour du ${receivedAt.toLocaleString('fr-FR')}`,
+    );
+    expect(updateLine({ kind: 'disabled', nativeVersion: '?' })).toBe(
+      'Mises à jour instantanées désactivées',
+    );
   });
 
   it('About falls back to a translated text when the version is unknown', () => {
