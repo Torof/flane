@@ -4,7 +4,7 @@ Statuts : **Idée** → **Prête** (fiche validée) → **En cours** → **À te
 
 ## En cours
 
-**T0.1b — Kit Claude : zéro interruption inutile**, étape du cycle : voir la fiche. Fiche : `docs/tranches/T0.1b-claude-kit.md`. Branche : `chore/T0.1b-claude-kit`. Budget : 1 session, validée le 2026-10-20.
+Aucune tranche en cours. Prochaine : **T0.2** (vérifications automatiques), fiche à planifier. T0.1c (démarrage automatique) peut passer avant si l'utilisateur le souhaite.
 
 ## Questions ouvertes
 
@@ -22,7 +22,7 @@ Statuts : **Idée** → **Prête** (fiche validée) → **En cours** → **À te
 | ID | Tranche | Statut |
 | --- | --- | --- |
 | T0.1 | Dépôt et garde-fous : hooks git locaux dans `.githooks/` (secrets avec gitleaks, format des commits, pré-push) avec banc de tests, garde-fou de Claude durci et fermé par défaut, `.editorconfig`, licence AGPL-3.0 et passage en public, modèles d'issues et de PR (définition de « fini » en cases), réglages GitHub (règle sur `main`, recherche de secrets, alertes), D-017 à D-019. Fiche `docs/tranches/T0.1-repo-conventions.md`, branche `chore/T0.1-repo-conventions`, budget 2 sessions, faite en 1 | Faite |
-| T0.1b | Kit Claude, zéro interruption inutile : mode « accept edits » (D-020), liste `allow` figée et testée, garde-fou durci pour que son silence vaille accord, `settings.local.json` contrôlé, conventions de commande, D-021 (qui décide quoi). Fiche `docs/tranches/T0.1b-claude-kit.md`, budget 1 session | En cours |
+| T0.1b | Kit Claude, zéro interruption inutile : mode « accept edits » (D-020), liste `allow` figée et testée, garde-fou durci pour que son silence vaille accord, `settings.local.json` contrôlé, conventions de commande, D-021 (qui décide quoi). Fiche `docs/tranches/T0.1b-claude-kit.md`, budget 1 session | Faite |
 | T0.1c | Démarrage automatique de session : hook `SessionStart` (journal, backlog, branche, arbre, issues ouvertes : titres nettoyés et tronqués des auteurs de confiance, jamais le corps, plafond en octets, délai sur `gh`), `/debut` adapté, boîte de réception listée. Budget 1 session | Idée |
 | T0.2 | Vérifications automatiques (GitHub Actions) : types, lint, tests, audit des dépendances, recherche de secrets, licences, `expo-doctor`, vérification de la méthode (cases de « fini » cochées, journal modifié avec le code), exécution hebdomadaire, actions épinglées par commit et permissions minimales, `dependabot.yml` (`github-actions`), CodeQL ; vérifications exigées par la règle sur `main` ; filtre de sortie des tests pour Claude | Idée |
 | T0.3 | Squelette de l'appli Expo : TypeScript strict, ESLint et Prettier, hook de format et lint à l'écriture pour Claude, fichiers de traduction, notice SPDX en tête des fichiers, `.npmrc` (`ignore-scripts`, `save-exact`), `.nvmrc`, Dependabot `npm`, compilation de développement installée sur Android | Idée |

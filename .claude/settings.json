@@ -22,6 +22,8 @@
       "Write(./.githooks/**)",
       "Edit(./.github/**)",
       "Write(./.github/**)",
+      "Edit(./.git/**)",
+      "Write(./.git/**)",
       "Edit(./tools/dev/**)",
       "Write(./tools/dev/**)",
       "Edit(./CLAUDE.md)",
@@ -73,7 +75,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash \"${CLAUDE_PROJECT_DIR}/.claude/hooks/garde-branche-main.sh\""
+            "command": "f=\"${CLAUDE_PROJECT_DIR}/.claude/hooks/garde-branche-main.sh\"; if [ -f \"$f\" ]; then bash \"$f\"; else echo 'Bloqué par le garde-fou Flâne : script du garde-fou absent, ne pas contourner.' >&2; exit 2; fi"
           }
         ]
       }
