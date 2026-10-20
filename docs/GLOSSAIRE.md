@@ -71,6 +71,9 @@ Attention au mot **« étape »**, qui a trois sens. Pour lever l'ambiguïté :
 | Mise à jour instantanée | Le code JavaScript d'une tranche livré à l'APK d'essai sans réinstallation (EAS Update, `expo-updates`), publié par Claude à la porte Observer sur le canal `preview`. Réservé à `app.flane.dev` (D-023). |
 | Version native | L'empreinte des modules natifs de l'APK (`runtimeVersion`). Une mise à jour instantanée ne s'applique qu'à la même version native ; quand elle change, il faut un nouvel APK. Visible dans « À propos ». |
 | Canal | Le nom sous lequel un APK reçoit ses mises à jour instantanées (`preview`). Un futur canal `beta` servira aux testeurs amis. |
+| Vérifications automatiques | Le workflow GitHub Actions `checks` (`app-check`, `secrets-check`, `deps-check`) qui contrôle chaque pull request. `app-check` et `secrets-check` sont **obligatoires** : la règle `protect-main` refuse la fusion tant qu'ils ne sont pas verts. |
+| Alerte acceptée | Une alerte `npm audit` haute ou critique que `deps-check` ne bloque pas, parce que le paquet n'est chargé par aucun module de l'appli (outillage sur le PC). Inscrite dans `tools/dev/audit-accepted.json` avec ses chemins et sa date (`docs/CONVENTIONS.md`). |
+| Tranche de dépendances | La tranche courte qui reprend une pull request Dependabot entre deux tranches (D-025). |
 | Boîte de réception | GitHub Issues : les retours et idées venus de l'extérieur, vidés vers le backlog ou le parking à chaque début de session (D-017). |
 
 ## L'étape 2 (pour mémoire)

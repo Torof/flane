@@ -4,7 +4,7 @@ Statuts : **Idée** → **Prête** (fiche validée) → **En cours** → **À te
 
 ## En cours
 
-Aucune tranche en cours. Prochaine : **T0.2** (vérifications automatiques GitHub Actions ; choix de l'utilisateur déjà pris : fusion bloquée si rouge, Dependabot mensuel groupé, audit bloquant pour le code embarqué seulement), puis T0.4 (historique des versions et étiquettes Git).
+**T0.2** — Vérifications automatiques (GitHub Actions), fiche `docs/tranches/T0.2-ci-checks.md`, validée le 2026-10-20, branche `chore/T0.2-ci-checks`. Ensuite T0.4 (historique des versions et étiquettes Git, qui reprend le contrôle « la version monte quand `app/` change »).
 
 ## Questions ouvertes
 
@@ -24,7 +24,7 @@ Aucune tranche en cours. Prochaine : **T0.2** (vérifications automatiques GitHu
 | --- | --- | --- |
 | T0.1 | Dépôt et conventions : hooks git locaux dans `.githooks/` (secrets avec gitleaks, format des commits, pré-push), `.editorconfig`, licence AGPL-3.0 et passage en public, modèles d'issues et de PR, réglages GitHub (règle sur `main`, recherche de secrets, alertes), D-017 à D-019. Le garde-fou de Claude livré ici a été retiré ensuite (D-022) | Faite |
 | T0.1b | Kit Claude : mode « accept edits », D-021 (qui décide quoi). La liste `allow` figée et le garde-fou durci ont été retirés (D-022) | Faite, puis simplifiée |
-| T0.2 | Vérifications automatiques (GitHub Actions) : types, lint, tests, audit des dépendances, recherche de secrets, licences ; exigées par la règle sur `main` ; Dependabot ; résumé court des échecs pour Claude | Idée |
+| T0.2 | Vérifications automatiques (GitHub Actions) : types, lint, tests, audit des dépendances, recherche de secrets, licences ; exigées par la règle sur `main` ; Dependabot ; résumé court des échecs pour Claude | En cours |
 | T0.3 | Squelette de l'appli Expo : TypeScript strict, ESLint et Prettier, fichiers de traduction, notice SPDX en tête des fichiers, `.npmrc` (`ignore-scripts`, `save-exact`), `.nvmrc`, trois onglets vides, variantes `app.flane.dev` / `app.flane`, APK `preview` et client de développement par EAS Build | Faite |
 | T0.5 | Mises à jour instantanées (EAS Update) pour la variante de test `app.flane.dev`, version native visible, une version par tranche (D-023) ; passée avant T0.2 à la demande de l'utilisateur pour accélérer la boucle de test | Faite |
 | T0.4 | Historique des versions automatique (à partir des messages de commit) et étiquettes Git par version | Idée |

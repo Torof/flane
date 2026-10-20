@@ -11,7 +11,7 @@ Fixées une fois pour toutes, pour ne plus y penser. Validées à la tranche T0.
 
 ## Branches
 
-- `main` : toujours stable. Jamais de modification directe. Deux verrous : les hooks git locaux (`.githooks/`, activés par `tools/dev/setup.sh`) et la règle GitHub sur `main` (pas de push direct, pas de push forcé, pas de suppression ; disponible depuis le passage en public, D-019). Un push forcé sur une branche de travail est demandé à l'utilisateur et consigné dans le journal.
+- `main` : toujours stable. Jamais de modification directe. Deux verrous : les hooks git locaux (`.githooks/`, activés par `tools/dev/setup.sh`) et la règle GitHub `protect-main` (pas de push direct, pas de push forcé, pas de suppression, pull request obligatoire, vérifications `app-check` et `secrets-check` obligatoires ; disponible depuis le passage en public, D-019 ; appliquée par `tools/dev/github-settings.sh`). Un push forcé sur une branche de travail est demandé à l'utilisateur et consigné dans le journal.
 - Une branche par tranche : `feat/T1.2-osm-extract`, `fix/T2.4-route-timeout`, `chore/T0.2-ci`.
 - Documentation hors tranche (journal entre deux tranches, réponses aux questions ouvertes, bilan de jalon) : branche `docs/meta-AAAA-MM-JJ`.
 - Intégration par pull request, après la définition de « fini ». Le journal et le backlog sont mis à jour dans la pull request elle-même, avant l'intégration. Fusion par merge uniquement, squash et rebase désactivés (D-018) ; la branche est supprimée après fusion.
@@ -130,6 +130,26 @@ Les écrans vivent dans `src/ui/`. Les fichiers de `src/app/` sont des **routes 
 - `npm audit` : aucune alerte haute ou critique dans du code embarqué dans l'appli. `npm audit --omit=dev` compte aussi l'outillage qu'`expo` tire (CLI, Metro) : ces alertes-là sont listées dans la pull request avec leur chaîne `npm explain`, et suivies jusqu'au correctif amont.
 - Licences des dépendances de production inventoriées par `tools/dev/licenses.mjs` (liste des licences acceptées dans le script).
 - Préférer une petite fonction maison à une grosse bibliothèque pour un besoin simple.
+- **Alertes acceptées** (`tools/dev/audit-accepted.json`) : une alerte haute ou critique de `npm audit --omit=dev` bloque `deps-check`, sauf si elle est acceptée. Critère d'acceptation : le paquet vulnérable n'est requis par aucun module chargé à l'exécution de l'appli (bundle Metro ou code natif). Une entrée porte l'identifiant GHSA, le paquet, la plage vulnérable, `requiredBy` (les paquets qui le requièrent) et `reachableFrom` (les dépendances directes qui y mènent), tels que `tools/dev/audit.mjs` les calcule depuis le fichier de verrouillage, la raison et la date de revue. Si la plage ou les chemins changent, l'acceptation tombe. Une acceptation de plus de 90 jours est signalée par le résumé du job et par `/debut`. Chaque entrée est relue par l'audit de sécurité de la tranche qui la touche.
+- **Pull requests Dependabot** (D-025) : jamais fusionnées telles quelles. Entre deux tranches, Claude ouvre une tranche `chore/Tx.y-deps-AAAA-MM` à fiche courte : diff, `npm explain` des paquets touchés, `npx expo install --check` pour la famille Expo et React (que Dependabot ignore, `.github/dependabot.yml`), empreinte native avant et après (si elle change, nouvel APK), version montée, commits au bon format ; puis il ferme la pull request Dependabot.
+
+## Vérifications automatiques
+
+Le workflow `checks` (`.github/workflows/checks.yml`) tourne sur chaque pull request et sur chaque push de `main` :
+
+| Job | Fait | Obligatoire sur `main` |
+| --- | --- | --- |
+| `app-check` | `npm ci` puis `npm run check` (types, lint, formatage, notices SPDX, tests) et `npm run licenses` dans `app/` | Oui |
+| `secrets-check` | gitleaks sur tout l'historique (sortie expurgée, aucun rapport déposé) ; refus d'une configuration gitleaks du dépôt et des annotations d'exception, comme le hook `pre-commit` | Oui |
+| `deps-check` | tests de `tools/dev/audit.mjs`, puis `npm audit --omit=dev` comparé aux alertes acceptées ; tourne aussi chaque lundi sur `main` | Non : rendu bloquant par la revue quand la pull request touche `app/package.json` ou `app/package-lock.json` |
+
+Règles :
+- Les noms des jobs `app-check` et `secrets-check` sont inscrits dans la règle `protect-main` : les renommer sans relancer `tools/dev/github-settings.sh` bloque toute pull request.
+- Les actions GitHub sont épinglées par SHA de commit (le dépôt l'exige) et limitées à celles de GitHub ; Dependabot propose les montées.
+- Un échec se lit en une commande : `gh run view <id> --log-failed`, ou le résumé du job dans l'onglet Actions (la première ligne nomme le job et la cause).
+- `deps-check` n'est pas une vérification obligatoire : un avis publié dans la nuit ne doit pas bloquer une pull request de documentation. Quand une pull request touche les fichiers de paquets, Claude le traite comme bloquant : pas de fusion tant qu'il est rouge.
+- **Sortie de secours** : si GitHub Actions ou le registre npm est en panne et qu'un correctif doit entrer, l'utilisateur retire la vérification obligatoire depuis l'interface de la règle (Settings → Rules → `protect-main`), Claude le consigne dans le journal, et la règle est rétablie par `tools/dev/github-settings.sh` juste après la fusion.
+- La version et la somme de contrôle de gitleaks vivent dans `tools/dev/gitleaks.env`, lues par `setup.sh`, le hook `pre-commit` et le workflow.
 
 ## Fichiers de documentation
 

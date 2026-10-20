@@ -1,5 +1,7 @@
 # Flâne
 
+[![checks](https://github.com/Torof/flane/actions/workflows/checks.yml/badge.svg)](https://github.com/Torof/flane/actions/workflows/checks.yml)
+
 Le compagnon de route qui te souffle où t'arrêter, pour faire du trajet une partie du voyage.
 
 Flâne est une appli mobile (Android d'abord) qui suggère les bons arrêts sur un trajet : points de vue, pique-nique, boulangeries de village, balades pour les chiens, baignades. Elle s'appuie sur des données ouvertes (OpenStreetMap, DATAtourisme), calcule tout sur le téléphone, et laisse la navigation à Google Maps ou Waze.
@@ -36,7 +38,7 @@ EXPO_NO_TELEMETRY=1 eas build -p android -e development    # client de développ
 
 ## Contribuer au dépôt
 
-Après avoir cloné : `tools/dev/setup.sh` active les hooks git du projet (format des commits, recherche de secrets, vérifications avant envoi), installe gitleaks dans `~/.local/bin` et la version de Node attendue. Méthode et conventions : [`docs/METHODE.md`](docs/METHODE.md), [`docs/CONVENTIONS.md`](docs/CONVENTIONS.md).
+Après avoir cloné : `tools/dev/setup.sh` active les hooks git du projet (format des commits, recherche de secrets, vérifications avant envoi), installe gitleaks dans `~/.local/bin` et la version de Node attendue. Chaque pull request passe les vérifications automatiques (`.github/workflows/checks.yml` : types, lint, formatage, notices SPDX, tests, licences, secrets, audit des dépendances) ; `main` refuse la fusion tant qu'elles ne sont pas vertes. Méthode et conventions : [`docs/METHODE.md`](docs/METHODE.md), [`docs/CONVENTIONS.md`](docs/CONVENTIONS.md).
 
 ## Licence
 

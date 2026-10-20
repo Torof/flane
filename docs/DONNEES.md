@@ -18,6 +18,8 @@ Chaque donnée que Flâne touche, où elle vit, pourquoi, et combien de temps. C
 
 Aucun compte utilisateur, aucun identifiant publicitaire, aucun outil de statistiques.
 
+**Vérifications automatiques (GitHub Actions, T0.2)** : elles ne touchent aucune donnée d'usage. GitHub reçoit le code du dépôt, déjà public, et les runners téléchargent les paquets npm et gitleaks. Journaux et résumés des jobs sont publics : la recherche de secrets sort expurgée (règle, fichier, ligne, jamais la valeur) et ne dépose aucun rapport.
+
 **Retours des utilisateurs par GitHub Issues** (dépôt public depuis T0.1) : ce qu'un utilisateur y écrit est public et hors de notre contrôle. Les modèles d'issues demandent un tronçon approximatif (« entre Briançon et Embrun ») et interdisent coordonnées, adresses et captures d'écran montrant la position. Le bouton « signaler un problème » de l'appli (T5.3) suivra la même règle : export des journaux sans position, jamais de position dans une issue.
 
 ## Données publiques utilisées
