@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+# Hook commit-msg Flâne : impose le format des messages de commit
+# (docs/CONVENTIONS.md) : type(Tx.y|meta): sujet. Les messages de fusion
+# produits par git ou GitHub et les « Revert » passent. Tout le reste est refusé.
+set -u
+
+file="${1:-}"
+if [ -z "$file" ] || [ ! -r "$file" ]; then
+  echo "commit-msg : fichier de message introuvable. Commit refusé." >&2
+  exit 1
+fi
+
+# Première ligne utile : ni commentaire, ni vide.
+subject="$(grep -v '^#' "$file" | grep -m1 -v '^[[:space:]]*$' || true)"
+
+conventional='^(feat|fix|docs|test|refactor|chore|perf)\((T[0-9]+\.[0-9]+[a-z]?|meta)\)!?: .+'
+revert='^Revert "'
+merge='^Merge (branch|pull request #[0-9]+) '
+
+if printf '%s' "$subject" | grep -Eq "$conventional" \
+  || printf '%s' "$subject" | grep -Eq "$revert" \
+  || printf '%s' "$subject" | grep -Eq "$merge"; then
+  exit 0
+fi
+
+cat >&2 <<EOF
+commit-msg : message refusé.
+  Reçu   : ${subject:-(vide)}
+  Attendu: type(scope): sujet
+    type  : feat | fix | docs | test | refactor | chore | perf
+    scope : identifiant de tranche (T0.1, T0.1b, T2.4…) ou meta
+  Exemples :
+    feat(T1.2): extract viewpoints and picnic sites from OSM
+    docs(meta): update journal after T0.1
+    fix(T2.4)!: change route request format
+  Voir docs/CONVENTIONS.md. Les hooks ne se contournent pas (--no-verify est bloqué).
+EOF
+exit 1

@@ -1,0 +1,78 @@
+#!/usr/bin/env bash
+# Hook pre-commit Flâne : recherche de secrets dans les fichiers indexés avec
+# gitleaks (version épinglée dans tools/dev/setup.sh). En cas de doute, on
+# refuse : gitleaks absent ou en erreur = commit refusé. Le secret lui-même
+# n'est jamais affiché.
+set -u
+
+EXPECTED_VERSION="8.30.1"
+
+find_gitleaks() {
+  if command -v gitleaks >/dev/null 2>&1; then
+    command -v gitleaks
+  elif [ -x "${HOME:-/nonexistent}/.local/bin/gitleaks" ]; then
+    printf '%s\n' "$HOME/.local/bin/gitleaks"
+  fi
+}
+
+gitleaks_bin="$(find_gitleaks)"
+if [ -z "$gitleaks_bin" ]; then
+  cat >&2 <<EOF
+pre-commit : gitleaks introuvable (ni dans le PATH, ni dans ~/.local/bin).
+  Lancer tools/dev/setup.sh pour l'installer (version $EXPECTED_VERSION, somme de contrôle vérifiée).
+  Commit refusé : la recherche de secrets est obligatoire.
+EOF
+  exit 1
+fi
+
+version="$("$gitleaks_bin" version 2>/dev/null | tr -d '[:space:]' | sed 's/^v//')"
+if [ "$version" != "$EXPECTED_VERSION" ]; then
+  echo "pre-commit : gitleaks $version détecté, $EXPECTED_VERSION attendue (avertissement, voir tools/dev/setup.sh)." >&2
+fi
+
+root="$(git rev-parse --show-toplevel 2>/dev/null)" || {
+  echo "pre-commit : pas dans un dépôt git. Commit refusé." >&2
+  exit 1
+}
+cd "$root" || exit 1
+
+report="$(mktemp)"
+log="$(mktemp)"
+trap 'rm -f "$report" "$log"' EXIT
+
+"$gitleaks_bin" git --pre-commit --staged --redact --no-banner --log-level error \
+  --exit-code 1 --report-format json --report-path "$report" >"$log" 2>&1
+rc=$?
+
+if [ "$rc" -eq 0 ]; then
+  exit 0
+fi
+
+# Rapport non vide : des secrets ont été trouvés. Afficher la règle, le fichier
+# et la ligne, jamais la valeur.
+if [ -s "$report" ] && command -v python3 >/dev/null 2>&1; then
+  findings="$(python3 -I - "$report" <<'PY'
+import json, sys
+try:
+    with open(sys.argv[1], encoding="utf-8") as f:
+        results = json.load(f) or []
+except Exception:
+    results = []
+for r in results:
+    print(f"  règle {r.get('RuleID', '?')}, fichier {r.get('File', '?')}, ligne {r.get('StartLine', '?')}")
+PY
+)"
+  if [ -n "$findings" ]; then
+    cat >&2 <<EOF
+pre-commit : secret détecté, commit refusé.
+$findings
+  Retirer le secret du fichier (et le révoquer s'il est réel). Aucune exception
+  gitleaks (.gitleaksignore, gitleaks:allow) sans justification écrite dans le commit.
+EOF
+    exit 1
+  fi
+fi
+
+echo "pre-commit : gitleaks a échoué (code $rc) sans résultat exploitable : doute, commit refusé." >&2
+tail -n 5 "$log" >&2 2>/dev/null || true
+exit 1

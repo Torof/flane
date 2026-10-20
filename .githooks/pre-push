@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+# Hook pre-push Flâne : types, lint et tests avant d'envoyer, dès que l'appli
+# existe (app/package.json). Tant qu'elle n'existe pas, ne fait rien.
+# Les noms des scripts npm sont fixés en T0.3.
+set -u
+
+root="$(git rev-parse --show-toplevel 2>/dev/null)" || exit 1
+if [ ! -f "$root/app/package.json" ]; then
+  exit 0
+fi
+
+cd "$root/app" || exit 1
+npm run --silent typecheck && npm run --silent lint && npm test --silent
