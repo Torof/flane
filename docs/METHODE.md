@@ -36,7 +36,7 @@ La validation de l'utilisateur est obligatoire à trois moments, et seulement l�
 | --- | --- | --- |
 | **Choisir** | La fiche de tranche, après l'avocat du diable | Le code, dans le périmètre de la fiche et pas au-delà |
 | **Observer** | Le résultat, constaté sur son téléphone ou dans le dépôt | Le passage à Sécuriser puis Valider |
-| **Intégrer** | La fusion de la pull request (délégable à Claude, tranche par tranche) | L'intégration à `main` |
+| **Intégrer** | La fusion de la pull request, faite par Claude dès que la porte Observer est passée et la définition de « fini » cochée (D-024) ; l'utilisateur n'a plus à la demander ni à l'accorder | L'intégration à `main` |
 
 Entre les portes, Claude enchaîne seul : branche, code par petits morceaux, tests, commits, push, pull request, agents de vérification, correction de leurs points bloquants dans le périmètre de la fiche, journal et backlog. Il rend compte à chaque porte par un résumé court. Il s'arrête et demande pour tout ce qui sort du périmètre : dépendance non prévue, donnée non listée, exception à la méthode.
 
