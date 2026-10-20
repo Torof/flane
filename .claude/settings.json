@@ -6,6 +6,7 @@
       "Bash(gh *)",
       "Bash(npm *)",
       "Bash(npx *)",
+      "Bash(eas *)",
       "Bash(node *)",
       "Bash(python3 *)",
       "Bash(bash tools/*)",
