@@ -7,26 +7,28 @@ Lu au début de chaque session (`/debut`), complété à la fin (`/fin`). Les en
 ## 2026-10-20 — T0.5 Mises à jour instantanées : la boucle de test en quelques secondes
 
 **Tranche** : T0.5 — Mises à jour instantanées pour la version de test, et version par tranche (jalon 0).
-**Étape** : Observer (pull request ouverte, « ne fusionnez pas encore » jusqu'au constat de la mise à jour reçue sur le téléphone).
+**Étape** : Valider (faite : PR 8 fusionnée).
 
 **Fait**
 - Porte Observer de T0.3 passée : l'utilisateur a installé l'APK `preview`, vu les trois onglets ; PR 7 fusionnée par Claude à sa demande. L'utilisateur a demandé le tutoiement et rappelé la règle : dire ce qu'on va faire et choisir ensemble avant de construire ; pendant le code, pas de question.
 - Discussion : T0.2 (vérifications automatiques) présentée avec trois choix (fusion bloquée si rouge, Dependabot mensuel groupé, audit bloquant pour le code embarqué seulement), acceptés. L'utilisateur a demandé les mises à jour instantanées (EAS Update) et le versionnage à chaque changement significatif ; il a choisi de passer T0.5 avant T0.2.
 - Fiche T0.5 attaquée par l'avocat du diable (16 objections, 4 bloquantes). Deux vérifiées par les faits avant la porte Choisir : la version n'entre pas dans l'empreinte native ; `development` et `preview` ont la même empreinte (constaté ensuite : elles ne diffèrent que par `updates.enabled`, ce qui est voulu). D-012 précisée par **D-023** (exception encadrée pour la variante de test), validée par l'utilisateur avec la fiche.
 - Livré : `expo-updates` 58.0.17, `runtimeVersion` par empreinte, mises à jour pour la seule variante `preview`, canal `preview`, `requireCommit` ; « À propos » affiche version, version native et état de la mise à jour (`updateStatus()`, testé) ; version `0.0.2` ; conventions : une version par tranche (table d'exemples), procédure de publication ; `DONNEES.md`, `SECURITE.md` (risque et déclencheur de signature des mises à jour), `METHODE.md`, modèle de fiche, glossaire, README ; test de configuration : empreinte indépendante de la version. 37 tests verts. Essai à blanc de l'export Metro réussi.
+- Observer : l'utilisateur a installé l'APK `preview` 0.0.2 (version native `d3ffc7e9`), puis Claude a publié la mise à jour du commit de tête de la PR (`eas update`, canal `preview`, commit `8cbff9b`, lancé sous Node 24 : sous Node 22, l'export échoue dans le chemin accentué) ; après deux fermetures et réouvertures, « À propos » affichait « Mise à jour publiée le … ». Constaté par l'utilisateur. PR 8 fusionnée par Claude à sa demande. Deux tranches dans la même session : exception assumée, voir ci-dessous.
 - Sécuriser : audit « à corriger », aucun point bloquant. L'auditeur a lu le code natif d'`expo-updates` : la description des flux vers Expo était incomplète (identifiants de mise à jour, échecs récents, texte d'erreur fatale, CDN) et en partie inexacte (la version de l'appli ne part pas) ; `DONNEES.md`, D-023 et la fiche réécrits. Déclencheur de signature élargi (donnée personnelle stockée, second appareil ou canal, pas seulement permission sensible). `ACCESS_NETWORK_STATE`, déclarée par `expo-updates` et inutile en mode `ON_LOAD`, bloquée hors client de développement. Procédure de publication durcie (commit de tête de la PR vérifié, `gitCommitHash` contrôlé). Relecture « conforme avec corrections mineures » : test de configuration sur la config entière moins `version`, date formatée à la main (même rendu sous Jest et sur Android), libellé « Mise à jour publiée le » (c'est la date de publication). 38 tests verts.
 
 **Décisions** : D-023.
 
 **Exceptions à la méthode**
+- Deux tranches (T0.3 et T0.5) dans une seule session, alors que la méthode en prévoit une : l'utilisateur voulait enchaîner après la porte Observer de T0.3, et T0.5 était courte. La session se termine ici ; T0.2 commence dans une session neuve.
 - La fiche faisait de la double authentification du compte Expo un préalable à la première publication. L'utilisateur a choisi de la remettre à plus tard ; la publication a eu lieu quand même, à sa demande. Risque accepté en connaissance de cause : aujourd'hui la version de test ne détient aucune donnée personnelle et n'a que la permission internet. Le verrou obligatoire reste le déclencheur de signature des mises à jour (`docs/SECURITE.md`), qui tombera avant la première donnée personnelle stockée.
 
 **Questions ouvertes**
 - Double authentification du compte Expo : remise à plus tard par l'utilisateur ; à activer avant que la version de test stocke une donnée personnelle (au plus tard avec la signature des mises à jour).
-- `Bash(eas *)` dans les réglages de Claude Code : toujours en suspens (décision de l'utilisateur).
+- `Bash(eas *)` dans les réglages de Claude Code : l'utilisateur l'ajoute lui-même dans `.claude/settings.json` (indication donnée) ; la modification entrera dans la branche de T0.2.
 
 **Prochaine étape**
-- Porte Observer : installer le nouvel APK `preview` (version native nouvelle : `expo-updates` est un module natif), lire « À propos » (« Code embarqué »), puis Claude publie la mise à jour du dernier commit de la PR sur le canal `preview` ; deux fermetures complètes et réouvertures : « Mise à jour du … ». Puis porte Intégrer. Ensuite `/tranche` pour T0.2.
+- `/clear`, `/debut`, puis la fiche de **T0.2** (vérifications automatiques GitHub Actions), présentée à l'utilisateur avant tout code. Ses trois choix sont déjà pris : fusion bloquée tant que les vérifications sont rouges ; Dependabot en un rendez-vous mensuel groupé ; audit des dépendances bloquant pour le code embarqué, informatif pour l'outillage. T0.2 reprend `npm run check`, `tools/dev/licenses.mjs`, `tools/dev/check-spdx.sh`, le test de configuration (empreinte) et pourrait contrôler que la version monte quand `app/` change. Ensuite T0.4.
 
 ## 2026-10-20 — T0.3 Squelette de l'appli : la première ligne de Flâne
 
