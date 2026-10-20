@@ -35,10 +35,15 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       backgroundImage: './assets/android-icon-background.png',
       monochromeImage: './assets/android-icon-monochrome.png',
     },
-    // Nothing beyond what Expo adds by default (INTERNET). Anything else that
-    // shows up in the built manifest is listed in blockedPermissions.
+    // Only INTERNET is wanted. The four below were found in the first built
+    // manifest (added by Expo's defaults) and are removed; see the T0.3 sheet.
     permissions: [],
-    blockedPermissions: [],
+    blockedPermissions: [
+      'android.permission.READ_EXTERNAL_STORAGE',
+      'android.permission.WRITE_EXTERNAL_STORAGE',
+      'android.permission.SYSTEM_ALERT_WINDOW',
+      'android.permission.VIBRATE',
+    ],
     // Android auto-backup would copy the app's private data to Google Drive.
     // Nothing is stored yet; off from the start so that it never happens (docs/DONNEES.md).
     allowBackup: false,
