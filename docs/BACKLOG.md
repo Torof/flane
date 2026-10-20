@@ -4,7 +4,7 @@ Statuts : **Idée** → **Prête** (fiche validée) → **En cours** → **À te
 
 ## En cours
 
-**T0.3 — Squelette de l'appli Expo** (fiche : `docs/tranches/T0.3-app-skeleton.md`, validée le 2026-10-20, branche `feat/T0.3-app-skeleton`). Ensuite : T0.2 (vérifications automatiques, qui ont besoin de l'appli pour avoir quelque chose à vérifier).
+**T0.3 — Squelette de l'appli Expo** (fiche : `docs/tranches/T0.3-app-skeleton.md`, validée le 2026-10-20, branche `feat/T0.3-app-skeleton`) : construite, auditée, relue ; pull request ouverte, à tester sur le téléphone (porte Observer). Ensuite : T0.2 (vérifications automatiques, qui reprendront `npm run check`).
 
 ## Questions ouvertes
 
@@ -24,7 +24,7 @@ Statuts : **Idée** → **Prête** (fiche validée) → **En cours** → **À te
 | T0.1 | Dépôt et conventions : hooks git locaux dans `.githooks/` (secrets avec gitleaks, format des commits, pré-push), `.editorconfig`, licence AGPL-3.0 et passage en public, modèles d'issues et de PR, réglages GitHub (règle sur `main`, recherche de secrets, alertes), D-017 à D-019. Le garde-fou de Claude livré ici a été retiré ensuite (D-022) | Faite |
 | T0.1b | Kit Claude : mode « accept edits », D-021 (qui décide quoi). La liste `allow` figée et le garde-fou durci ont été retirés (D-022) | Faite, puis simplifiée |
 | T0.2 | Vérifications automatiques (GitHub Actions) : types, lint, tests, audit des dépendances, recherche de secrets, licences ; exigées par la règle sur `main` ; Dependabot ; résumé court des échecs pour Claude | Idée |
-| T0.3 | Squelette de l'appli Expo : TypeScript strict, ESLint et Prettier, fichiers de traduction, notice SPDX en tête des fichiers, `.npmrc` (`ignore-scripts`, `save-exact`), `.nvmrc`, trois onglets vides, variantes `app.flane.dev` / `app.flane`, APK `preview` et client de développement par EAS Build | En cours |
+| T0.3 | Squelette de l'appli Expo : TypeScript strict, ESLint et Prettier, fichiers de traduction, notice SPDX en tête des fichiers, `.npmrc` (`ignore-scripts`, `save-exact`), `.nvmrc`, trois onglets vides, variantes `app.flane.dev` / `app.flane`, APK `preview` et client de développement par EAS Build | À tester sur la route |
 | T0.4 | Historique des versions automatique (à partir des messages de commit) et version par jalon | Idée |
 
 ## Jalon 1 — Je vois les bons coins de ma région
@@ -123,6 +123,12 @@ Idées notées, traitées en fin de jalon. Ne pas s'y attaquer avant.
 - Tests de parcours complets (Maestro), galerie d'écrans (Storybook), carnet de route transcrit par Claude.
 
 **Outillage**
+- Mode sombre (mode nuit pour la conduite) et orientation paysage : thème clair et portrait seulement depuis T0.3 ; à traiter avec la vue en mouvement (jalon 3), via `app/src/ui/theme.ts`.
+- Anglais et détection de la langue du téléphone : un fichier `en.json` à côté de `fr.json`, pas de code à changer.
+- Icône et écran de démarrage définitifs (icône du modèle Expo conservée en T0.3).
+- Compilation locale de l'appli (SDK Android sur le PC) : EAS Build suffit pour l'instant.
+- Route `+not-found` et lecture des paramètres du schéma `flane` : à la première tranche qui reçoit un lien.
+- Déplacer les tests des outils du dépôt (`app/src/tools/`) hors de l'appli quand `data-pipeline/` aura les siens.
 - Banc d'essai en PR : le banc d'essai tourne sur le trajet de référence à chaque pull request et poste la différence avec `main` (après T2.8).
 - `SECURITY.md` et politique de signalement des failles (jalon 5).
 - Démarrage automatique de session (hook `SessionStart` qui charge journal, backlog et issues), si `/debut` devient lourd.
