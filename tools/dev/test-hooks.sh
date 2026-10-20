@@ -314,6 +314,7 @@ garde ALLOW "find sans -exec"                         "$B" 'find . -name "*.md"'
 garde ALLOW "mkdir docs"                              "$B" 'mkdir -p docs/tranches'
 garde ALLOW "redirection vers docs"                   "$B" 'echo x > docs/x.md'
 garde ALLOW "wc -l"                                   "$B" 'wc -l CLAUDE.md'
+garde ALLOW "gitleaks git (sous-commande git)"        "$B" 'gitleaks git --no-banner --redact .'
 garde ALLOW "commande multi-lignes sur branche"       "$B" "$(printf 'git add docs\ngit commit -m "docs(T0.1): x"\ngit push')"
 
 # Cas spéciaux : entrée invalide, cwd absent, autre outil.

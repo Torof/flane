@@ -460,7 +460,7 @@ PURE_READ = {
     "du", "realpath", "readlink", "dirname", "basename", "shellcheck", "bat", "sort", "uniq",
     "cut", "tr", "awk", "jq", "xxd", "hexdump", "od", "strings", "true", "false", ":", "type",
     "which", "hash", "pwd", "date", "sleep", "env", "printenv", "uname", "id", "whoami",
-    "python3", "python", "node", "bash", "sh",
+    "python3", "python", "node", "bash", "sh", "gitleaks", "shellcheck",
 }
 SCRIPT_RUNNERS = {"bash", "sh", "python3", "python", "node"}
 EXECUTORS = {
