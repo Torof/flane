@@ -359,17 +359,25 @@ def analyse_git(words, ctx):
                 raise Decision(DENY, f"git {sub} toucherait {a} (dossiers protégés : .claude/, .githooks/, tools/dev/)")
         return
     if sub == "push":
-        pos, j = [], 0
+        # Le push forcé est une exception explicite : demandé à l'utilisateur,
+        # jamais silencieux, consigné dans le journal. Côté serveur, la règle
+        # GitHub sur main l'interdit de toute façon.
+        pos, forced, j = [], False, 0
         while j < len(args):
             a = args[j]
             if a in ("-o", "--push-option", "--repo", "--receive-pack", "--exec") \
                     or a.startswith(("--repo=", "--receive-pack=", "--exec=")):
                 raise Decision(DENY, f"git push {a} (doute)")
-            if a in ("--force", "--force-with-lease", "--force-if-includes", "--mirror", "--all",
-                     "--prune", "--delete", "-d") or a.startswith("--force-with-lease="):
-                raise Decision(DENY, f"git push {a} : push forcé, miroir ou suppression")
-            if re.match(r"^-[a-zA-Z]*[fdn]", a):
-                raise Decision(DENY, f"git push {a} : -f, -d ou -n")
+            if a in ("--mirror", "--all", "--prune", "--delete", "-d"):
+                raise Decision(DENY, f"git push {a} : miroir ou suppression")
+            if a in ("--force", "--force-with-lease", "--force-if-includes") or a.startswith("--force-with-lease="):
+                forced = True
+            elif re.match(r"^-[a-zA-Z]*n", a):
+                raise Decision(DENY, f"git push {a} : -n contourne les hooks")
+            elif re.match(r"^-[a-zA-Z]*d", a):
+                raise Decision(DENY, f"git push {a} : -d supprime une branche distante")
+            elif re.match(r"^-[a-zA-Z]*f", a):
+                forced = True
             if a == "--":
                 pos.extend(args[j + 1:])
                 break
@@ -377,9 +385,11 @@ def analyse_git(words, ctx):
                 pos.append(a)
             j += 1
         refspecs = pos[1:]
+        if any(r.startswith("+") for r in refspecs):
+            forced = True
+        if forced:
+            raise Decision(ASK, "push forcé : exception à confirmer par l'utilisateur, puis à consigner dans le journal")
         for r in refspecs:
-            if r.startswith("+"):
-                raise Decision(DENY, f"refspec forcé {r}")
             src, _, dst = r.partition(":")
             if dst in MAIN_REFS or src in MAIN_REFS:
                 raise Decision(DENY, f"push vers ou depuis main ({r}) : passer par une pull request")

@@ -220,10 +220,11 @@ garde ALLOW "fetch sur main"                          "$M" 'git fetch origin'
 garde ALLOW "diff sur main"                           "$M" 'git diff --stat'
 
 # Partout : contournements et écritures dangereuses.
-garde DENY  "push --force"                            "$B" 'git push --force origin feat/x'
-garde DENY  "push --force-with-lease"                 "$B" 'git push --force-with-lease'
-garde DENY  "push -f"                                 "$B" 'git push -f origin feat/x'
-garde DENY  "push +main"                              "$B" 'git push origin +main'
+garde ASK   "push --force (exception demandée)"       "$B" 'git push --force origin feat/x'
+garde ASK   "push --force-with-lease"                 "$B" 'git push --force-with-lease'
+garde ASK   "push -f"                                 "$B" 'git push -f origin feat/x'
+garde ASK   "push +main"                              "$B" 'git push origin +main'
+garde ASK   "push --force origin main"                "$B" 'git push --force origin main'
 garde DENY  "push HEAD:main"                          "$B" 'git push origin HEAD:main'
 garde DENY  "push feat:main"                          "$B" 'git push origin feat/x:main'
 garde DENY  "push origin main"                        "$B" 'git push origin main'
@@ -242,6 +243,7 @@ garde DENY  "config core.hooksPath"                   "$B" 'git config core.hook
 garde DENY  "config alias"                            "$B" 'git config alias.st "push --force"'
 garde DENY  "env GIT_DIR"                             "$B" 'env GIT_DIR=/x git status'
 garde DENY  "variable comme commande"                 "$B" 'G=git; $G push --force'
+garde DENY  "push -fn (contourne les hooks)"          "$B" 'git push -fn origin feat/x'
 garde DENY  "git -C vers un dépôt sur main"           "$B" "/usr/bin/git -C $M commit -m \"x\""
 garde DENY  "cd vers un dépôt sur main"               "$B" "cd $M && git commit -m \"x\""
 garde DENY  "cd hors dépôt puis commit"               "$B" 'cd .. && git commit -m "x"'
