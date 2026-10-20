@@ -4,25 +4,28 @@ Lu au début de chaque session (`/debut`), complété à la fin (`/fin`). Les en
 
 ---
 
-## 2026-10-20 — Observer T0.1b : les demandes venaient de Claude
+## 2026-10-20 — Le garde-fou est retiré : on revient au projet
 
 **Tranche** : aucune (méthode, hors cycle, branche `docs/meta-2026-10-20`).
 **Étape** : —
 
 **Fait**
-- Porte Observer de T0.1b : au premier `/debut`, l'utilisateur a eu cinq demandes d'accord. Cause établie : les commandes de Claude (`tail`, `awk`, `sed`, `grep`, `cat`, `ls`, `echo`, enchaînements `;` et tubes `|`), aucune dans la liste `allow`. Les règles `allow` elles-mêmes fonctionnent (question ouverte de T0.1b fermée).
-- Correctif : règle « zéro demande d'accord inutile » dans `CLAUDE.md` (Read/Grep/Glob pour lire, Bash réservé aux préfixes autorisés, une commande par appel) ; `/debut` réécrit dans cette forme.
-- `.claude/settings.local.json` vidé à nouveau : les clics « toujours autoriser » l'avaient rempli de règles ponctuelles.
+- Porte Observer de T0.1b : au premier `/debut`, l'utilisateur a eu cinq demandes d'accord, puis d'autres pendant que Claude tentait de corriger. Cause immédiate : les commandes de Claude (`tail`, `awk`, `sed`, enchaînements `;`, tubes), hors de la liste `allow`. Cause de fond : un système qui transforme chaque écart en interruption.
+- Constat de l'utilisateur, fondé : cinq pull requests, zéro ligne de l'appli, un garde-fou de 900 lignes qu'il n'avait pas demandé, et une heure et demie de sollicitations. Ce n'est pas le processus voulu.
+- Ce que l'utilisateur veut, reformulé et confirmé : il donne une idée ; on la discute, on l'observe, on l'audite ; il valide ; puis coder, tester, vérifier et auditer s'enchaînent seuls jusqu'à la pull request ; il teste et fusionne. La sécurité se valide sur les failles, les choix structurants et le résultat, pas sur chaque fichier.
+- Nettoyage (D-022) : garde-fou `.claude/hooks/` et son banc `tools/dev/test-hooks.sh` supprimés ; `.claude/settings.json` réduit à « accept edits » et une liste large de commandes courantes (accord seulement pour la fusion d'une pull request, un push forcé, une suppression récursive) ; `CLAUDE.md` réécrit autour du flux idée, fiche, oui, construction automatique, observer, intégrer ; `docs/OUTILLAGE.md`, les fiches T0.1 et T0.1b et la compétence `/installation` supprimés ; `METHODE.md`, `SECURITE.md`, `CONVENTIONS.md`, `/debut`, `/fin`, `README.md`, modèle de fiche allégés ; T0.1c retiré du jalon 0 (idée au parking).
+- Ordre du jalon 0 changé : T0.3 (squelette de l'appli) avant T0.2 (vérifications automatiques), pour coder dès la prochaine session.
 
-**Décisions** : aucune.
+**Décisions** : D-022 (remplace D-020).
 
-**Exceptions à la méthode** : aucune.
+**Exceptions à la méthode**
+- Ce nettoyage a été fait dans la session même, sans fiche, à la demande de l'utilisateur et après son « oui » sur la liste précise de ce qui part et de ce qui reste.
 
 **Questions ouvertes**
-- Faut-il, en T0.1c, que le garde-fou **bloque** (au lieu de laisser Claude Code demander) toute commande Bash hors liste `allow`, avec un message qui renvoie vers Read/Grep ? L'utilisateur ne serait plus interrompu ; Claude serait corrigé sur le coup. À peser contre les commandes légitimes des tranches à venir (`npm test`, etc.).
+- Aucune.
 
 **Prochaine étape**
-- `/tranche` pour T0.2 (ou T0.1c).
+- Fusionner cette pull request, redémarrer Claude Code (les réglages se chargent au démarrage), `/debut`, puis `/tranche` pour T0.3.
 
 ## 2026-10-20 — T0.1b Kit Claude : zéro interruption inutile
 

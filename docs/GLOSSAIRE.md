@@ -61,7 +61,7 @@ Attention au mot **« étape »**, qui a trois sens. Pour lever l'ambiguïté :
 | Banc d'essai | L'outil qui sort la liste des suggestions sur le trajet de référence. |
 | Simulateur de trajet | L'outil qui rejoue un trajet enregistré. |
 | Porte | L'un des trois moments où la validation de l'utilisateur est obligatoire : Choisir, Observer, Intégrer (D-016). Entre les portes, Claude enchaîne seul. |
-| Garde-fou | Un contrôle automatique qui bloque une action interdite : hook de Claude Code (`.claude/hooks/`), hook git (`.githooks/`), règle GitHub sur `main`. En cas de doute, il bloque. |
+| Garde-fou | Un contrôle automatique qui bloque une action interdite : hook git (`.githooks/`), règle GitHub sur `main`. Le hook de Claude Code qui analysait chaque commande a été retiré (D-022). |
 | Boîte de réception | GitHub Issues : les retours et idées venus de l'extérieur, vidés vers le backlog ou le parking à chaque début de session (D-017). |
 
 ## L'étape 2 (pour mémoire)

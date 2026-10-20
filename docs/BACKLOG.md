@@ -4,7 +4,7 @@ Statuts : **Idée** → **Prête** (fiche validée) → **En cours** → **À te
 
 ## En cours
 
-Aucune tranche en cours. Prochaine : **T0.2** (vérifications automatiques), fiche à planifier. T0.1c (démarrage automatique) peut passer avant si l'utilisateur le souhaite.
+Aucune tranche en cours. Prochaine : **T0.3** (squelette de l'appli, pour commencer à coder), puis T0.2 (vérifications automatiques, qui ont besoin de l'appli pour avoir quelque chose à vérifier).
 
 ## Questions ouvertes
 
@@ -21,11 +21,10 @@ Aucune tranche en cours. Prochaine : **T0.2** (vérifications automatiques), fic
 
 | ID | Tranche | Statut |
 | --- | --- | --- |
-| T0.1 | Dépôt et garde-fous : hooks git locaux dans `.githooks/` (secrets avec gitleaks, format des commits, pré-push) avec banc de tests, garde-fou de Claude durci et fermé par défaut, `.editorconfig`, licence AGPL-3.0 et passage en public, modèles d'issues et de PR (définition de « fini » en cases), réglages GitHub (règle sur `main`, recherche de secrets, alertes), D-017 à D-019. Fiche `docs/tranches/T0.1-repo-conventions.md`, branche `chore/T0.1-repo-conventions`, budget 2 sessions, faite en 1 | Faite |
-| T0.1b | Kit Claude, zéro interruption inutile : mode « accept edits » (D-020), liste `allow` figée et testée, garde-fou durci pour que son silence vaille accord, `settings.local.json` contrôlé, conventions de commande, D-021 (qui décide quoi). Fiche `docs/tranches/T0.1b-claude-kit.md`, budget 1 session | Faite |
-| T0.1c | Démarrage automatique de session : hook `SessionStart` (journal, backlog, branche, arbre, issues ouvertes : titres nettoyés et tronqués des auteurs de confiance, jamais le corps, plafond en octets, délai sur `gh`), `/debut` adapté, boîte de réception listée. Budget 1 session | Idée |
-| T0.2 | Vérifications automatiques (GitHub Actions) : types, lint, tests, audit des dépendances, recherche de secrets, licences, `expo-doctor`, vérification de la méthode (cases de « fini » cochées, journal modifié avec le code), exécution hebdomadaire, actions épinglées par commit et permissions minimales, `dependabot.yml` (`github-actions`), CodeQL ; vérifications exigées par la règle sur `main` ; filtre de sortie des tests pour Claude | Idée |
-| T0.3 | Squelette de l'appli Expo : TypeScript strict, ESLint et Prettier, hook de format et lint à l'écriture pour Claude, fichiers de traduction, notice SPDX en tête des fichiers, `.npmrc` (`ignore-scripts`, `save-exact`), `.nvmrc`, Dependabot `npm`, compilation de développement installée sur Android | Idée |
+| T0.1 | Dépôt et conventions : hooks git locaux dans `.githooks/` (secrets avec gitleaks, format des commits, pré-push), `.editorconfig`, licence AGPL-3.0 et passage en public, modèles d'issues et de PR, réglages GitHub (règle sur `main`, recherche de secrets, alertes), D-017 à D-019. Le garde-fou de Claude livré ici a été retiré ensuite (D-022) | Faite |
+| T0.1b | Kit Claude : mode « accept edits », D-021 (qui décide quoi). La liste `allow` figée et le garde-fou durci ont été retirés (D-022) | Faite, puis simplifiée |
+| T0.2 | Vérifications automatiques (GitHub Actions) : types, lint, tests, audit des dépendances, recherche de secrets, licences ; exigées par la règle sur `main` ; Dependabot ; résumé court des échecs pour Claude | Idée |
+| T0.3 | Squelette de l'appli Expo : TypeScript strict, ESLint et Prettier, fichiers de traduction, notice SPDX en tête des fichiers, `.npmrc` (`ignore-scripts`, `save-exact`), `.nvmrc`, compilation de développement installée sur Android | Idée |
 | T0.4 | Historique des versions automatique (à partir des messages de commit) et version par jalon | Idée |
 
 ## Jalon 1 — Je vois les bons coins de ma région
@@ -123,6 +122,7 @@ Idées notées, traitées en fin de jalon. Ne pas s'y attaquer avant.
 - Vélo, moto, van ; usage domicile-travail ; autres pays ; iOS.
 - Tests de parcours complets (Maestro), galerie d'écrans (Storybook), carnet de route transcrit par Claude.
 
-**Outillage (voir `docs/OUTILLAGE.md`)**
+**Outillage**
 - Banc d'essai en PR : le banc d'essai tourne sur le trajet de référence à chaque pull request et poste la différence avec `main` (après T2.8).
-- `SECURITY.md` et politique de signalement des failles, au passage en public (jalon 5).
+- `SECURITY.md` et politique de signalement des failles (jalon 5).
+- Démarrage automatique de session (hook `SessionStart` qui charge journal, backlog et issues), si `/debut` devient lourd.

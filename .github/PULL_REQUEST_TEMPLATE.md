@@ -13,7 +13,6 @@
 - [ ] Relecture : aucun point bloquant ouvert
 - [ ] `docs/DONNEES.md`, glossaire, décisions à jour si nécessaire
 - [ ] Journal et backlog à jour, dans cette pull request
-- [ ] `docs/OUTILLAGE.md` à jour si la tranche livre un outil
 
 ## Exceptions à la méthode
 
