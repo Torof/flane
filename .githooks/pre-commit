@@ -36,11 +36,25 @@ root="$(git rev-parse --show-toplevel 2>/dev/null)" || {
 }
 cd "$root" || exit 1
 
+# Une configuration gitleaks fournie par le dépôt neutraliserait la recherche :
+# refusée, qu'elle soit indexée ou déjà présente. Une exception se discute et se
+# consigne dans le journal ; elle ne se glisse pas dans un commit.
+staged="$(git diff --cached --name-only --diff-filter=ACMR)"
+if printf '%s\n' "$staged" | grep -Eq '(^|/)\.gitleaks(\.toml|ignore)$' \
+  || [ -e .gitleaks.toml ] || [ -e .gitleaksignore ]; then
+  echo "pre-commit : configuration gitleaks fournie par le dépôt (.gitleaks.toml ou .gitleaksignore). Commit refusé." >&2
+  exit 1
+fi
+if git diff --cached -U0 -- . ':(exclude)docs' ':(exclude)*.md' | grep '^+' | grep -v '^+++' | grep -q 'gitleaks:''allow'; then
+  echo "pre-commit : annotation d'exception gitleaks dans le code. Commit refusé : une exception se consigne dans le journal, pas dans le code." >&2
+  exit 1
+fi
+
 report="$(mktemp)"
 log="$(mktemp)"
 trap 'rm -f "$report" "$log"' EXIT
 
-"$gitleaks_bin" git --pre-commit --staged --redact --no-banner --log-level error \
+env -u GITLEAKS_CONFIG "$gitleaks_bin" git --pre-commit --staged --redact --no-banner --log-level error \
   --exit-code 1 --report-format json --report-path "$report" >"$log" 2>&1
 rc=$?
 
@@ -67,12 +81,12 @@ PY
 pre-commit : secret détecté, commit refusé.
 $findings
   Retirer le secret du fichier (et le révoquer s'il est réel). Aucune exception
-  gitleaks (.gitleaksignore, gitleaks:allow) sans justification écrite dans le commit.
+  gitleaks : une exception se discute et se consigne dans le journal.
 EOF
     exit 1
   fi
 fi
 
 echo "pre-commit : gitleaks a échoué (code $rc) sans résultat exploitable : doute, commit refusé." >&2
-tail -n 5 "$log" >&2 2>/dev/null || true
+tail -n 5 "$log" >&2 || true
 exit 1

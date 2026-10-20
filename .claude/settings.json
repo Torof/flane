@@ -19,6 +19,8 @@
       "Write(./.claude/**)",
       "Edit(./.githooks/**)",
       "Write(./.githooks/**)",
+      "Edit(./.github/**)",
+      "Write(./.github/**)",
       "Edit(./tools/dev/**)",
       "Write(./tools/dev/**)"
     ]

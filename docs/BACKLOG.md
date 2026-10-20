@@ -4,7 +4,7 @@ Statuts : **Idée** → **Prête** (fiche validée) → **En cours** → **À te
 
 ## En cours
 
-**T0.1 — Dépôt et garde-fous**, étape Construire. Fiche : `docs/tranches/T0.1-repo-conventions.md`. Branche : `chore/T0.1-repo-conventions`. Budget : 2 sessions, validée le 2026-10-20.
+**T0.1 — Dépôt et garde-fous**, étape du cycle : voir la fiche. Fiche : `docs/tranches/T0.1-repo-conventions.md`. Branche : `chore/T0.1-repo-conventions`. Budget : 2 sessions, validée le 2026-10-20.
 
 ## Questions ouvertes
 

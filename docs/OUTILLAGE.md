@@ -15,7 +15,7 @@ L'inventaire de tout ce qui automatise, vérifie ou protège le travail sur Flâ
 | Outil | Rôle | Où | État |
 | --- | --- | --- | --- |
 | Garde-fou `main` | Analyse chaque commande Bash de Claude. Bloque : commit, merge, rebase, reset sur `main` ; push vers `main`, `--no-verify`, `-c core.hooksPath`, réécriture de références, écriture directe sur le dépôt par l'API GitHub, écriture par Bash dans les dossiers protégés. Demande (confirmation de l'utilisateur) : push forcé, commandes indirectes (`bash -c`, `eval`, substitution) avec git, `gh pr merge` (porte Intégrer), réglages du dépôt. En cas de doute, bloque. Toute panne du hook = blocage | `.claude/hooks/garde-branche-main.sh` (enveloppe) et `.py` (analyse) | En place, durci en T0.1. Testé par `tools/dev/test-hooks.sh` |
-| Protection des garde-fous | `Write` et `Edit` sur `.claude/**`, `.githooks/**`, `tools/dev/**` demandent l'accord de l'utilisateur ; l'écriture par Bash vers ces chemins est bloquée | `.claude/settings.json` (`ask`) et garde-fou | En place (T0.1) |
+| Protection des garde-fous | `Write` et `Edit` sur `.claude/**`, `.githooks/**`, `.github/**`, `tools/dev/**` demandent l'accord de l'utilisateur ; l'écriture par Bash vers ces chemins (et `.git/`) est bloquée. Limites connues du garde-fou : `docs/SECURITE.md` | `.claude/settings.json` (`ask`) et garde-fou | En place (T0.1) |
 | Fichiers interdits en lecture | Claude ne peut pas lire `.env`, keystores, clés, `google-services.json`, `node_modules` | `.claude/settings.json` (`deny`) | En place |
 | Démarrage automatique | Au début de chaque session, injecte la dernière entrée du journal, la section « En cours » du backlog, la branche, l'état de l'arbre et les issues ouvertes (numéro, titre tronqué, auteur, étiquettes ; jamais le corps ; dix au plus ; délai sur `gh`) | hook `SessionStart` | Prévu T0.1b |
 | Avertissement de fin de session | Signaler les modifications non enregistrées | hook `Stop` | Retiré en T0.1 : ce hook se déclenche à chaque réponse, pas en fin de session. `/fin` et le démarrage automatique couvrent le besoin |
@@ -47,7 +47,7 @@ Activés par `tools/dev/setup.sh` (`git config core.hooksPath .githooks`), sans 
 | `commit-msg` | Format Conventional Commits avec scope `Tx.y`, `Tx.yb` ou `meta`, marqueur `!` ; exceptions `Revert "…"` et fusions git et GitHub | En place (T0.1) |
 | `pre-push` | Types, lint et tests avant d'envoyer, dès que `app/package.json` existe | En place (T0.1), actif à partir de T0.3 |
 | `tools/dev/setup.sh` | Active les hooks, installe gitleaks (version épinglée, SHA-256 vérifié, Linux x86_64) dans `~/.local/bin`, affiche l'état. À lancer après chaque clonage | En place (T0.1) |
-| `tools/dev/test-hooks.sh` | Banc de tests des hooks git et du garde-fou de Claude, dans des dépôts temporaires : une ligne par cas, sortie 1 si un échec | En place (T0.1), 139 cas |
+| `tools/dev/test-hooks.sh` | Banc de tests des hooks git, des réglages de Claude Code et du garde-fou de Claude, dans des dépôts temporaires : une ligne par cas, sortie 1 si un échec | En place (T0.1) |
 | Mise à jour de gitleaks | Manuelle : changer la version et la somme de contrôle dans `setup.sh`, relancer le banc | Revue au bilan de chaque jalon |
 
 ## Vérifications automatiques (`.github/workflows/`)

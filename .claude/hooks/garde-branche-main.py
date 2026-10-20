@@ -5,10 +5,14 @@ Sortie 2 avec un message sur stderr : appel bloqué.
 Sortie 0 sans sortie : appel autorisé.
 Sortie 0 avec un JSON sur stdout : demande de confirmation à l'utilisateur.
 
-Règle absolue : en cas de doute, on bloque. Un faux positif se corrige en
-reformulant la commande ; un faux négatif laisserait passer une modification
-de main ou un contournement des hooks. Le script est appelé par
+Règle absolue : en cas de doute, on bloque ou on demande. Un faux positif se
+corrige en reformulant la commande ; un faux négatif laisserait passer une
+modification de main ou un contournement des hooks. Le script est appelé par
 garde-branche-main.sh, qui convertit toute panne en blocage.
+
+Limites connues (docs/SECURITE.md) : un script exécuté depuis un fichier hors
+des dossiers protégés est seulement demandé ; la garantie forte reste côté
+serveur (règle GitHub sur main, vérifications automatiques).
 
 Bibliothèque standard seulement. Testé par tools/dev/test-hooks.sh.
 """
@@ -35,11 +39,13 @@ class Decision(Exception):
 
 
 # ---------------------------------------------------------------------------
-# Heredocs : retirés avant la tokenisation. Un corps à délimiteur cité est une
-# donnée pure (jamais analysée) ; un corps à délimiteur non cité subit
-# l'expansion bash, il est donc réinjecté pour la détection de substitution.
+# Heredocs : retirés avant la tokenisation et remplacés par __HEREDOC_n__.
+# Un corps à délimiteur cité est une donnée (sauf s'il nourrit un interpréteur,
+# voir check_runner) ; un corps non cité subit l'expansion bash, il est donc
+# réinjecté pour la détection de substitution.
 # ---------------------------------------------------------------------------
 HEREDOC_RE = re.compile(r"<<-?\s*(?P<q>['\"]?)\\?(?P<d>[A-Za-z_][A-Za-z0-9_]*)(?P=q)")
+HEREDOC_TOKEN_RE = re.compile(r"^__HEREDOC_(\d+)__$")
 
 
 def strip_heredocs(cmd):
@@ -55,7 +61,7 @@ def strip_heredocs(cmd):
             quoted = bool(m.group("q")) or after.startswith("\\")
             delim = m.group("d")
             dash = line[m.start():].startswith("<<-")
-            out.append(line[:m.start()] + " __HEREDOC__ " + line[m.end():])
+            out.append(line[:m.start()] + f" __HEREDOC_{len(bodies)}__ " + line[m.end():])
             body = []
             i += 1
             while i < len(lines):
@@ -93,7 +99,7 @@ def tokenize(text):
 
 
 def split_segments(tokens):
-    """Découpe sur && || ; | |& & saut de ligne ( ). Renvoie aussi si un sous-shell apparaît."""
+    """Découpe sur && || ; | |& & saut de ligne ( ). Signale aussi un sous-shell."""
     segments, subshell = [[]], False
     for tok in tokens:
         if SEP_RE.fullmatch(tok) and not any(c in tok for c in "<>"):
@@ -107,38 +113,47 @@ def split_segments(tokens):
 
 
 def extract_redirs(segment):
-    """Sépare les mots des redirections. Renvoie (mots, cibles écrites)."""
-    words, writes, i = [], [], 0
+    """Sépare les mots des redirections. Renvoie (mots, cibles écrites, lectures)."""
+    words, writes, reads, i = [], [], [], 0
     while i < len(segment):
         tok = segment[i]
         if REDIR_RE.fullmatch(tok):
             if words and words[-1].isdigit():
                 words.pop()
             target = segment[i + 1] if i + 1 < len(segment) else ""
-            if ">" in tok and not tok.startswith("<") and target and not target.isdigit() and target != "-":
-                writes.append(target)
+            if target and not target.isdigit() and target != "-":
+                if tok in ("<", "<<<"):
+                    reads.append((tok, target))
+                elif tok == "<>" or (">" in tok and not tok.startswith("<&")):
+                    writes.append(target)
             i += 2
             continue
         words.append(tok)
         i += 1
-    return words, writes
+    return words, writes, reads
 
 
 # ---------------------------------------------------------------------------
-# Chemins protégés : les garde-fous eux-mêmes ne se modifient que par les
-# outils Edit et Write de Claude Code, soumis à une demande (settings.json).
+# Chemins protégés : les garde-fous (et .git, .github) ne se modifient que par
+# les outils Edit et Write de Claude Code, soumis à une demande (settings.json).
 # ---------------------------------------------------------------------------
-PROTECTED = ((".claude",), (".githooks",), ("tools", "dev"))
+PROTECTED = ((".claude",), (".githooks",), (".github",), (".git",), ("tools", "dev"))
+ANY_COMPONENT = {".claude", ".githooks", ".github", ".git"}
+PROTECTED_SUBSTR_RE = re.compile(
+    r"(?:^|[^A-Za-z0-9_.\-])(?:\.claude|\.githooks|\.github|\.git|tools/dev)(?:[/\s'\"`)]|$)")
+DYNAMIC_RE = re.compile(r"[$`]|\{[^{}]*,[^{}]*\}")
+PROTECTED_LABEL = "les garde-fous (.claude/, .githooks/, .github/, .git/, tools/dev/) ne se modifient que par Edit ou Write"
 
 
 def is_protected(tok, cwd, roots):
+    # Un argument --option=chemin est coupé sur « = » pour examiner le chemin.
     for part in tok.split("="):
         if not part:
             continue
         path = os.path.expanduser(part.replace("\\", "/"))
         absolute = posixpath.normpath(path if posixpath.isabs(path) else posixpath.join(cwd, path))
         comps = [c for c in absolute.split("/") if c]
-        if ".claude" in comps or ".githooks" in comps:
+        if ANY_COMPONENT.intersection(comps):
             return True
         for root in roots:
             root_comps = [c for c in posixpath.normpath(root).split("/") if c]
@@ -152,17 +167,22 @@ def is_protected(tok, cwd, roots):
     return False
 
 
+def is_dynamic(tok):
+    return bool(DYNAMIC_RE.search(tok))
+
+
 # ---------------------------------------------------------------------------
 # Préfixes : affectations, env, command, nohup, nice, timeout.
 # ---------------------------------------------------------------------------
 ASSIGN_RE = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*=")
 DURATION_RE = re.compile(r"^\d+(\.\d+)?[smhd]?$")
+ENV_SENSITIVE_RE = re.compile(r"^(GIT_|GH_|GITLEAKS_)")
 ENV_OK = {
     "GIT_PAGER", "PAGER", "GIT_TERMINAL_PROMPT", "GIT_EDITOR", "EDITOR", "LANG", "LC_ALL",
     "LC_MESSAGES", "TZ", "NO_COLOR", "CLICOLOR", "GH_PAGER", "GH_NO_UPDATE_NOTIFIER",
     "GH_PROMPT_DISABLED", "GIT_OPTIONAL_LOCKS", "GIT_TRACE", "FORCE_COLOR",
-    "FILTER_BRANCH_SQUELCH_WARNING",
 }
+SHELL_SETTERS = {"export", "declare", "typeset", "readonly", "local"}
 
 
 def strip_prefixes(words):
@@ -192,8 +212,16 @@ def strip_prefixes(words):
     return words[i:], envs
 
 
+def check_env_names(names, context):
+    for name in names:
+        if ENV_SENSITIVE_RE.match(name) and name not in ENV_OK:
+            raise Decision(DENY, f"variable d'environnement {name} {context} (doute)")
+
+
 # ---------------------------------------------------------------------------
-# Lecture de la branche : seul effet de bord, borné dans le temps.
+# Lecture de la branche : seul effet de bord, borné dans le temps. Les
+# changements de branche faits dans la même commande (checkout, switch, cd)
+# sont suivis segment par segment.
 # ---------------------------------------------------------------------------
 def git_run(repo, *args):
     try:
@@ -204,6 +232,9 @@ def git_run(repo, *args):
     except (OSError, subprocess.TimeoutExpired):
         return None
     return result.stdout.strip() if result.returncode == 0 else None
+
+
+UNKNOWN_BRANCH = "__unknown__"
 
 
 class Ctx:
@@ -228,7 +259,13 @@ class Ctx:
             if branch == "HEAD":
                 raise Decision(DENY, "HEAD détaché : la branche est inconnue (doute)")
             self.cache[repo] = branch
-        return self.cache[repo]
+        branch = self.cache[repo]
+        if branch == UNKNOWN_BRANCH:
+            raise Decision(DENY, "la branche a été changée plus tôt dans la commande vers une cible inconnue (doute)")
+        return branch
+
+    def set_branch(self, repo, name):
+        self.cache[posixpath.normpath(repo)] = name
 
     def upstream_is_main(self, repo):
         upstream = git_run(repo, "rev-parse", "--abbrev-ref", "--symbolic-full-name", "@{u}") or ""
@@ -236,10 +273,10 @@ class Ctx:
         return upstream.endswith("/main") or push_default == "matching"
 
     def change_dir(self, target):
-        new = posixpath.normpath(os.path.expanduser(target) if posixpath.isabs(os.path.expanduser(target))
-                                 else posixpath.join(self.cwd, os.path.expanduser(target)))
+        expanded = os.path.expanduser(target)
+        new = posixpath.normpath(expanded if posixpath.isabs(expanded) else posixpath.join(self.cwd, expanded))
         if not os.path.isdir(new):
-            raise Decision(DENY, f"cd vers un dossier introuvable ({target}) : la branche ne peut plus être vérifiée")
+            raise Decision(DENY, f"cd vers un dossier introuvable ({target}) : le dossier courant ne peut plus être suivi")
         self.cwd = new
         top = git_run(new, "rev-parse", "--show-toplevel")
         if top:
@@ -249,13 +286,22 @@ class Ctx:
 # ---------------------------------------------------------------------------
 # Règles git.
 # ---------------------------------------------------------------------------
+def opt_matches(arg, *names):
+    """Vrai si arg est une option longue égale à, ou préfixe non trivial de, l'un des names.
+    git accepte tout préfixe non ambigu : --no-veri vaut --no-verify."""
+    name = arg.split("=", 1)[0]
+    if not name.startswith("--") or len(name) < 3:
+        return False
+    return any(n == name or n.startswith(name) for n in names)
+
+
 CONFIG_KEY_OK = re.compile(
     r"^(color\..*|core\.pager|core\.editor|core\.quotepath|commit\.gpgsign|gpg\..*|"
     r"user\.(name|email)|advice\..*|pager\..*|safe\.directory)$", re.I)
 CONFIG_KEY_DENY = re.compile(
     r"^(core\.hookspath|alias\.|include|url\.|credential|core\.sshcommand|core\.gitproxy|"
     r"core\.fsmonitor|core\.editor|core\.pager|diff\..*\.command|diff\.external|"
-    r"merge\..*\.driver|filter\.|remote\.|push\.|receive\.|safe\.)", re.I)
+    r"merge\..*\.driver|filter\.|remote\.|push\.|receive\.|safe\.|init\.templatedir)", re.I)
 GLOBAL_OK = {
     "--no-pager", "-p", "--paginate", "--no-optional-locks", "--literal-pathspecs",
     "--glob-pathspecs", "--noglob-pathspecs", "--icase-pathspecs", "--no-replace-objects",
@@ -265,15 +311,12 @@ READ_ONLY_SUB = {
     "status", "log", "diff", "show", "blame", "rev-parse", "ls-files", "ls-tree", "cat-file",
     "describe", "shortlog", "grep", "for-each-ref", "name-rev", "count-objects", "fsck", "help",
     "version", "check-ignore", "ls-remote", "merge-base", "rev-list", "diff-tree", "whatchanged",
-    "reflog", "stash", "add", "fetch", "worktree", "tag", "notes", "init", "clone", "mv", "rm",
-    "restore", "checkout", "switch", "clean", "apply", "bisect", "remote", "config", "branch",
-    "show-ref", "var", "check-attr", "archive", "bundle", "range-diff", "cherry", "format-patch",
-    "submodule", "gc", "prune", "maintenance",
+    "reflog", "add", "bisect", "show-ref", "var", "check-attr", "bundle", "range-diff", "cherry",
+    "format-patch", "gc", "prune", "maintenance", "tag", "notes", "stash", "remote",
 }
 MAIN_SENSITIVE = {"commit", "merge", "rebase", "cherry-pick", "am", "revert", "reset", "pull"}
 ALWAYS_DENY_SUB = {"update-ref", "filter-branch", "filter-repo", "replace", "symbolic-ref"}
-TREE_WRITERS = {"checkout", "restore", "clean", "rm", "mv", "apply", "stash", "clone", "init",
-                "worktree", "submodule", "archive"}
+TREE_WRITERS = {"restore", "clean", "rm", "mv", "apply", "clone", "init", "worktree", "submodule", "archive"}
 BRANCH_LISTING = {
     "-a", "-r", "-v", "-vv", "--list", "--contains", "--merged", "--no-merged", "--show-current",
     "--format", "--sort", "--points-at", "--column", "--color", "--no-color", "--all", "--remotes",
@@ -281,13 +324,16 @@ BRANCH_LISTING = {
 MAIN_REFS = ("main", "refs/heads/main")
 
 
-def analyse_git(words, ctx):
+def parse_global_options(words, ctx):
+    """Options globales de git. Renvoie (dépôt visé, index de la sous-commande), ou (repo, None) si --help."""
     repo, i = ctx.cwd, 1
     while i < len(words) and words[i].startswith("-"):
         w = words[i]
         if w == "-C":
             i += 1
             path = words[i] if i < len(words) else ""
+            if is_dynamic(path):
+                raise Decision(DENY, "git -C avec un chemin dynamique (doute)")
             repo = path if os.path.isabs(path) else os.path.join(repo, path)
         elif w == "-c" or (w.startswith("-c") and "=" in w):
             if w == "-c":
@@ -303,11 +349,96 @@ def analyse_git(words, ctx):
         elif w in GLOBAL_OK:
             pass
         elif w in ("--help", "--version", "-h"):
-            return
+            return repo, None
         else:
             raise Decision(DENY, f"option globale de git non reconnue : {w} (doute)")
         i += 1
-    if i >= len(words):
+    return repo, i
+
+
+def check_push(args, ctx, repo):
+    # Le push forcé est une exception explicite : demandé à l'utilisateur,
+    # jamais silencieux, consigné dans le journal. Côté serveur, la règle
+    # GitHub sur main l'interdit de toute façon.
+    pos, forced, j = [], False, 0
+    while j < len(args):
+        a = args[j]
+        if opt_matches(a, "--push-option", "--repo", "--receive-pack", "--exec") or a == "-o":
+            raise Decision(DENY, f"git push {a} (doute)")
+        if opt_matches(a, "--mirror", "--all", "--prune", "--delete") or a == "-d":
+            raise Decision(DENY, f"git push {a} : miroir, suppression ou envoi global")
+        if opt_matches(a, "--force", "--force-with-lease", "--force-if-includes"):
+            forced = True
+        elif re.match(r"^-[a-zA-Z]*d", a):
+            raise Decision(DENY, f"git push {a} : -d supprime une branche distante")
+        elif re.match(r"^-[a-zA-Z]*f", a):
+            forced = True
+        if a == "--":
+            pos.extend(args[j + 1:])
+            break
+        if not a.startswith("-"):
+            pos.append(a)
+        j += 1
+    refspecs = pos[1:]
+    if any(r.startswith("+") for r in refspecs):
+        forced = True
+    if forced:
+        raise Decision(ASK, "push forcé : exception à confirmer par l'utilisateur, puis à consigner dans le journal")
+    for r in refspecs:
+        src, _, dst = r.partition(":")
+        if dst in MAIN_REFS or src in MAIN_REFS:
+            raise Decision(DENY, f"push vers ou depuis main ({r}) : passer par une pull request")
+    if not refspecs or any(r.partition(":")[0] in ("HEAD", "@", "") for r in refspecs):
+        if ctx.branch(repo) == "main":
+            raise Decision(DENY, "push de la branche courante alors qu'on est sur main")
+        if not refspecs and ctx.upstream_is_main(repo):
+            raise Decision(DENY, "git push sans refspec : la branche suit origin/main ou push.default=matching")
+
+
+def check_config(args, ctx):
+    if any(a in args for a in ("--get", "--list", "-l", "--get-all", "--get-regexp",
+                               "--show-origin", "--get-urlmatch")) or "get" in args or "list" in args:
+        return
+    for a in args:
+        if CONFIG_KEY_DENY.match(a):
+            raise Decision(DENY, f"git config {a} : clé sensible")
+        if not a.startswith("-") and is_protected(a, ctx.cwd, ctx.roots):
+            raise Decision(DENY, f"git config sur {a} : {PROTECTED_LABEL}")
+    raise Decision(ASK, "git config en écriture")
+
+
+def check_checkout(sub, args, ctx, repo):
+    """checkout et switch : chemins protégés interdits ; la branche visée est mémorisée."""
+    if "--" in args:
+        idx = args.index("--")
+        flags, paths = args[:idx], args[idx + 1:]
+    else:
+        flags, paths = args, []
+    if "main" in flags and any(a in ("-B", "-C", "--force-create", "--orphan") for a in flags):
+        raise Decision(DENY, f"git {sub} : recréation forcée de main")
+    for a in paths + [a for a in flags if not a.startswith("-")]:
+        if is_protected(a, ctx.cwd, ctx.roots) or a in (".", "./", ":/", "*"):
+            raise Decision(DENY, f"git {sub} toucherait {a} : {PROTECTED_LABEL}")
+    target = None
+    creation = [k for k, a in enumerate(flags) if a in ("-b", "-B", "-c", "-C", "--orphan")]
+    if creation:
+        k = creation[0]
+        target = flags[k + 1] if k + 1 < len(flags) else UNKNOWN_BRANCH
+    else:
+        positionals = [a for a in flags if not a.startswith("-")]
+        if positionals:
+            target = positionals[0]
+        elif "-" in flags or any(a in ("--detach",) for a in flags):
+            target = UNKNOWN_BRANCH  # branche précédente ou HEAD détaché : inconnue
+    if target is not None:
+        if target == "-" or is_dynamic(target):
+            target = UNKNOWN_BRANCH
+        ctx.set_branch(repo, target)
+
+
+def analyse_git(words, ctx):
+    repo, i = parse_global_options(words, ctx)
+    if i is None or i >= len(words):
         return
     sub, args = words[i], words[i + 1:]
     positionals = [a for a in args if not a.startswith("-")]
@@ -315,38 +446,34 @@ def analyse_git(words, ctx):
     if sub in ALWAYS_DENY_SUB and (sub != "symbolic-ref" or len(positionals) >= 2):
         raise Decision(DENY, f"git {sub} : réécriture directe de références")
     if sub == "update-index":
-        if args and all(a.startswith("--chmod=") or not a.startswith("-") for a in args) \
-                and any(a.startswith("--chmod=") for a in args):
+        if args and any(a.startswith("--chmod=") for a in args) \
+                and all(a.startswith("--chmod=") or not a.startswith("-") for a in args):
             return
         raise Decision(DENY, "git update-index : seule la forme --chmod=+x <chemin> est admise")
-    if "--no-verify" in args:
+    if any(opt_matches(a, "--no-verify") for a in args):
         raise Decision(DENY, "--no-verify : les hooks git ne se contournent pas")
-    if sub in ("commit", "push", "merge") and any(re.match(r"^-[a-zA-Z]*n", a) for a in args):
-        raise Decision(DENY, f"-n sur git {sub} : les hooks git ne se contournent pas")
+    if sub == "commit" and any(re.match(r"^-[a-zA-Z]*n", a) for a in args):
+        raise Decision(DENY, "-n sur git commit : les hooks git ne se contournent pas")
 
     if sub == "config":
-        if any(a in args for a in ("--get", "--list", "-l", "--get-all", "--get-regexp",
-                                   "--show-origin", "--get-urlmatch")):
-            return
-        if positionals and CONFIG_KEY_DENY.match(positionals[0]):
-            raise Decision(DENY, f"git config {positionals[0]} : clé sensible")
-        raise Decision(ASK, "git config en écriture")
+        check_config(args, ctx)
+        return
     if sub == "branch":
         if "main" in args and any(a.startswith("-") and a not in BRANCH_LISTING for a in args):
             raise Decision(DENY, "git branch avec une option agissant sur main")
         return
-    if sub in ("checkout", "switch", "worktree") and "main" in args \
-            and any(a in ("-B", "-C", "--force-create", "--orphan") for a in args):
-        raise Decision(DENY, f"git {sub} : recréation forcée de main")
-    if sub == "tag" and any(a in ("-d", "-D", "--delete", "-f", "--force") for a in args):
+    if sub in ("checkout", "switch"):
+        check_checkout(sub, args, ctx, repo)
+        return
+    if sub == "tag" and any(a in ("-d", "-D", "-f") or opt_matches(a, "--delete", "--force") for a in args):
         raise Decision(DENY, "git tag -d/-f : suppression ou écrasement d'une étiquette")
-    if sub == "clean" and any(a == "--force" or (a.startswith("-") and not a.startswith("--") and "f" in a)
+    if sub == "clean" and any(opt_matches(a, "--force") or (a.startswith("-") and not a.startswith("--") and "f" in a)
                               for a in args):
         raise Decision(DENY, "git clean -f : suppression de fichiers non suivis (doute)")
     if sub == "remote" and any(a in ("add", "set-url", "remove", "rename", "rm") for a in args):
         raise Decision(ASK, "git remote modifié")
     if sub == "fetch":
-        if any(a.startswith("+") or a == "--update-head-ok" for a in args):
+        if any(a.startswith("+") or opt_matches(a, "--update-head-ok") for a in args):
             raise Decision(DENY, "git fetch forcé")
         for a in args:
             src, sep, dst = a.partition(":")
@@ -354,53 +481,17 @@ def analyse_git(words, ctx):
                 raise Decision(DENY, f"git fetch {a} : écriture de main")
         return
     if sub in TREE_WRITERS:
+        if sub == "worktree" and "main" in args and any(a in ("-B", "--orphan") for a in args):
+            raise Decision(DENY, "git worktree : recréation forcée de main")
         for a in positionals:
-            if is_protected(a, ctx.cwd, ctx.roots) or (sub in ("checkout", "restore") and a in (".", "./", ":/", "*")):
-                raise Decision(DENY, f"git {sub} toucherait {a} (dossiers protégés : .claude/, .githooks/, tools/dev/)")
+            if is_protected(a, ctx.cwd, ctx.roots) or (sub == "restore" and a in (".", "./", ":/", "*")):
+                raise Decision(DENY, f"git {sub} toucherait {a} : {PROTECTED_LABEL}")
         return
     if sub == "push":
-        # Le push forcé est une exception explicite : demandé à l'utilisateur,
-        # jamais silencieux, consigné dans le journal. Côté serveur, la règle
-        # GitHub sur main l'interdit de toute façon.
-        pos, forced, j = [], False, 0
-        while j < len(args):
-            a = args[j]
-            if a in ("-o", "--push-option", "--repo", "--receive-pack", "--exec") \
-                    or a.startswith(("--repo=", "--receive-pack=", "--exec=")):
-                raise Decision(DENY, f"git push {a} (doute)")
-            if a in ("--mirror", "--all", "--prune", "--delete", "-d"):
-                raise Decision(DENY, f"git push {a} : miroir ou suppression")
-            if a in ("--force", "--force-with-lease", "--force-if-includes") or a.startswith("--force-with-lease="):
-                forced = True
-            elif re.match(r"^-[a-zA-Z]*n", a):
-                raise Decision(DENY, f"git push {a} : -n contourne les hooks")
-            elif re.match(r"^-[a-zA-Z]*d", a):
-                raise Decision(DENY, f"git push {a} : -d supprime une branche distante")
-            elif re.match(r"^-[a-zA-Z]*f", a):
-                forced = True
-            if a == "--":
-                pos.extend(args[j + 1:])
-                break
-            if not a.startswith("-"):
-                pos.append(a)
-            j += 1
-        refspecs = pos[1:]
-        if any(r.startswith("+") for r in refspecs):
-            forced = True
-        if forced:
-            raise Decision(ASK, "push forcé : exception à confirmer par l'utilisateur, puis à consigner dans le journal")
-        for r in refspecs:
-            src, _, dst = r.partition(":")
-            if dst in MAIN_REFS or src in MAIN_REFS:
-                raise Decision(DENY, f"push vers ou depuis main ({r}) : passer par une pull request")
-        if not refspecs or any(r.partition(":")[0] in ("HEAD", "@", "") for r in refspecs):
-            if ctx.branch(repo) == "main":
-                raise Decision(DENY, "push de la branche courante alors qu'on est sur main")
-            if not refspecs and ctx.upstream_is_main(repo):
-                raise Decision(DENY, "git push sans refspec : la branche suit origin/main ou push.default=matching")
+        check_push(args, ctx, repo)
         return
     if sub in MAIN_SENSITIVE:
-        if sub == "pull" and any(a in ("--force", "-f") or a.startswith("+") for a in args):
+        if sub == "pull" and any(a in ("-f",) or opt_matches(a, "--force") or a.startswith("+") for a in args):
             raise Decision(DENY, "git pull forcé")
         if ctx.branch(repo) == "main":
             if sub == "pull" and all(a in ("--ff-only", "--prune", "-p", "-q", "--quiet", "origin", "main") for a in args):
@@ -450,13 +541,13 @@ def analyse_gh(words):
             raise Decision(ASK, f"gh api en écriture ({method}) sur {endpoint}")
         return
     if args[:2] == ["pr", "merge"]:
-        if any(a in ("--admin", "--squash", "--rebase", "-s", "-r") for a in args):
+        if any(a in ("-s", "-r") or opt_matches(a, "--admin", "--squash", "--rebase") for a in args):
             raise Decision(DENY, "gh pr merge --admin/--squash/--rebase : fusion par merge seulement, sans contournement")
         raise Decision(ASK, "gh pr merge : porte Intégrer, validation de l'utilisateur")
     if args[:2] == ["repo", "delete"]:
         raise Decision(DENY, "gh repo delete")
     if args[0] in ("alias", "extension", "auth") \
-            or args[:2] in (["repo", "edit"], ["secret", "set"], ["release", "delete"]):
+            or args[:2] in (["repo", "edit"], ["repo", "sync"], ["secret", "set"], ["release", "delete"]):
         raise Decision(ASK, f"gh {' '.join(args[:2])} : réglage du dépôt ou de l'outil")
 
 
@@ -467,46 +558,114 @@ GIT_WORD_RE = re.compile(r"\b(git|gh)\b")
 PURE_READ = {
     "cat", "less", "more", "head", "tail", "wc", "grep", "rg", "egrep", "fgrep", "ls", "stat",
     "file", "diff", "cmp", "md5sum", "sha256sum", "echo", "printf", "test", "[", "[[", "tree",
-    "du", "realpath", "readlink", "dirname", "basename", "shellcheck", "bat", "sort", "uniq",
-    "cut", "tr", "awk", "jq", "xxd", "hexdump", "od", "strings", "true", "false", ":", "type",
-    "which", "hash", "pwd", "date", "sleep", "env", "printenv", "uname", "id", "whoami",
-    "python3", "python", "node", "bash", "sh", "gitleaks", "shellcheck",
+    "du", "realpath", "readlink", "dirname", "basename", "shellcheck", "bat", "uniq", "cut",
+    "tr", "jq", "xxd", "hexdump", "od", "strings", "true", "false", ":", "type", "which", "hash",
+    "pwd", "date", "sleep", "env", "printenv", "uname", "id", "whoami", "gitleaks", "column",
+    "nl", "tac", "rev", "fold", "paste", "comm", "join", "expand", "unexpand",
 }
 SCRIPT_RUNNERS = {"bash", "sh", "python3", "python", "node"}
+INLINE_FLAGS = {"-c", "-e", "-s", "-m"}
 EXECUTORS = {
-    "bash", "sh", "zsh", "dash", "ksh", "eval", "source", ".", "exec", "xargs", "parallel", "sudo",
-    "doas", "su", "watch", "script", "chroot", "flock", "python", "python3", "node", "perl",
-    "ruby", "php", "ssh", "make",
+    "bash", "sh", "zsh", "dash", "ksh", "eval", "source", ".", "exec", "xargs", "parallel",
+    "watch", "script", "chroot", "flock", "python", "python3", "node", "perl", "ruby", "php",
+    "ssh", "make",
 }
-FIND_DANGEROUS = {"-exec", "-execdir", "-ok", "-okdir", "-delete"}
+# Commandes qui écrivent dans le fichier qu'on leur désigne : chemins dynamiques interdits.
+WRITERS = {
+    "tee", "cp", "mv", "rm", "install", "ln", "dd", "rsync", "truncate", "chmod", "chown",
+    "chgrp", "patch", "tar", "unzip", "curl", "wget", "sort", "sed", "awk", "perl",
+}
+# Programmes en ligne (awk, sed, perl) : leur texte est examiné, pas leurs variables.
+SCRIPT_LANGS = {"awk", "sed", "perl"}
+FIND_DANGEROUS_RE = re.compile(r"^-(exec|execdir|ok|okdir|delete|fprint0?|fprintf|fls)$")
 CHMOD_OK = re.compile(r"^([ugoa]*\+x|0?7[0-7]5|0?755)$")
+SED_WRITE_RE = re.compile(r"(^|[;{\n])\s*[wWe](\s|$)|/[a-zA-Z]*[we](\s|;|$)")
+AWK_WRITE_RE = re.compile(r">|\bsystem\s*\(|\|")
 
 
 def is_pure_read(base, words):
     if base == "find":
-        return not any(a in FIND_DANGEROUS for a in words)
+        return not any(FIND_DANGEROUS_RE.match(a) for a in words)
     if base == "sed":
-        return not any(a.startswith("-i") or a.startswith("--in-place") for a in words[1:])
+        return not any(a.startswith("-i") or a.startswith("--in-place") or SED_WRITE_RE.search(a) for a in words[1:])
+    if base == "awk":
+        return not any(AWK_WRITE_RE.search(a) for a in words[1:])
+    if base == "sort":
+        return not any(a == "-o" or a.startswith("--output") or re.match(r"^-[a-zA-Z]*o", a) for a in words[1:])
     if base == "chmod":
         return len(words) > 1 and bool(CHMOD_OK.match(words[1]))
-    if base in SCRIPT_RUNNERS:
-        # Exécuter un script du projet est permis ; les options -c/-e/-s/- sont
-        # traitées comme commandes indirectes plus bas.
-        return not any(a in ("-c", "-e", "-s", "-") for a in words[1:])
     return base in PURE_READ
 
 
-def analyse_segment(segment, ctx, mentions, subshell):
-    words, writes = extract_redirs(segment)
+def check_code(code, what):
+    """Code destiné à un interpréteur : chemins protégés et git demandent confirmation."""
+    if PROTECTED_SUBSTR_RE.search(code):
+        raise Decision(ASK, f"{what} mentionne un dossier protégé : à confirmer")
+    if GIT_WORD_RE.search(code):
+        raise Decision(ASK, f"{what} contient git ou gh : commande indirecte, à confirmer")
+
+
+def find_script(rest):
+    """Premier argument qui n'est ni une option, ni un heredoc : le fichier de script."""
+    skip = False
+    for a in rest:
+        if skip:
+            skip = False
+            continue
+        if a in ("-X", "-W", "-Q", "--check-hash-based-pycs"):
+            skip = True
+            continue
+        if a.startswith("-") or HEREDOC_TOKEN_RE.match(a):
+            continue
+        return a
+    return None
+
+
+def check_runner(base, words, reads, ctx, bodies):
+    """bash, sh, python3, node : d'où vient le programme exécuté ?"""
+    rest = words[1:]
+    if any(a in INLINE_FLAGS for a in rest):
+        check_code(" ".join(rest), f"{base} avec un programme en ligne")
+        return
+    script = find_script(rest)
+    if script is not None:
+        if is_dynamic(script):
+            raise Decision(DENY, f"{base} avec un chemin de script dynamique (doute)")
+        if is_protected(script, ctx.cwd, ctx.roots):
+            return  # script du projet, protégé en écriture : exécution permise
+        raise Decision(ASK, f"{base} exécute un script hors des dossiers protégés ({script}) : à confirmer")
+    # Pas de fichier : le programme arrive par l'entrée standard.
+    heredocs = [int(m.group(1)) for m in (HEREDOC_TOKEN_RE.match(a) for a in rest) if m]
+    if heredocs:
+        for n in heredocs:
+            body = bodies[n][1]
+            if base in ("bash", "sh"):
+                analyse_text(body, ctx)
+            else:
+                check_code(body, f"{base} avec un script sur l'entrée standard")
+        return
+    for op, target in reads:
+        if op == "<<<":
+            check_code(target, f"{base} avec une chaîne sur l'entrée standard")
+            return
+        raise Decision(ASK, f"{base} lit un script depuis {target} : à confirmer")
+    raise Decision(ASK, f"{base} sans programme identifiable : à confirmer")
+
+
+def analyse_segment(segment, ctx, mentions, subshell, bodies):
+    words, writes, reads = extract_redirs(segment)
     for target in writes:
+        if is_dynamic(target):
+            raise Decision(DENY, f"redirection vers un chemin dynamique ({target}) : doute")
         if is_protected(target, ctx.cwd, ctx.roots):
-            raise Decision(DENY, f"redirection vers {target} : les garde-fous ne se modifient que par Edit ou Write")
+            raise Decision(DENY, f"redirection vers {target} : {PROTECTED_LABEL}")
     while words and words[0] in KEYWORDS:
         words = words[1:]
     if not words:
         return
     words, envs = strip_prefixes(words)
     if not words:
+        check_env_names(envs, "définie pour la suite de la commande")
         return
     head = words[0]
     base = os.path.basename(head)
@@ -514,65 +673,86 @@ def analyse_segment(segment, ctx, mentions, subshell):
         raise Decision(DENY, f"commande dont le nom est une variable ({head}) : doute")
 
     if base in ("git", "gh"):
-        bad = [e for e in envs if e not in ENV_OK]
-        if bad:
-            raise Decision(DENY, f"variable d'environnement {bad[0]} devant {base} (doute)")
+        check_env_names(envs, f"devant {base}")
+        bad = [e for e in envs if e not in ENV_OK and not ENV_SENSITIVE_RE.match(e)]
+        if bad and base == "git":
+            raise Decision(DENY, f"variable d'environnement {bad[0]} devant git (doute)")
         if base == "git":
             analyse_git(words, ctx)
         else:
             analyse_gh(words)
         return
 
+    if base in SHELL_SETTERS:
+        check_env_names([a.split("=", 1)[0] for a in words[1:] if not a.startswith("-")], f"par {base}")
+        return
+
     if base in ("cd", "pushd", "popd"):
-        if not mentions:
-            return
-        if subshell:
-            raise Decision(DENY, "cd dans une commande avec sous-shell et git : la branche ne peut plus être vérifiée")
-        if base == "popd" or len(words) < 2 or words[1] == "-" or "$" in words[1] or "`" in words[1]:
-            raise Decision(DENY, "cd combiné à git ou gh sans cible vérifiable : la branche ne peut plus être vérifiée")
+        if subshell and (mentions or writes):
+            raise Decision(DENY, "cd dans une commande avec sous-shell : le dossier courant ne peut plus être suivi")
+        if base == "popd" or len(words) < 2 or words[1] == "-" or is_dynamic(words[1]):
+            raise Decision(DENY, "cd sans cible vérifiable : le dossier courant ne peut plus être suivi")
         ctx.change_dir(words[1])
         return
 
     if base in ("sudo", "doas", "su"):
         raise Decision(DENY, f"{base} : aucune élévation de privilèges n'est nécessaire pour ce projet")
 
-    if base in EXECUTORS or (base == "find" and any(a in FIND_DANGEROUS for a in words)):
-        indirect = any(a in ("-c", "-e", "-s", "-") for a in words[1:]) or base not in SCRIPT_RUNNERS
-        if indirect and (GIT_WORD_RE.search(" ".join(words)) or (base in ("eval", "source", ".") and mentions)):
+    if base in SCRIPT_RUNNERS:
+        check_runner(base, words, reads, ctx, bodies)
+        return
+
+    if base in EXECUTORS or (base == "find" and any(FIND_DANGEROUS_RE.match(a) for a in words)):
+        if GIT_WORD_RE.search(" ".join(words)) or (base in ("eval", "source", ".") and mentions):
             raise Decision(ASK, f"{base} avec git ou gh : commande indirecte, à confirmer")
 
     pure = is_pure_read(base, words)
+    if pure:
+        return
     for w in words[1:]:
-        if os.path.basename(w) in ("git", "gh") and not pure:
+        if os.path.basename(w) in ("git", "gh"):
             raise Decision(DENY, f"git ou gh en position inattendue après {base} (doute)")
-    if not pure:
+    if base in SCRIPT_LANGS:
         for w in words[1:]:
-            if is_protected(w, ctx.cwd, ctx.roots):
-                raise Decision(DENY, f"{base} toucherait {w} : les garde-fous ne se modifient que par Edit ou Write")
+            if PROTECTED_SUBSTR_RE.search(w):
+                raise Decision(DENY, f"{base} mentionne un dossier protégé : {PROTECTED_LABEL}")
+            if GIT_WORD_RE.search(w):
+                raise Decision(ASK, f"{base} avec git ou gh : commande indirecte, à confirmer")
+        return
+    for w in words[1:]:
+        if is_protected(w, ctx.cwd, ctx.roots):
+            raise Decision(DENY, f"{base} toucherait {w} : {PROTECTED_LABEL}")
+        if base in WRITERS and is_dynamic(w):
+            raise Decision(DENY, f"{base} avec un chemin dynamique ({w}) : doute")
 
 
 # ---------------------------------------------------------------------------
 # Orchestration.
 # ---------------------------------------------------------------------------
-def analyse(cmd, cwd, roots):
-    if len(cmd) > 20000 or re.search(r"[\x00-\x08\x0b\x0c\x0e-\x1f]", cmd):
-        raise Decision(DENY, "commande trop longue ou contenant des caractères de contrôle")
+def analyse_text(cmd, ctx):
+    """Analyse un texte bash (la commande, ou un script bash passé en heredoc)."""
     text, bodies = strip_heredocs(cmd)
     effective = text + "\n" + "\n".join(body for quoted, body in bodies if not quoted)
     mentions = bool(GIT_WORD_RE.search(effective))
     if mentions and re.search(r"\$\(|`|[<>]\(|\$\{[^}]*[#%/^,]", effective):
         raise Decision(ASK, "substitution de commande ($(…), `…`, <(…)) combinée à git ou gh : à confirmer")
     segments, subshell = split_segments(tokenize(text))
-    ctx, decisions = Ctx(cwd, roots), []
+    decisions = []
     for segment in segments:
         try:
-            analyse_segment(segment, ctx, mentions, subshell)
+            analyse_segment(segment, ctx, mentions, subshell, bodies)
         except Decision as d:
             decisions.append(d)
     for kind in (DENY, ASK):
         for d in decisions:
             if d.kind == kind:
                 raise d
+
+
+def analyse(cmd, cwd, roots):
+    if len(cmd) > 20000 or re.search(r"[\x00-\x08\x0b\x0c\x0e-\x1f]", cmd):
+        raise Decision(DENY, "commande trop longue ou contenant des caractères de contrôle")
+    analyse_text(cmd, Ctx(cwd, roots))
 
 
 def decide(cmd, cwd, roots):
