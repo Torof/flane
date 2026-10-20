@@ -21,6 +21,7 @@ Lu au début de chaque session (`/debut`), complété à la fin (`/fin`). Les en
 **Exceptions à la méthode**
 - Push forcé de `main` fait par Claude pour y mettre l'historique anonymisé, avant le passage en public, avec confirmation explicite de l'utilisateur dans l'outil. Dépôt alors privé, aucun autre contributeur. À cette occasion, l'utilisateur a décidé que le garde-fou **demande** tout push forcé au lieu de le bloquer ; la règle GitHub l'interdit de toute façon côté serveur.
 - La protection de `main` a d'abord été constatée indisponible (dépôt privé gratuit), puis obtenue par le passage en public : le périmètre de la fiche a été amendé en cours de tranche, avec l'accord de l'utilisateur.
+- La pull request numéro 3 a été fusionnée par l'utilisateur depuis GitHub pendant l'étape Observer, avant la fin de l'étape Sécuriser : les correctifs de l'audit et la consignation ont été intégrés juste après par la pull request numéro 4. Leçon pour la méthode : la porte Intégrer n'est ouverte qu'une fois la définition de « fini » cochée, et c'est Claude qui la présente ; la règle GitHub pourra exiger les vérifications de T0.2 pour l'imposer.
 
 **Questions ouvertes**
 - Dépôt de marque « Flâne » à l'INPI : quand ? (backlog)
