@@ -4,6 +4,30 @@ Lu au début de chaque session (`/debut`), complété à la fin (`/fin`). Les en
 
 ---
 
+## 2026-10-20 — T0.1 Dépôt et garde-fous
+
+**Tranche** : T0.1 — Dépôt et garde-fous (jalon 0).
+**Étape** : Valider.
+
+**Fait**
+- Fiche planifiée, attaquée par l'avocat du diable (seize objections, toutes retenues, tranche redécoupée : kit Claude en T0.1b), validée à la porte Choisir. Puis décision de passer le dépôt en public dès cette tranche (D-019).
+- Historique réécrit vers l'identité anonyme GitHub avant le passage en public.
+- Livré : `LICENSE` AGPL-3.0 ; hooks git (`commit-msg`, `pre-commit` avec gitleaks 8.30.1, `pre-push`) ; `tools/dev/setup.sh` ; garde-fou de Claude réécrit (enveloppe fermée par défaut, analyse python, trois décisions : bloquer, autoriser, demander) ; `tools/dev/test-hooks.sh` (187 cas) ; `.editorconfig` ; modèles d'issues et de PR ; dépôt public avec règle `protect-main` (pas de suppression, pas de push forcé, pull request obligatoire, fusion par merge seulement, aucun contournement), recherche de secrets et blocage des push, alertes et correctifs Dependabot ; conventions, carte des risques, données, glossaire, inventaire d'outillage à jour.
+- Sécuriser : audit de sécurité (verdict « à corriger » : six contournements du garde-fou démontrés, tous fermés et couverts par des tests négatifs ; limites connues consignées dans `docs/SECURITE.md`) et relecture (verdict « conforme », points de forme corrigés).
+- Observer : l'utilisateur a constaté le banc de tests au vert, la règle sur `main` et les réglages GitHub.
+
+**Décisions** : D-017 (suivi : backlog source de vérité, Issues boîte de réception), D-018 (fusion par merge uniquement), D-019 (dépôt public sous AGPL-3.0).
+
+**Exceptions à la méthode**
+- Push forcé de `main` fait par Claude pour y mettre l'historique anonymisé, avant le passage en public, avec confirmation explicite de l'utilisateur dans l'outil. Dépôt alors privé, aucun autre contributeur. À cette occasion, l'utilisateur a décidé que le garde-fou **demande** tout push forcé au lieu de le bloquer ; la règle GitHub l'interdit de toute façon côté serveur.
+- La protection de `main` a d'abord été constatée indisponible (dépôt privé gratuit), puis obtenue par le passage en public : le périmètre de la fiche a été amendé en cours de tranche, avec l'accord de l'utilisateur.
+
+**Questions ouvertes**
+- Dépôt de marque « Flâne » à l'INPI : quand ? (backlog)
+
+**Prochaine étape**
+- `/tranche` pour T0.1b (kit Claude : démarrage automatique, liste `allow`), en gardant en tête les limites connues du garde-fou.
+
 ## 2026-10-20 — Automatisation du processus
 
 **Tranche** : aucune (méthode, hors cycle).
