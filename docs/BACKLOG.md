@@ -4,13 +4,13 @@ Statuts : **Idée** → **Prête** (fiche validée) → **En cours** → **À te
 
 ## En cours
 
-Aucune tranche en cours. Prochaine : **T0.1**, après réponse aux questions ouvertes.
+Aucune tranche en cours. Prochaine : **T0.1** (questions ouvertes répondues, fiche à planifier).
 
 ## Questions ouvertes
 
-- [ ] **Région du premier paquet** (jalon 1) : quelle région exactement ?
-- [ ] **Trajet de référence** : le trajet que l'utilisateur fait souvent et connaît par cœur, plus un long trajet (par exemple Paris–Montpellier).
-- [ ] **Nom du dépôt GitHub et identifiant de l'appli** (par exemple `flane` et un identifiant de paquet Android).
+- [x] **Région du premier paquet** (jalon 1) : les Hautes-Alpes (05). *Répondu le 2026-10-20.*
+- [x] **Trajet de référence** : Briançon–Embrun (trajet connu par cœur) ; trajet long : Briançon–Marseille. *Répondu le 2026-10-20.*
+- [x] **Nom du dépôt GitHub et identifiant de l'appli** : dépôt `flane`, identifiant de paquet Android `app.flane`, nom affiché « Flâne » (voir D-015). *Répondu le 2026-10-20.*
 
 ---
 
