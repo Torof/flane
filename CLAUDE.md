@@ -26,6 +26,7 @@ L'utilisateur parle français et anglais : répondre dans la langue de son derni
 - **Une session ne traite qu'une seule tranche** (une tranche peut prendre une à trois sessions). Entre deux sessions, ou après une pause de plus d'une heure : `/fin`, `/clear`, `/debut`.
 - **Modes de Claude Code (D-020)** : « accept edits » est le mode normal, réglé dans `.claude/settings.json` ; les dossiers et fichiers protégés demandent toujours l'accord ; le garde-fou s'applique quel que soit le mode. Mode plan pour les discussions d'architecture. Jamais `bypassPermissions` ni `--dangerously-skip-permissions`.
 - **Commandes de Claude** : pas de `cd … &&` en tête (le dossier courant persiste) ; message de commit par plusieurs `-m`, sans `$(…)` ; corps de pull request par `--body-file` depuis le brouillon (`/tmp/claude-*`). Ce sont les formes que la liste `allow` reconnaît.
+- **Zéro demande d'accord inutile** : lire les fichiers avec les outils Read, Grep et Glob, jamais avec `cat`, `head`, `tail`, `sed`, `awk`, `grep` ou `ls` dans le shell. Bash sert uniquement aux préfixes de la liste `allow` (`git`, `gh`, scripts de `tools/dev/`), **une commande par appel**, sans `;`, `&&`, `|`, `echo` ni redirection : une commande composée n'est autorisée que si chacun de ses morceaux l'est. Un besoin qui sort de la liste se propose dans une tranche, il ne se contourne pas.
 
 ## Le cycle, pour chaque tranche
 

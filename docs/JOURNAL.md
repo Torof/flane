@@ -4,6 +4,26 @@ Lu au début de chaque session (`/debut`), complété à la fin (`/fin`). Les en
 
 ---
 
+## 2026-10-20 — Observer T0.1b : les demandes venaient de Claude
+
+**Tranche** : aucune (méthode, hors cycle, branche `docs/meta-2026-10-20`).
+**Étape** : —
+
+**Fait**
+- Porte Observer de T0.1b : au premier `/debut`, l'utilisateur a eu cinq demandes d'accord. Cause établie : les commandes de Claude (`tail`, `awk`, `sed`, `grep`, `cat`, `ls`, `echo`, enchaînements `;` et tubes `|`), aucune dans la liste `allow`. Les règles `allow` elles-mêmes fonctionnent (question ouverte de T0.1b fermée).
+- Correctif : règle « zéro demande d'accord inutile » dans `CLAUDE.md` (Read/Grep/Glob pour lire, Bash réservé aux préfixes autorisés, une commande par appel) ; `/debut` réécrit dans cette forme.
+- `.claude/settings.local.json` vidé à nouveau : les clics « toujours autoriser » l'avaient rempli de règles ponctuelles.
+
+**Décisions** : aucune.
+
+**Exceptions à la méthode** : aucune.
+
+**Questions ouvertes**
+- Faut-il, en T0.1c, que le garde-fou **bloque** (au lieu de laisser Claude Code demander) toute commande Bash hors liste `allow`, avec un message qui renvoie vers Read/Grep ? L'utilisateur ne serait plus interrompu ; Claude serait corrigé sur le coup. À peser contre les commandes légitimes des tranches à venir (`npm test`, etc.).
+
+**Prochaine étape**
+- `/tranche` pour T0.2 (ou T0.1c).
+
 ## 2026-10-20 — T0.1b Kit Claude : zéro interruption inutile
 
 **Tranche** : T0.1b — Kit Claude (jalon 0).
