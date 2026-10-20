@@ -1,10 +1,12 @@
 # Vérifications automatiques de Flâne (T0.2). Trois jobs :
 #   app-check     : types, lint, formatage, notices SPDX, tests, licences (app/)
 #   secrets-check : gitleaks sur tout l'historique, sans configuration du dépôt
-#   deps-check    : npm audit du code de production, comparé aux alertes acceptées
-# app-check et secrets-check sont obligatoires sur main (règle protect-main) ;
-# deps-check l'est seulement quand la pull request touche les fichiers de paquets
-# (voir docs/CONVENTIONS.md). Les actions sont épinglées par SHA de commit.
+#   deps-check    : npm audit du code de production, comparé aux alertes acceptées ;
+#                   un rouge ne bloque une pull request que si elle touche les
+#                   fichiers de paquets (voir docs/CONVENTIONS.md)
+# Les trois sont obligatoires sur main (règle protect-main, tools/dev/github-settings.sh).
+# Les actions sont épinglées par SHA de commit. Les expressions ${{ }} ne sont
+# jamais écrites dans un `run` : elles passent par `env:`.
 name: checks
 
 on:
@@ -18,7 +20,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: checks-${{ github.workflow }}-${{ github.ref }}
+  group: checks-${{ github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 env:
@@ -34,25 +36,58 @@ jobs:
         working-directory: app
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version-file: app/.nvmrc
           cache: npm
           cache-dependency-path: app/package-lock.json
-      - name: Install (lockfile, no install scripts)
+      - id: install
+        name: npm ci (lockfile, no install scripts)
         run: npm ci
-      - name: Types, lint, format, SPDX notices, tests
-        run: npm run check
-      - name: Licences of production dependencies
+      - id: typecheck
+        name: Types
+        run: npm run typecheck
+      - id: lint
+        name: Lint
+        run: npm run lint
+      - id: format
+        name: Format
+        run: npm run format:check
+      - id: spdx
+        name: SPDX notices
+        run: npm run spdx
+      - id: test
+        name: Tests
+        run: npm test
+      - id: licenses
+        name: Licences of production dependencies
         run: npm run licenses
-      - name: Summary on failure
-        if: failure()
+      - name: Summary
+        if: always()
+        env:
+          OUTCOMES: >-
+            install=${{ steps.install.outcome }}
+            typecheck=${{ steps.typecheck.outcome }}
+            lint=${{ steps.lint.outcome }}
+            format=${{ steps.format.outcome }}
+            spdx=${{ steps.spdx.outcome }}
+            test=${{ steps.test.outcome }}
+            licenses=${{ steps.licenses.outcome }}
         run: |
+          failed=""
+          for pair in $OUTCOMES; do
+            case "$pair" in *=failure) failed="${pair%=*}" ;; esac
+          done
+          if [ -z "$failed" ]; then
+            echo "## app-check : vert" >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
           {
-            echo "## app-check : ROUGE"
+            echo "## app-check : ROUGE, étape « $failed »"
             echo
-            echo "Une étape a échoué (types, lint, formatage, SPDX, tests ou licences)."
-            echo "Lire : \`gh run view ${{ github.run_id }} --log-failed | grep -vE '^\s*$' | head -n 30\`"
+            echo "Lire : \`gh run view $GITHUB_RUN_ID --log-failed | grep -vE '^\s*$' | head -n 30\`"
             echo "Rejouer en local : \`cd app && npm run check && npm run licenses\`."
           } >> "$GITHUB_STEP_SUMMARY"
 
@@ -60,10 +95,13 @@ jobs:
     if: github.event_name != 'schedule'
     runs-on: ubuntu-24.04
     timeout-minutes: 5
+    env:
+      BASE_SHA: ${{ github.event.pull_request.base.sha }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
+          persist-credentials: false
       - name: Refuse a repository gitleaks configuration or an exception annotation
         run: |
           set -euo pipefail
@@ -71,12 +109,15 @@ jobs:
             echo "## secrets-check : ROUGE, configuration gitleaks fournie par le dépôt (.gitleaks.toml ou .gitleaksignore)" >> "$GITHUB_STEP_SUMMARY"
             exit 1
           fi
-          # Lignes ajoutées par la pull request (hors docs et Markdown), comme le hook pre-commit.
+          # Lignes ajoutées par la pull request, comme le hook pre-commit. Le diff va
+          # dans un fichier avant le grep : un grep -q sur un tube sous pipefail
+          # ferait échouer l'amont (SIGPIPE) et masquerait la correspondance.
           # Le motif est coupé en deux pour que ce fichier ne se détecte pas lui-même.
-          if [ "${{ github.event_name }}" = "pull_request" ]; then
-            base="${{ github.event.pull_request.base.sha }}"
-            if git diff -U0 "$base...HEAD" -- . ':(exclude)docs' ':(exclude)*.md' | grep '^+' | grep -v '^+++' | grep -q 'gitleaks:''allow'; then
-              echo "## secrets-check : ROUGE, annotation d'exception gitleaks dans le code (une exception se consigne dans le journal)" >> "$GITHUB_STEP_SUMMARY"
+          if [ "$GITHUB_EVENT_NAME" = "pull_request" ]; then
+            added="$(mktemp)"
+            git diff -U0 "$BASE_SHA...HEAD" | grep '^+' | grep -v '^+++' > "$added" || true
+            if grep -q 'gitleaks:''allow' "$added"; then
+              echo "## secrets-check : ROUGE, annotation d'exception gitleaks ajoutée (une exception se consigne dans le journal)" >> "$GITHUB_STEP_SUMMARY"
               exit 1
             fi
           fi
@@ -94,11 +135,13 @@ jobs:
         run: |
           set -uo pipefail
           report="$(mktemp)"
+          log="$(mktemp)"
           env -u GITLEAKS_CONFIG /tmp/gitleaks git --redact --no-banner --log-level error \
-            --exit-code 1 --report-format json --report-path "$report" >/dev/null 2>&1
+            --exit-code 1 --report-format json --report-path "$report" >"$log" 2>&1
           rc=$?
           if [ "$rc" -eq 0 ]; then
             echo "## secrets-check : vert" >> "$GITHUB_STEP_SUMMARY"
+            rm -f "$report" "$log"
             exit 0
           fi
           {
@@ -115,28 +158,67 @@ jobs:
           for r in results[:30]:
               print(f"- règle {r.get('RuleID', '?')}, fichier {r.get('File', '?')}, ligne {r.get('StartLine', '?')}, commit {str(r.get('Commit', '?'))[:8]}")
           if not results:
-              print("Aucun résultat exploitable : gitleaks a échoué. Relancer, puis regarder le journal du job.")
+              print("Aucun résultat exploitable : gitleaks a échoué. Dernières lignes de sa sortie (expurgée) :")
           PY
+            if [ ! -s "$report" ] || [ "$(tr -d '[:space:]' < "$report")" = "[]" ]; then
+              echo '```'
+              tail -n 5 "$log"
+              echo '```'
+            fi
             echo
             echo "Retirer le secret et le révoquer s'il est réel. Aucune exception gitleaks : une exception se consigne dans le journal."
           } >> "$GITHUB_STEP_SUMMARY"
-          rm -f "$report"
+          rm -f "$report" "$log"
           exit 1
 
   deps-check:
     runs-on: ubuntu-24.04
     timeout-minutes: 5
+    env:
+      BASE_SHA: ${{ github.event.pull_request.base.sha }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version-file: app/.nvmrc
       - name: Tests of the audit script
         run: node --test tools/dev/audit.test.mjs
+      - id: scope
+        name: Decide whether a red audit blocks this run
+        run: |
+          set -euo pipefail
+          # Sur main et le lundi : toujours. Sur une pull request : seulement si
+          # elle touche les fichiers de paquets (docs/CONVENTIONS.md).
+          if [ "$GITHUB_EVENT_NAME" != "pull_request" ]; then
+            blocking=true
+          elif [ -n "$(git diff --name-only "$BASE_SHA...HEAD" -- app/package.json app/package-lock.json)" ]; then
+            blocking=true
+          else
+            blocking=false
+          fi
+          echo "blocking=$blocking" >> "$GITHUB_OUTPUT"
+          echo "blocking=$blocking"
       - name: npm audit of production dependencies (reads the lockfile, no install)
         working-directory: app
+        # npm audit sort en 1 dès qu'il y a une alerte : c'est audit.mjs qui juge,
+        # et il sort en 2 si le JSON est une erreur du registre ou vide.
         run: npm audit --omit=dev --json > "$RUNNER_TEMP/audit.json" || true
       - name: Compare with accepted advisories
+        env:
+          BLOCKING: ${{ steps.scope.outputs.blocking }}
         run: |
+          set -uo pipefail
           node tools/dev/audit.mjs --audit "$RUNNER_TEMP/audit.json" --lock app/package-lock.json \
             --accepted tools/dev/audit-accepted.json --summary "$GITHUB_STEP_SUMMARY"
+          rc=$?
+          if [ "$rc" -ne 0 ] && [ "$BLOCKING" != "true" ]; then
+            {
+              echo
+              echo "_Informatif : cette pull request ne touche ni \`app/package.json\` ni \`app/package-lock.json\` ; ce rouge ne la bloque pas (\`docs/CONVENTIONS.md\`). À corriger dans une tranche de dépendances._"
+            } >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          exit "$rc"

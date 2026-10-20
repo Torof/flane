@@ -53,7 +53,7 @@ if printf '%s\n' "$staged" | grep -Eq '(^|/)\.gitleaks(\.toml|ignore)$' \
   echo "pre-commit : configuration gitleaks fournie par le dépôt (.gitleaks.toml ou .gitleaksignore). Commit refusé." >&2
   exit 1
 fi
-if git diff --cached -U0 -- . ':(exclude)docs' ':(exclude)*.md' | grep '^+' | grep -v '^+++' | grep -q 'gitleaks:''allow'; then
+if git diff --cached -U0 | grep '^+' | grep -v '^+++' | grep -q 'gitleaks:''allow'; then
   echo "pre-commit : annotation d'exception gitleaks dans le code. Commit refusé : une exception se consigne dans le journal, pas dans le code." >&2
   exit 1
 fi

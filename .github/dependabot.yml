@@ -43,3 +43,4 @@ updates:
       - dependency-name: 'babel-preset-expo'
       - dependency-name: 'eslint-config-expo'
       - dependency-name: 'typescript'
+      - dependency-name: '@types/react'

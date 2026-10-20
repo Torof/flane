@@ -14,8 +14,10 @@ cd "$root"
 
 # Version et somme de contrôle de gitleaks : une seule source, partagée avec
 # le hook pre-commit et les vérifications automatiques.
+[ -r tools/dev/gitleaks.env ] || { echo "tools/dev/gitleaks.env manquant ou illisible." >&2; exit 1; }
 # shellcheck source=tools/dev/gitleaks.env
 . tools/dev/gitleaks.env
+: "${GITLEAKS_VERSION:?gitleaks.env sans GITLEAKS_VERSION}" "${GITLEAKS_SHA256:?gitleaks.env sans GITLEAKS_SHA256}"
 GITLEAKS_URL="https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz"
 
 # 1. Hooks git.

@@ -38,7 +38,7 @@ EXPO_NO_TELEMETRY=1 eas build -p android -e development    # client de développ
 
 ## Contribuer au dépôt
 
-Après avoir cloné : `tools/dev/setup.sh` active les hooks git du projet (format des commits, recherche de secrets, vérifications avant envoi), installe gitleaks dans `~/.local/bin` et la version de Node attendue. Chaque pull request passe les vérifications automatiques (`.github/workflows/checks.yml` : types, lint, formatage, notices SPDX, tests, licences, secrets, audit des dépendances) ; `main` refuse la fusion tant qu'elles ne sont pas vertes. Méthode et conventions : [`docs/METHODE.md`](docs/METHODE.md), [`docs/CONVENTIONS.md`](docs/CONVENTIONS.md).
+Après avoir cloné : `tools/dev/setup.sh` active les hooks git du projet (format des commits, recherche de secrets, vérifications avant envoi), installe gitleaks dans `~/.local/bin` et la version de Node attendue. Chaque pull request passe les vérifications automatiques (`.github/workflows/checks.yml` : types, lint, formatage, notices SPDX, tests, licences, secrets, audit des dépendances) ; `main` refuse la fusion tant qu'elles ne sont pas vertes (l'audit des dépendances ne bloque que si la pull request touche les fichiers de paquets). Méthode et conventions : [`docs/METHODE.md`](docs/METHODE.md), [`docs/CONVENTIONS.md`](docs/CONVENTIONS.md).
 
 ## Licence
 

@@ -46,7 +46,7 @@ Une tranche est finie quand **toutes** ces cases sont cochées :
 
 - [ ] Le critère de réussite de la fiche est atteint et l'utilisateur l'a constaté.
 - [ ] Les tests sont écrits et passent, y compris les cas limites de la fiche.
-- [ ] Les vérifications automatiques sont vertes (`app-check`, `secrets-check`, et `deps-check` si la tranche touche les dépendances).
+- [ ] Les vérifications automatiques sont vertes (`app-check`, `secrets-check`, `deps-check`).
 - [ ] L'audit de sécurité n'a laissé aucun point bloquant ouvert.
 - [ ] La relecture de code n'a laissé aucun point bloquant ouvert.
 - [ ] `docs/DONNEES.md` est à jour si la tranche touche des données.
