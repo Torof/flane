@@ -219,7 +219,12 @@ class Ctx:
                 raise Decision(DENY, f"dossier introuvable : {repo}")
             branch = git_run(repo, "rev-parse", "--abbrev-ref", "HEAD")
             if branch is None:
-                raise Decision(DENY, "pas un dépôt git, ou git indisponible (doute)")
+                inside = git_run(repo, "rev-parse", "--is-inside-work-tree")
+                head = git_run(repo, "rev-parse", "--verify", "--quiet", "HEAD")
+                if inside == "true" and head is None:
+                    branch = "__unborn__"  # dépôt sans aucun commit : rien à protéger encore
+                else:
+                    raise Decision(DENY, "pas un dépôt git, ou git indisponible (doute)")
             if branch == "HEAD":
                 raise Decision(DENY, "HEAD détaché : la branche est inconnue (doute)")
             self.cache[repo] = branch

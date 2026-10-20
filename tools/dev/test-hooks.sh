@@ -48,7 +48,8 @@ nouveau_depot "$TMP/sur-main"
 nouveau_depot "$TMP/sur-branche" "feat/T0.1-test"
 nouveau_depot "$TMP/avec-hooks" "feat/T0.1-test"
 git -C "$TMP/avec-hooks" config core.hooksPath "$ROOT/.githooks"
-mkdir -p "$TMP/pas-un-depot" "$TMP/home-vide"
+mkdir -p "$TMP/pas-un-depot" "$TMP/home-vide" "$TMP/depot-vide"
+git -C "$TMP/depot-vide" init -q -b main   # aucun commit : branche « non née »
 
 # ---------------------------------------------------------------------------
 # [commit-msg]
@@ -323,6 +324,7 @@ if [ "$G_RC" -eq 2 ]; then ok "[garde-fou] JSON invalide → DENY" "$(first_line
 (cd "$M" && garde_run "" 'git commit -m "x"'; [ "$(classify)" = DENY ]) && ok "[garde-fou] sans cwd, depuis main → DENY" || ko "[garde-fou] sans cwd, depuis main" "attendu DENY"
 (cd "$B" && garde_run "" 'git commit -m "x"'; [ "$(classify)" = ALLOW ]) && ok "[garde-fou] sans cwd, depuis une branche → ALLOW" || ko "[garde-fou] sans cwd, depuis une branche" "attendu ALLOW"
 (cd "$TMP" && CLAUDE_PROJECT_DIR="$M" garde_run "" 'git commit -m "x"'; [ "$(classify)" = DENY ]) && ok "[garde-fou] sans cwd, CLAUDE_PROJECT_DIR sur main → DENY" || ko "[garde-fou] sans cwd, CLAUDE_PROJECT_DIR sur main" "attendu DENY"
+garde ALLOW "premier commit d'un dépôt vide"          "$TMP/depot-vide" 'git commit -m "docs: starter kit"'
 garde DENY  "cwd inexistant"                          "$TMP/nexiste-pas" 'git commit -m "x"'
 garde DENY  "cwd hors dépôt"                          "$TMP/pas-un-depot" 'git commit -m "x"'
 garde_run "$M" 'git commit -m "x"' Read
