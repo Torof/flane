@@ -1,0 +1,22 @@
+name: Idée
+description: Une suggestion pour Flâne. Elle ira au parking du backlog, revu en fin de jalon.
+title: "[Idée] "
+labels: ["idée"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Les idées sont lues à chaque début de session et notées au parking (`docs/BACKLOG.md`). Elles sont revues en fin de jalon. Pas besoin de détailler la solution : le besoin suffit.
+  - type: textarea
+    id: besoin
+    attributes:
+      label: Le besoin
+      description: Dans quelle situation, sur la route ou avant, cette idée vous aiderait ?
+    validations:
+      required: true
+  - type: textarea
+    id: piste
+    attributes:
+      label: Une piste (facultatif)
+    validations:
+      required: false

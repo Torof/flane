@@ -1,0 +1,48 @@
+name: Bug sur la route
+description: Quelque chose s'est mal passé pendant un trajet ou en préparant un trajet.
+title: "[Bug] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Merci. Deux règles pour protéger votre vie privée : **ne collez ni coordonnées GPS, ni capture d'écran montrant votre position**, et décrivez le lieu par un tronçon approximatif (« entre Briançon et Embrun »), jamais par une adresse.
+  - type: textarea
+    id: quoi
+    attributes:
+      label: Ce qui s'est passé
+      description: Ce que Flâne a fait, et ce que vous attendiez.
+    validations:
+      required: true
+  - type: input
+    id: troncon
+    attributes:
+      label: Tronçon approximatif
+      placeholder: "entre Briançon et Embrun"
+    validations:
+      required: false
+  - type: dropdown
+    id: moment
+    attributes:
+      label: Moment
+      options:
+        - En préparant le trajet (à l'arrêt)
+        - En route (en mouvement)
+        - À l'arrêt pendant le trajet
+        - Autre
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version de Flâne et modèle de téléphone
+      placeholder: "0.1.0, Pixel 7"
+    validations:
+      required: false
+  - type: checkboxes
+    id: vieprivee
+    attributes:
+      label: Vie privée
+      options:
+        - label: Je n'ai collé ni coordonnées, ni adresse, ni capture montrant ma position.
+          required: true
