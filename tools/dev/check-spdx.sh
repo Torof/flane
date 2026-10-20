@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 # Checks that every code file carries the SPDX licence notice in its first two
 # lines (after an optional shebang). Usage: check-spdx.sh [root-directory]
-# Code files: *.ts *.tsx *.js *.mjs *.cjs *.sh and the git hooks in .githooks/.
+# Code files: *.ts *.tsx *.js *.mjs *.cjs *.sh *.py and the git hooks in .githooks/.
 # Skipped: any directory named node_modules, android, ios, .expo, dist, coverage
 # or .git (at any depth), and declaration files (*.d.ts: generated, or typings
 # copied from elsewhere). Exit code 1 if at least one notice is missing.
@@ -23,7 +23,7 @@ done < <(
        -o -name dist -o -name coverage -o -name .git \) -prune \
     -o -type f \
        \( -name '*.ts' -o -name '*.tsx' -o -name '*.js' -o -name '*.mjs' \
-          -o -name '*.cjs' -o -name '*.sh' -o -path '*/.githooks/*' \) \
+          -o -name '*.cjs' -o -name '*.sh' -o -name '*.py' -o -path '*/.githooks/*' \) \
        ! -name 'expo-env.d.ts' ! -name '*.d.ts' \
     -print0
 )

@@ -67,7 +67,7 @@ Utilisée par l'agent `auditeur-securite` à chaque tranche.
 
 **Plateforme**
 - [ ] Chaque nouvelle permission Android est nécessaire, justifiée, et demandée au moment où elle sert.
-- [ ] Le manifeste de l'APK a été lu (permissions, composants exportés, `allowBackup`) et correspond à la configuration.
+- [ ] Le manifeste de l'APK a été lu (`python3 -I tools/dev/read-manifest.py <apk>` : permissions, composants exportés, `allowBackup`) et correspond à la configuration.
 - [ ] La localisation n'est active que pendant un trajet.
 
 **Sécurité routière**

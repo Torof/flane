@@ -54,7 +54,7 @@ flane/
 ├── .claude/               compétences, agents et réglages de Claude Code
 ├── .githooks/             hooks git locaux (format des commits, secrets, pré-push)
 ├── .github/               vérifications automatiques, modèles d'issues et de PR
-├── tools/dev/             setup.sh (hooks, gitleaks, Node), check-spdx.sh, licenses.mjs, make-dev-keystore.sh
+├── tools/dev/             setup.sh (hooks, gitleaks, Node), check-spdx.sh, licenses.mjs, make-dev-keystore.sh, read-manifest.py
 ├── app/                   l'appli Expo (React Native, TypeScript), née en T0.3
 │   ├── app.config.ts      configuration Expo (variante app.flane.dev pour development et preview, app.flane pour production)
 │   ├── eas.json           profils de compilation EAS (development, preview, production)
@@ -78,7 +78,7 @@ Les écrans vivent dans `src/ui/`. Les fichiers de `src/app/` sont des **routes 
 
 ## Code
 
-- Chaque fichier de code (`.ts`, `.tsx`, `.js`, `.mjs`, `.cjs`, `.sh`, hooks git) commence par la notice `// SPDX-License-Identifier: AGPL-3.0-or-later` (après le shebang pour les scripts). Vérifié par `tools/dev/check-spdx.sh`. Le texte complet de la licence est dans `LICENSE`.
+- Chaque fichier de code (`.ts`, `.tsx`, `.js`, `.mjs`, `.cjs`, `.sh`, `.py`, hooks git) commence par la notice `// SPDX-License-Identifier: AGPL-3.0-or-later` (après le shebang pour les scripts). Vérifié par `tools/dev/check-spdx.sh`. Le texte complet de la licence est dans `LICENSE`.
 - TypeScript en mode strict ; pas de `any`.
 - Formatage automatique (Prettier) et règles de lint (ESLint, aucun avertissement toléré, `no-console` et `no-explicit-any` en erreur), appliqués par les vérifications automatiques.
 - Scripts npm de `app/` : `typecheck`, `lint`, `format`, `format:check`, `test`, `spdx`, `licenses`, et `check` qui enchaîne tout. Le hook `pre-push` lance `check`.
