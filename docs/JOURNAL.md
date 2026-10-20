@@ -4,6 +4,28 @@ Lu au début de chaque session (`/debut`), complété à la fin (`/fin`). Les en
 
 ---
 
+## 2026-10-20 — Installation
+
+**Tranche** : aucune (installation, hors cycle).
+**Étape** : —
+
+**Fait**
+- Kit décompressé à la racine du dossier (le dossier caché `.claude/` et le `.gitignore` manquaient, ajoutés depuis l'archive).
+- Outils vérifiés : Git 2.53, Node.js v22.15 (LTS), GitHub CLI 2.46 connecté au compte Torof.
+- Dépôt git local créé sur `main`, kit enregistré dans le commit `docs: starter kit`.
+- Dépôt GitHub privé créé : `flane`, https://github.com/Torof/flane.
+- `DEMARRAGE.md` supprimé, devenu inutile.
+
+**Décisions** : aucune.
+
+**Exceptions à la méthode** : aucune.
+
+**Questions ouvertes**
+- Celles du backlog (région du premier paquet, trajet de référence, nom de l'appli), à traiter avec `/debut`.
+
+**Prochaine étape**
+- Lancer `/debut`, puis planifier la tranche T0.1.
+
 ## 2026-10-20 — Préparation du terrain (claude.ai)
 
 **Tranche** : aucune (préparation, hors cycle).
