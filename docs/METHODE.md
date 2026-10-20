@@ -4,8 +4,8 @@ Une méthode pour construire à deux (l'utilisateur et Claude) : les forces de l
 
 ## Les rôles
 
-- **L'utilisateur** décide, valide et teste.
-- **Claude** propose, code et contredit. Il fait respecter la méthode.
+- **L'utilisateur** décide, valide et teste. Le produit (ce que fait l'appli, pourquoi, l'interface, l'expérience) se décide ensemble (D-021).
+- **Claude** propose, code et contredit. Il fait respecter la méthode. La technique (code, outils, bibliothèques, structure) est sa décision ; il ne sollicite l'utilisateur qu'en cas de doute ou de choix lourd (D-021).
 - **Les agents** vérifient avec un regard neuf : `avocat-du-diable` (fiches), `auditeur-securite` (sécurité), `relecteur` (code).
 
 ## Les unités de travail
@@ -90,7 +90,7 @@ L'utilisateur reste le décideur. Une étape peut être sautée, mais **jamais e
 ## Économiser le contexte, sans perdre en qualité
 
 - Une session ne traite qu'une seule tranche ; `/clear` entre deux sessions ou après une pause de plus d'une heure. Le journal assure la continuité.
-- Rester en mode par défaut ou en mode plan : jamais d'acceptation automatique des modifications.
+- Mode « accept edits » par défaut (D-020) : les garde-fous (hook de Claude, hooks git, règle GitHub, accord demandé sur les dossiers protégés) tiennent lieu de relecture pas à pas. Mode plan pour les discussions d'architecture.
 - `CLAUDE.md` reste court (moins de 200 lignes). Les procédures détaillées vivent dans les compétences (`.claude/skills/`) et ne se chargent qu'à la demande.
 - Les sorties verbeuses (tests, journaux) passent par des sous-agents ou des filtres (hooks) qui ne remontent que l'essentiel.
 - Le mode plan pour toute tâche complexe : Claude explore et propose avant de modifier.

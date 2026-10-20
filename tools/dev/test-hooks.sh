@@ -45,11 +45,21 @@ nouveau_depot() { # <dossier> [branche]
   if [ -n "$branch" ]; then git -C "$dir" checkout -q -b "$branch"; fi
 }
 nouveau_depot "$TMP/sur-main"
-nouveau_depot "$TMP/sur-branche" "feat/T0.1-test"
 nouveau_depot "$TMP/avec-hooks" "feat/T0.1-test"
 git -C "$TMP/avec-hooks" config core.hooksPath "$ROOT/.githooks"
-mkdir -p "$TMP/pas-un-depot" "$TMP/home-vide" "$TMP/depot-vide" "$TMP/sur-branche/.githooks" "$TMP/sur-branche/docs"
+mkdir -p "$TMP/pas-un-depot" "$TMP/home-vide" "$TMP/depot-vide"
 git -C "$TMP/depot-vide" init -q -b main   # aucun commit : branche « non née »
+# sur-branche : main porte un garde-fou versionné (commit 2) ; la branche ajoute
+# un fichier ordinaire (commit 3). HEAD~2 n'a pas de garde-fou : retour en arrière.
+nouveau_depot "$TMP/sur-branche"
+mkdir -p "$TMP/sur-branche/.claude/hooks" "$TMP/sur-branche/.githooks" "$TMP/sur-branche/docs"
+printf '#!/bin/sh\nexit 0\n' >"$TMP/sur-branche/.claude/hooks/garde-branche-main.sh"
+git -C "$TMP/sur-branche" add .claude
+git -C "$TMP/sur-branche" commit -q -m "chore(T0.1): guard"
+git -C "$TMP/sur-branche" checkout -q -b "feat/T0.1-test"
+printf 'x\n' >"$TMP/sur-branche/fichier-suivi.txt"
+git -C "$TMP/sur-branche" add fichier-suivi.txt
+git -C "$TMP/sur-branche" commit -q -m "chore(T0.1): file"
 
 # ---------------------------------------------------------------------------
 # [commit-msg]
@@ -229,25 +239,65 @@ else
 fi
 
 # ---------------------------------------------------------------------------
-# [settings] : les réglages de Claude Code protègent bien les garde-fous.
+# [kit] : les réglages de Claude Code protègent les garde-fous, la liste
+# « allow » est exactement celle décidée (T0.1b), le kit est cohérent.
 # ---------------------------------------------------------------------------
-if python3 -I - "$ROOT/.claude/settings.json" <<'PY' 2>"$TMP/err"
-import json, sys
-with open(sys.argv[1], encoding="utf-8") as f:
+if python3 -I - "$ROOT" <<'PY' 2>"$TMP/err"
+import json, os, re, sys
+root = sys.argv[1]
+with open(os.path.join(root, ".claude/settings.json"), encoding="utf-8") as f:
     s = json.load(f)
-ask = set(s["permissions"]["ask"])
+perms = s["permissions"]
+if perms.get("defaultMode") != "acceptEdits":
+    sys.exit("defaultMode doit être acceptEdits (D-020)")
+ask = set(perms["ask"])
 needed = {f"{tool}(./{path}/**)" for tool in ("Edit", "Write") for path in (".claude", ".githooks", ".github", "tools/dev")}
+needed |= {f"{tool}(./{path})" for tool in ("Edit", "Write") for path in ("CLAUDE.md", ".gitignore", ".mcp.json")}
 missing = needed - ask
 if missing:
-    sys.exit("manquent : " + ", ".join(sorted(missing)))
+    sys.exit("ask : manquent " + ", ".join(sorted(missing)))
+# Liste figée (T0.1b) : toute modification passe par une tranche et par ce banc.
+expected_allow = [
+    "Bash(git status:*)", "Bash(git log:*)", "Bash(git diff:*)", "Bash(git show:*)",
+    "Bash(git branch --show-current)", "Bash(git branch -a)", "Bash(git branch --list:*)",
+    "Bash(git rev-parse:*)", "Bash(git ls-files:*)", "Bash(git merge-base:*)", "Bash(git remote -v)",
+    "Bash(git fetch:*)", "Bash(git stash list)", "Bash(git add:*)", "Bash(git commit:*)",
+    "Bash(git push:*)", "Bash(git switch:*)",
+    "Bash(gh pr view:*)", "Bash(gh pr list:*)", "Bash(gh pr create:*)", "Bash(gh pr checks:*)",
+    "Bash(gh issue list:*)", "Bash(gh run list:*)", "Bash(gh repo view:*)", "Bash(gh label list:*)",
+    "Bash(bash tools/dev/test-hooks.sh:*)", "Bash(bash tools/dev/setup.sh)",
+]
+if perms.get("allow") != expected_allow:
+    sys.exit("allow : différente de la liste figée du banc")
+forbidden = re.compile(r"\b(gh api|gh pr merge|rm|sudo|curl|wget|--force|gh issue view)\b")
+for entry in expected_allow:
+    if forbidden.search(entry):
+        sys.exit(f"allow : motif interdit dans {entry}")
 hooks = s["hooks"]["PreToolUse"][0]
 assert hooks["matcher"] == "Bash"
 assert "garde-branche-main.sh" in hooks["hooks"][0]["command"]
+local = os.path.join(root, ".claude/settings.local.json")
+if os.path.exists(local):
+    with open(local, encoding="utf-8") as f:
+        l = json.load(f)
+    bad = [e for e in l.get("permissions", {}).get("allow", []) if e.startswith("Bash(")]
+    if bad:
+        sys.exit("settings.local.json : règles Bash hors du kit : " + ", ".join(bad))
+# Compétences et agents cités dans CLAUDE.md existent.
+with open(os.path.join(root, "CLAUDE.md"), encoding="utf-8") as f:
+    claude_md = f.read()
+builtin = {"clear", "compact", "insights", "rewind", "help", "config", "fast", "code-review"}
+for skill in re.findall(r"`/([a-z-]+)`", claude_md):
+    if skill not in builtin and not os.path.exists(os.path.join(root, ".claude/skills", skill, "SKILL.md")):
+        sys.exit(f"compétence citée sans fichier : /{skill}")
+for agent in ("avocat-du-diable", "auditeur-securite", "relecteur"):
+    if agent not in claude_md or not os.path.exists(os.path.join(root, ".claude/agents", agent + ".md")):
+        sys.exit(f"agent manquant : {agent}")
 PY
 then
-  ok "[settings] settings.json valide, ask sur les garde-fous, hook Bash branché"
+  ok "[kit] settings.json : acceptEdits, ask sur les garde-fous, allow figée, hook branché ; compétences et agents présents"
 else
-  ko "[settings] settings.json" "$(first_line "$(cat "$TMP/err")")"
+  ko "[kit] réglages de Claude Code" "$(first_line "$(cat "$TMP/err")")"
 fi
 
 # ---------------------------------------------------------------------------
@@ -382,6 +432,38 @@ garde DENY  "git tag -d"                              "$B" 'git tag -d v0.0.1'
 garde DENY  "sudo git"                                "$B" 'sudo git status'
 garde DENY  "chmod 777 sur un hook"                   "$B" 'chmod 777 .githooks/pre-commit'
 garde DENY  "bash avec script dynamique"              "$B" 'bash "$HOOK"'
+
+# Dérivés dangereux des préfixes « allow » (T0.1b) : jamais silencieux.
+garde DENY  "git diff --output vers le garde-fou"     "$B" 'git diff --no-index a b --output=.claude/hooks/garde-branche-main.sh'
+garde DENY  "git log --output"                        "$B" 'git log --output=/tmp/x'
+garde DENY  "git log -o"                              "$B" 'git log -o /tmp/x'
+garde DENY  "git fetch --upload-pack"                 "$B" "git fetch --upload-pack='sh -c x' ."
+garde DENY  "git ls-remote --upload-pack"             "$B" "git ls-remote --upload-pack='sh -c x' ."
+garde ASK   "git checkout vers un commit aux garde-fous différents" "$B" 'git checkout HEAD~2'
+garde ASK   "git checkout -- chemins"                 "$B" 'git checkout -- app/'
+garde ASK   "git checkout fichier suivi"              "$B" 'git checkout fichier-suivi.txt'
+garde ASK   "git switch --discard-changes"            "$B" 'git switch --discard-changes feat/T0.1-test'
+garde ASK   "git checkout -f"                         "$B" 'git checkout -f feat/T0.1-test'
+garde ASK   "git branch -D autre branche"             "$B" 'git branch -D feat/x'
+garde ASK   "git branch -m"                           "$B" 'git branch -m feat/x feat/y'
+garde ASK   "git push vers un autre dépôt distant"    "$B" 'git push https://example.invalid/x.git HEAD:x'
+garde ASK   "git gc"                                  "$B" 'git gc --prune=now'
+garde ASK   "git reflog expire"                       "$B" 'git reflog expire --expire=now --all'
+garde ASK   "git stash drop"                          "$B" 'git stash drop'
+garde ASK   "gh pr create --body-file hors brouillon" "$B" 'gh pr create --title x --body-file ~/.config/gh/hosts.yml'
+garde ASK   "gh pr create -F .env"                    "$B" 'gh pr create --title x -F .env'
+garde ASK   "gh issue create --body-file hors brouillon" "$B" 'gh issue create --title x --body-file docs/x.md'
+garde ASK   "rg --pre"                                "$B" 'rg --pre sh x f'
+garde ASK   "find -delete"                            "$B" 'find docs -name "*.md" -delete'
+garde ASK   "redirection hors du projet"              "$B" 'echo x > ~/.gitconfig'
+garde DENY  "tree -o vers .githooks"                  "$B" 'tree -o .githooks/x'
+garde ALLOW "gh pr create --body-file depuis le brouillon" "$B" 'gh pr create --title x --body-file /tmp/claude-1000/x/body.md'
+garde ALLOW "git checkout branche aux mêmes garde-fous" "$B" 'git checkout feat/T0.1-test'
+garde ALLOW "git switch -c"                           "$B" 'git switch -c feat/T0.1b-x'
+garde ALLOW "git reflog (liste)"                      "$B" 'git reflog -5'
+garde ALLOW "git stash list"                          "$B" 'git stash list'
+garde ALLOW "redirection vers le brouillon"           "$B" 'echo x > /tmp/claude-1000/x/out.txt'
+garde ALLOW "redirection vers /dev/null"              "$B" 'git status > /dev/null'
 
 # Demandé : commandes indirectes, scripts externes et portes.
 garde ASK   "bash -c git commit"                      "$B" 'bash -c "git commit -m x"'

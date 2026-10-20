@@ -16,6 +16,14 @@ Fixées une fois pour toutes, pour ne plus y penser. Validées à la tranche T0.
 - Documentation hors tranche (journal entre deux tranches, réponses aux questions ouvertes, bilan de jalon) : branche `docs/meta-AAAA-MM-JJ`.
 - Intégration par pull request, après la définition de « fini ». Le journal et le backlog sont mis à jour dans la pull request elle-même, avant l'intégration. Fusion par merge uniquement, squash et rebase désactivés (D-018) ; la branche est supprimée après fusion.
 
+## Commandes de Claude
+
+Les commandes que Claude lance passent par la liste `allow` de `.claude/settings.json` (sans demande) et par le garde-fou (qui garde la priorité). Pour rester dans les formes reconnues :
+- pas de `cd … &&` en tête : le dossier courant persiste entre les commandes ;
+- message de commit par plusieurs `-m` (sujet, corps, `Co-Authored-By`), sans substitution `$(…)` ;
+- corps de pull request ou d'issue par `--body-file` depuis le brouillon de Claude (`/tmp/claude-*`), jamais depuis un fichier du projet ou du poste ;
+- lecture des fichiers par les outils de Claude Code (Read, Grep, Glob), pas par `cat` ou `find`.
+
 ## Suivi
 
 - `docs/BACKLOG.md` est la seule source de vérité des tranches (D-017).
