@@ -15,16 +15,17 @@ Lu au début de chaque session (`/debut`), complété à la fin (`/fin`). Les en
 - Dépôt git local créé sur `main`, kit enregistré dans le commit `docs: starter kit`.
 - Dépôt GitHub privé créé : `flane`, https://github.com/Torof/flane.
 - `DEMARRAGE.md` supprimé, devenu inutile.
+- Questions ouvertes du backlog répondues : Hautes-Alpes (05) ; Briançon–Embrun et Briançon–Marseille ; identifiant `app.flane`.
 
-**Décisions** : aucune.
+**Décisions** : D-015 (identifiant de l'appli).
 
 **Exceptions à la méthode** : aucune.
 
 **Questions ouvertes**
-- Celles du backlog (région du premier paquet, trajet de référence, nom de l'appli), à traiter avec `/debut`.
+- Aucune.
 
 **Prochaine étape**
-- Lancer `/debut`, puis planifier la tranche T0.1.
+- `/tranche` pour la fiche de T0.1.
 
 ## 2026-10-20 — Préparation du terrain (claude.ai)
 
