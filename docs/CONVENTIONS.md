@@ -55,26 +55,34 @@ flane/
 ├── .githooks/             hooks git locaux (format des commits, secrets, pré-push)
 ├── .github/               vérifications automatiques, modèles d'issues et de PR
 ├── tools/dev/             installation des hooks et de gitleaks (setup.sh)
-├── app/                   l'appli Expo (React Native, TypeScript) — naît en T0.3
+├── app/                   l'appli Expo (React Native, TypeScript), née en T0.3
+│   ├── app.config.ts      configuration Expo (variantes dev / production)
+│   ├── eas.json           profils de compilation EAS (development, preview, production)
 │   └── src/
+│       ├── app/           routes minces d'Expo Router : un fichier par écran, qui désigne l'écran de ui/
 │       ├── domain/        modèle de données (Trip, Stop, Place, StopRequest…), sans dépendance à l'interface
 │       ├── engine/        moteur de suggestions et niveaux de connaissance
 │       ├── data/          stockage local, lecture et vérification des paquets
 │       ├── services/      itinéraire, localisation, voix, liens Google Maps et Waze
 │       ├── ui/            écrans et composants (vue complète, vue en mouvement)
-│       ├── i18n/          textes de l'appli
-│       └── config/        types d'arrêts, réglages
+│       ├── i18n/          textes de l'appli (fr.json) et la fonction t()
+│       ├── config/        types d'arrêts, réglages
+│       └── tools/         tests des outils du dépôt (tools/dev)
 ├── data-pipeline/         chaîne de fabrication des paquets régionaux
 └── tools/                 simulateur, visualiseur, banc d'essai, écouteur de phrases
 ```
 
-Le principe : **le domaine et le moteur ne dépendent pas de l'interface**. C'est ce qui permet de les tester seuls, de changer l'affichage (vue conducteur, vue passager, CarPlay) et de passer sur iOS sans tout réécrire.
+Le principe : **le domaine et le moteur ne dépendent pas de l'interface**. C'est ce qui permet de les tester seuls, de changer l'affichage (vue conducteur, vue passager, CarPlay) et de passer sur iOS sans tout réécrire. Une règle ESLint (`no-restricted-imports`) interdit à `src/domain/` et `src/engine/` d'importer `react`, `react-native`, `expo*`, `src/app`, `src/ui` et `src/services`.
+
+Les écrans vivent dans `src/ui/`. Les fichiers de `src/app/` sont des **routes minces** : ils ne font que désigner l'écran à afficher (`export { AboutScreen as default } from '@/ui/screens/AboutScreen'`). Ainsi la navigation peut changer sans toucher aux écrans, et les écrans se testent sans navigation.
 
 ## Code
 
-- Chaque fichier de code commence par la notice `// SPDX-License-Identifier: AGPL-3.0-or-later` (dès T0.3). Le texte complet de la licence est dans `LICENSE`.
+- Chaque fichier de code (`.ts`, `.tsx`, `.js`, `.mjs`, `.cjs`, `.sh`, hooks git) commence par la notice `// SPDX-License-Identifier: AGPL-3.0-or-later` (après le shebang pour les scripts). Vérifié par `tools/dev/check-spdx.sh`. Le texte complet de la licence est dans `LICENSE`.
 - TypeScript en mode strict ; pas de `any`.
-- Formatage automatique (Prettier) et règles de lint (ESLint), appliqués par les vérifications automatiques.
+- Formatage automatique (Prettier) et règles de lint (ESLint, aucun avertissement toléré, `no-console` et `no-explicit-any` en erreur), appliqués par les vérifications automatiques.
+- Scripts npm de `app/` : `typecheck`, `lint`, `format`, `format:check`, `test`, `spdx`, `licenses`, et `check` qui enchaîne tout. Le hook `pre-push` lance `check`.
+- Version de Node : celle de `app/.nvmrc` (installée par `tools/dev/setup.sh` quand nvm est présent). Node 22.15.0 ne retrouve pas ses modules dans un chemin qui contient un accent, comme « Flâne ».
 - Fonctions courtes ; noms explicites, tirés du glossaire.
 - Tests à côté du code : `trip.ts` et `trip.test.ts`.
 - Aucun `console.log` contenant une position, un trajet ou une préférence.
@@ -84,7 +92,9 @@ Le principe : **le domaine et le moteur ne dépendent pas de l'interface**. C'es
 
 - Chaque ajout est justifié dans la fiche de tranche : pourquoi, alternatives, licence, maintenance.
 - Licence compatible AGPL-3.0, vérifiée automatiquement.
-- Versions verrouillées (fichier de verrouillage enregistré).
+- Versions verrouillées (fichier de verrouillage enregistré, `save-exact`), scripts d'installation désactivés (`ignore-scripts` dans `app/.npmrc`).
+- `npm audit` : aucune alerte haute ou critique dans le code embarqué dans l'appli ; les alertes des outils (CLI, Metro, Jest) sont listées et justifiées dans la pull request.
+- Licences des dépendances de production inventoriées par `tools/dev/licenses.mjs` (liste des licences acceptées dans le script).
 - Préférer une petite fonction maison à une grosse bibliothèque pour un besoin simple.
 
 ## Fichiers de documentation

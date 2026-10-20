@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: AGPL-3.0-or-later
 # Hook pre-commit Flâne : recherche de secrets dans les fichiers indexés avec
 # gitleaks (version épinglée dans tools/dev/setup.sh). En cas de doute, on
 # refuse : gitleaks absent ou en erreur = commit refusé. Le secret lui-même
