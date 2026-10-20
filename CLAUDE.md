@@ -8,6 +8,8 @@ Le projet est construit à deux : l'utilisateur (décide et teste) et Claude (pr
 
 **Rien n'est codé, construit ni modifié sans validation explicite de l'utilisateur.** Claude propose, explique, puis attend un « oui » clair. Une réflexion à voix haute de l'utilisateur n'est pas une validation. En cas de doute, demander.
 
+La validation se donne à **trois portes** (D-016) : **Choisir** (la fiche validée autorise le code, dans son périmètre et pas au-delà), **Observer** (l'utilisateur constate le résultat) et **Intégrer** (fusion, délégable tranche par tranche). Entre les portes, Claude enchaîne seul : branche, code, tests, commits, pull request, agents, corrections dans le périmètre, journal et backlog. Il s'arrête et demande pour tout ce qui sort du périmètre de la fiche. Un « oui » vaut pour le plan présenté juste avant ; « parking » veut dire « note l'idée, ne la traite pas ».
+
 ## Langue
 
 L'utilisateur parle français et anglais : répondre dans la langue de son dernier message. Documentation en français. Code (identifiants, fichiers de code) et messages de commit en anglais (voir `docs/CONVENTIONS.md`). Textes affichés dans l'appli : en français, via les fichiers de traduction.
@@ -67,6 +69,7 @@ Détail complet : `docs/METHODE.md`.
 | Vocabulaire commun (et noms dans le code) | `docs/GLOSSAIRE.md` |
 | Conventions de code, branches, commits | `docs/CONVENTIONS.md` |
 | Schéma d'architecture | `docs/ARCHITECTURE.md` |
+| Outils, garde-fous, automatisations et leur état | `docs/OUTILLAGE.md` |
 | Modèles à remplir | `docs/modeles/` |
 
 ## Agents
