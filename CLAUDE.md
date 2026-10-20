@@ -10,6 +10,8 @@ Le projet est construit à deux : l'utilisateur (décide et teste) et Claude (pr
 
 La validation se donne à **trois portes** (D-016) : **Choisir** (la fiche validée autorise le code, dans son périmètre et pas au-delà), **Observer** (l'utilisateur constate le résultat) et **Intégrer** (fusion, délégable tranche par tranche). Entre les portes, Claude enchaîne seul : branche, code, tests, commits, pull request, agents, corrections dans le périmètre, journal et backlog. Il s'arrête et demande pour tout ce qui sort du périmètre de la fiche. Un « oui » vaut pour le plan présenté juste avant ; « parking » veut dire « note l'idée, ne la traite pas ».
 
+Pendant Construire, les commits et les push sur la branche de la tranche ne demandent pas d'accord dans la conversation. Les permissions d'outils de Claude Code (demande avant une commande ou une modification) sont une couche distincte, réglée par le mode que l'utilisateur choisit. Le garde-fou de `.claude/hooks/` s'applique quel que soit le mode, et il demande confirmation pour la fusion d'une pull request.
+
 ## Langue
 
 L'utilisateur parle français et anglais : répondre dans la langue de son dernier message. Documentation en français. Code (identifiants, fichiers de code) et messages de commit en anglais (voir `docs/CONVENTIONS.md`). Textes affichés dans l'appli : en français, via les fichiers de traduction.

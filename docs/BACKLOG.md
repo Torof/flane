@@ -4,10 +4,11 @@ Statuts : **Idée** → **Prête** (fiche validée) → **En cours** → **À te
 
 ## En cours
 
-Aucune tranche en cours. Prochaine : **T0.1** (questions ouvertes répondues, fiche à planifier).
+**T0.1 — Dépôt et garde-fous**, étape Construire. Fiche : `docs/tranches/T0.1-repo-conventions.md`. Branche : `chore/T0.1-repo-conventions`. Budget : 2 sessions, validée le 2026-10-20.
 
 ## Questions ouvertes
 
+- [ ] **Dépôt de marque « Flâne » (INPI)** : quand ? Depuis le passage en public (D-019), le nom est la seule chose que la licence ne protège pas. Prévu en T5.5 ; à avancer si possible.
 - [x] **Région du premier paquet** (jalon 1) : les Hautes-Alpes (05). *Répondu le 2026-10-20.*
 - [x] **Trajet de référence** : Briançon–Embrun (trajet connu par cœur) ; trajet long : Briançon–Marseille. *Répondu le 2026-10-20.*
 - [x] **Nom du dépôt GitHub et identifiant de l'appli** : dépôt `flane`, identifiant de paquet Android `app.flane`, nom affiché « Flâne » (voir D-015). *Répondu le 2026-10-20.*
@@ -20,9 +21,10 @@ Aucune tranche en cours. Prochaine : **T0.1** (questions ouvertes répondues, fi
 
 | ID | Tranche | Statut |
 | --- | --- | --- |
-| T0.1 | Dépôt et conventions : structure des dossiers, modèles d'issues et de pull requests (définition de « fini » en cases à cocher), garde-fous git locaux dans `.githooks/` (secrets, format des commits, pré-push), `.npmrc` (`ignore-scripts`, `save-exact`), `.nvmrc`, `.editorconfig`, réglages GitHub (alertes de vulnérabilité, Dependabot, protection de `main` à tester), kit Claude vérifié et complété (garde-fou affiné, démarrage automatique, avertissement de fin de session, liste d'autorisations). Détail dans `docs/OUTILLAGE.md`. Branche `chore/T0.1-repo-conventions`. Étape Observer : l'utilisateur vérifie le dépôt et relance `/debut` | Idée |
-| T0.2 | Vérifications automatiques (GitHub Actions) : types, lint, tests, audit des dépendances, recherche de secrets, licences, `expo-doctor`, vérification de la méthode (cases de « fini » cochées, journal modifié avec le code), exécution hebdomadaire, actions épinglées par commit et permissions minimales ; filtre de sortie des tests pour Claude | Idée |
-| T0.3 | Squelette de l'appli Expo : TypeScript strict, ESLint et Prettier, hook de format et lint à l'écriture pour Claude, fichiers de traduction, compilation de développement installée sur Android | Idée |
+| T0.1 | Dépôt et garde-fous : hooks git locaux dans `.githooks/` (secrets avec gitleaks, format des commits, pré-push) avec banc de tests, garde-fou de Claude durci et fermé par défaut, `.editorconfig`, licence AGPL-3.0 et passage en public, modèles d'issues et de PR (définition de « fini » en cases), réglages GitHub (règle sur `main`, recherche de secrets, alertes), D-017 à D-019. Fiche `docs/tranches/T0.1-repo-conventions.md`, branche `chore/T0.1-repo-conventions`, budget 2 sessions. Étape Observer : l'utilisateur lance le banc de tests, vérifie le dépôt et relance `/debut` | En cours |
+| T0.1b | Kit Claude : démarrage automatique (hook `SessionStart` borné : jamais le corps des issues, dix au plus, délai sur `gh`), liste `allow` entrée par entrée, vérification des compétences et agents, `/debut` adapté. Budget 1 session | Idée |
+| T0.2 | Vérifications automatiques (GitHub Actions) : types, lint, tests, audit des dépendances, recherche de secrets, licences, `expo-doctor`, vérification de la méthode (cases de « fini » cochées, journal modifié avec le code), exécution hebdomadaire, actions épinglées par commit et permissions minimales, `dependabot.yml` (`github-actions`), CodeQL ; vérifications exigées par la règle sur `main` ; filtre de sortie des tests pour Claude | Idée |
+| T0.3 | Squelette de l'appli Expo : TypeScript strict, ESLint et Prettier, hook de format et lint à l'écriture pour Claude, fichiers de traduction, notice SPDX en tête des fichiers, `.npmrc` (`ignore-scripts`, `save-exact`), `.nvmrc`, Dependabot `npm`, compilation de développement installée sur Android | Idée |
 | T0.4 | Historique des versions automatique (à partir des messages de commit) et version par jalon | Idée |
 
 ## Jalon 1 — Je vois les bons coins de ma région

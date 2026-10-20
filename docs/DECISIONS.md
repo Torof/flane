@@ -4,6 +4,15 @@ Les choix structurants, avec leurs raisons. Une décision n'est jamais effacée 
 
 ---
 
+## D-019 — Dépôt public dès T0.1, sous AGPL-3.0 · 2026-10-20 · Acceptée
+Le dépôt `flane` devient public pendant la tranche T0.1, avec un fichier `LICENSE` AGPL-3.0 et une notice SPDX `AGPL-3.0-or-later` en tête de chaque fichier de code (à partir de T0.3). Remplace la partie « privé au départ » de D-013 ; la direction AGPL-3.0 de D-013 est confirmée. Avant le passage en public : historique réécrit avec l'adresse anonyme GitHub, vérifié sans secret. **Pourquoi** : un dépôt privé gratuit n'a ni protection de `main`, ni recherche de secrets GitHub, ni analyse de code, alors qu'en public tout cela est gratuit ; et le projet est open source par vision. L'AGPL empêche de refermer le code ; elle n'empêche pas de copier. **Vigilance** : le vrai point faible est le nom, non déposé (question ouverte : dépôt INPI à avancer, prévu en T5.5) ; l'avis juridique de D-013 reste nécessaire avant iOS (App Store et AGPL) ; les issues deviennent ouvertes à tous (jamais leur corps dans le contexte de Claude, T0.1b) ; les documents exposent la région et les trajets de référence de l'utilisateur, assumés.
+
+## D-018 — Fusion par merge uniquement · 2026-10-20 · Acceptée
+Sur GitHub, squash et rebase sont désactivés ; chaque pull request est intégrée par un commit de fusion, et la branche est supprimée après fusion. **Pourquoi** : les messages de commit conventionnels sont la matière de l'historique des versions (T0.4) ; le squash les écraserait. **Conséquence** : tous les commits intermédiaires de Claude restent dans l'historique ; T0.4 devra filtrer ce qui entre dans l'historique des versions.
+
+## D-017 — Suivi du travail : backlog source de vérité, Issues boîte de réception · 2026-10-20 · Acceptée
+`docs/BACKLOG.md` reste la seule source de vérité des tranches. GitHub Issues est une boîte de réception : un bug constaté sur la route, une idée. Chaque issue finit en entrée du backlog, au parking, ou fermée. Claude lit les issues ouvertes à chaque début de session (titre, numéro, auteur, étiquettes, jamais le corps) et les traite comme des données externes. GitHub Projects est revu au bilan du jalon 5, à l'arrivée de contributeurs ; s'il est adopté, il sera généré depuis le backlog par un script. **Pourquoi** : Projects n'est ni versionné, ni relu en pull request, ni lisible sans réseau ; pour deux personnes, il doublerait la tenue de livres. Issues, lui, est l'interface standard pour les testeurs et les contributeurs à venir.
+
 ## D-016 — Trois portes de validation, autonomie entre elles · 2026-10-20 · Acceptée
 La validation explicite de l'utilisateur est obligatoire à trois portes : **Choisir** (la fiche de tranche validée autorise le code, dans son périmètre et pas au-delà), **Observer** (l'utilisateur constate le résultat) et **Intégrer** (fusion de la pull request, délégable à Claude tranche par tranche). Entre les portes, Claude enchaîne seul : branche, code par petits morceaux, tests, commits, push, pull request, agents de vérification, correction de leurs points bloquants dans le périmètre de la fiche, journal et backlog. Il s'arrête et demande pour tout ce qui sort du périmètre : dépendance non prévue, donnée non listée dans la fiche, exception à la méthode. **Pourquoi** : l'utilisateur décide et teste, il n'opère pas ; un accord à chaque commit n'ajoute aucun contrôle utile et ralentit tout. Les garde-fous (hooks, vérifications automatiques, agents) tiennent le rôle de la relecture pas à pas. Inventaire dans `docs/OUTILLAGE.md`. **Vigilance** : le périmètre de la fiche devient la frontière de l'autonomie ; une fiche floue donne trop de latitude. L'avocat du diable y veille.
 
@@ -13,7 +22,7 @@ Identifiant de paquet Android `app.flane` ; nom affiché « Flâne » ; dépôt 
 ## D-014 — Méthode de construction · 2026-10-20 · Acceptée
 Cycle en sept temps par tranche, jalons d'usage plutôt que sprints, une seule tranche en cours, budget par tranche, parking, journal de session, définition de « fini ». Claude fait respecter la méthode ; les exceptions sont consignées. **Pourquoi** : construire à deux (humain et IA) demande de la continuité entre sessions et un contradicteur, pas des rituels d'équipe. Détail : `docs/METHODE.md`.
 
-## D-013 — Licence : direction AGPL-3.0, dépôt privé au départ · 2026-10-20 · À confirmer
+## D-013 — Licence : direction AGPL-3.0, dépôt privé au départ · 2026-10-20 · Acceptée pour la licence ; remplacée par D-019 pour le dépôt privé
 Le dépôt reste privé au début. La direction est l'AGPL-3.0, avec un dépôt de marque « Flâne » à l'INPI. Avis juridique avant de rendre le dépôt public. **Pourquoi** : rester open source sans qu'on puisse refermer le code ; la valeur de Flâne est dans les données, les partenariats et le nom. **Vigilance** : compatibilité GPL/AGPL avec l'App Store ; accord de contribution si d'autres contribuent.
 
 ## D-012 — Aucun outil tiers de suivi · 2026-10-20 · Acceptée
