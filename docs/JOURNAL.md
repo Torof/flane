@@ -19,10 +19,10 @@ Lu au début de chaque session (`/debut`), complété à la fin (`/fin`). Les en
 **Décisions** : D-023.
 
 **Exceptions à la méthode**
-- Aucune.
+- La fiche faisait de la double authentification du compte Expo un préalable à la première publication. L'utilisateur a choisi de la remettre à plus tard ; la publication a eu lieu quand même, à sa demande. Risque accepté en connaissance de cause : aujourd'hui la version de test ne détient aucune donnée personnelle et n'a que la permission internet. Le verrou obligatoire reste le déclencheur de signature des mises à jour (`docs/SECURITE.md`), qui tombera avant la première donnée personnelle stockée.
 
 **Questions ouvertes**
-- Double authentification du compte Expo : à confirmer par l'utilisateur (non vérifiable depuis le dépôt).
+- Double authentification du compte Expo : remise à plus tard par l'utilisateur ; à activer avant que la version de test stocke une donnée personnelle (au plus tard avec la signature des mises à jour).
 - `Bash(eas *)` dans les réglages de Claude Code : toujours en suspens (décision de l'utilisateur).
 
 **Prochaine étape**

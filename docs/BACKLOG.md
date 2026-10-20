@@ -8,6 +8,7 @@ Statuts : **Idée** → **Prête** (fiche validée) → **En cours** → **À te
 
 ## Questions ouvertes
 
+- [ ] **Double authentification du compte Expo** : remise à plus tard le 2026-10-20. À activer avant la première donnée personnelle stockée par la version de test, en même temps que la signature des mises à jour (déclencheur dans `docs/SECURITE.md`).
 - [ ] **Dépôt de marque « Flâne » (INPI)** : quand ? Depuis le passage en public (D-019), le nom est la seule chose que la licence ne protège pas. Prévu en T5.5 ; à avancer si possible.
 - [x] **Région du premier paquet** (jalon 1) : les Hautes-Alpes (05). *Répondu le 2026-10-20.*
 - [x] **Trajet de référence** : Briançon–Embrun (trajet connu par cœur) ; trajet long : Briançon–Marseille. *Répondu le 2026-10-20.*
