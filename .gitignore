@@ -10,15 +10,24 @@
 *.key
 google-services.json
 GoogleService-Info.plist
+credentials.json
+app/credentials/
 
 # Dépendances et compilations
 node_modules/
 .expo/
 dist/
 build/
-android/app/build/
+coverage/
+*.tsbuildinfo
 *.apk
 *.aab
+
+# Dossiers natifs générés par Expo (prebuild) : jamais enregistrés
+app/android/
+app/ios/
+app/expo-env.d.ts
+app/.kotlin/
 
 # Chaîne de fabrication des paquets
 data-pipeline/out/

@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: AGPL-3.0-or-later
 # Hook commit-msg Flâne : impose le format des messages de commit
 # (docs/CONVENTIONS.md) : type(Tx.y|meta): sujet. Les messages de fusion
 # produits par git ou GitHub et les « Revert » passent. Tout le reste est refusé.
