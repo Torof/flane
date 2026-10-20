@@ -37,3 +37,6 @@ Thumbs.db
 .vscode/*
 !.vscode/extensions.json
 *.log
+
+# Python (garde-fou de Claude)
+__pycache__/

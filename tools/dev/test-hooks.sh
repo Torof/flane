@@ -48,7 +48,7 @@ nouveau_depot "$TMP/sur-main"
 nouveau_depot "$TMP/sur-branche" "feat/T0.1-test"
 nouveau_depot "$TMP/avec-hooks" "feat/T0.1-test"
 git -C "$TMP/avec-hooks" config core.hooksPath "$ROOT/.githooks"
-mkdir -p "$TMP/pas-un-depot" "$TMP/home-vide" "$TMP/depot-vide"
+mkdir -p "$TMP/pas-un-depot" "$TMP/home-vide" "$TMP/depot-vide" "$TMP/sur-branche/.githooks" "$TMP/sur-branche/docs"
 git -C "$TMP/depot-vide" init -q -b main   # aucun commit : branche « non née »
 
 # ---------------------------------------------------------------------------
@@ -81,6 +81,18 @@ msg_case 1 "feat(t0.1): minuscule"
 msg_case 1 "chore: x"
 msg_case 1 ""
 
+if bash "$ROOT/.githooks/commit-msg" "$TMP/fichier-absent" >/dev/null 2>&1; then
+  ko "[commit-msg] fichier de message absent" "accepté"
+else
+  ok "[commit-msg] fichier de message absent → refusé"
+fi
+: >"$TMP/msg-vide"
+if bash "$ROOT/.githooks/commit-msg" "$TMP/msg-vide" >/dev/null 2>&1; then
+  ko "[commit-msg] fichier de message vide" "accepté"
+else
+  ok "[commit-msg] fichier de message vide → refusé"
+fi
+
 # De bout en bout : le hook est bien câblé par core.hooksPath.
 if git -C "$TMP/avec-hooks" commit -q --allow-empty -m "feat: no scope" 2>/dev/null; then
   ko "[commit-msg] câblage core.hooksPath" "un message hors format a été accepté"
@@ -102,7 +114,7 @@ fake_token="ghp_${part_a}${part_b}"
 gitleaks_present=0
 if command -v gitleaks >/dev/null 2>&1 || [ -x "$HOME/.local/bin/gitleaks" ]; then gitleaks_present=1; fi
 
-run_pre_commit() { # [env…] ; stdout/stderr dans $TMP/err ; code dans $?
+run_pre_commit() { # [VAR=valeur…] ; sortie dans $TMP/err ; code dans $?
   (cd "$TMP/avec-hooks" && env "$@" bash "$ROOT/.githooks/pre-commit") >"$TMP/err" 2>&1
 }
 
@@ -137,6 +149,32 @@ else
   ko "[pre-commit] fichier sans secret" "gitleaks absent sur ce poste : lancer tools/dev/setup.sh"
 fi
 
+# Configuration gitleaks fournie par le dépôt : refusée.
+printf 'x\n' >"$TMP/avec-hooks/.gitleaksignore"
+git -C "$TMP/avec-hooks" add .gitleaksignore
+if run_pre_commit X=1; then
+  ko "[pre-commit] .gitleaksignore indexé" "accepté : la recherche de secrets pourrait être neutralisée"
+elif grep -qi 'configuration gitleaks' "$TMP/err"; then
+  ok "[pre-commit] .gitleaksignore indexé → refusé"
+else
+  ko "[pre-commit] .gitleaksignore indexé" "refusé pour une autre raison : $(first_line "$(cat "$TMP/err")")"
+fi
+git -C "$TMP/avec-hooks" rm -q --cached .gitleaksignore
+rm -f "$TMP/avec-hooks/.gitleaksignore"
+
+# Annotation d'exception gitleaks ajoutée dans du code : refusée.
+printf 'token = "none" # gitleaks:%s\n' "allow" >"$TMP/avec-hooks/annot.txt"
+git -C "$TMP/avec-hooks" add annot.txt
+if run_pre_commit X=1; then
+  ko "[pre-commit] annotation d'exception dans le code" "acceptée"
+elif grep -q "annotation d'exception" "$TMP/err"; then
+  ok "[pre-commit] annotation d'exception dans le code → refusée"
+else
+  ko "[pre-commit] annotation d'exception dans le code" "refusée pour une autre raison : $(first_line "$(cat "$TMP/err")")"
+fi
+git -C "$TMP/avec-hooks" rm -q --cached annot.txt
+rm -f "$TMP/avec-hooks/annot.txt"
+
 # gitleaks absent : PATH sans son dossier, HOME vide.
 path_sans=""
 gitleaks_dir=""
@@ -155,6 +193,32 @@ else
   ko "[pre-commit] gitleaks absent" "refusé sans citer tools/dev/setup.sh : $(first_line "$(cat "$TMP/err")")"
 fi
 
+# gitleaks en panne (code 3, aucun rapport) : refus par doute.
+mkdir -p "$TMP/fakebin"
+cat >"$TMP/fakebin/gitleaks" <<'EOF'
+#!/bin/sh
+if [ "$1" = "version" ]; then echo 8.30.1; exit 0; fi
+echo "boom" >&2
+exit 3
+EOF
+chmod +x "$TMP/fakebin/gitleaks"
+if run_pre_commit PATH="$TMP/fakebin:$path_sans" HOME="$TMP/home-vide"; then
+  ko "[pre-commit] gitleaks en panne" "le commit a été accepté"
+elif grep -q 'doute' "$TMP/err"; then
+  ok "[pre-commit] gitleaks en panne → refusé par doute"
+else
+  ko "[pre-commit] gitleaks en panne" "refusé sans mentionner le doute : $(first_line "$(cat "$TMP/err")")"
+fi
+
+# La version attendue est la même dans le hook et dans setup.sh.
+v_hook="$(grep -E '^EXPECTED_VERSION=' "$ROOT/.githooks/pre-commit" | cut -d'"' -f2)"
+v_setup="$(grep -E '^GITLEAKS_VERSION=' "$ROOT/tools/dev/setup.sh" | cut -d'"' -f2)"
+if [ -n "$v_hook" ] && [ "$v_hook" = "$v_setup" ]; then
+  ok "[pre-commit] version gitleaks cohérente avec setup.sh ($v_hook)"
+else
+  ko "[pre-commit] version gitleaks" "hook : ${v_hook:-?}, setup.sh : ${v_setup:-?}"
+fi
+
 # ---------------------------------------------------------------------------
 # [pre-push] sans app/ : ne fait rien.
 # ---------------------------------------------------------------------------
@@ -162,6 +226,28 @@ if (cd "$TMP/sur-branche" && printf '' | bash "$ROOT/.githooks/pre-push" origin 
   ok "[pre-push] sans app/ → sortie 0"
 else
   ko "[pre-push] sans app/" "$(first_line "$(cat "$TMP/err")")"
+fi
+
+# ---------------------------------------------------------------------------
+# [settings] : les réglages de Claude Code protègent bien les garde-fous.
+# ---------------------------------------------------------------------------
+if python3 -I - "$ROOT/.claude/settings.json" <<'PY' 2>"$TMP/err"
+import json, sys
+with open(sys.argv[1], encoding="utf-8") as f:
+    s = json.load(f)
+ask = set(s["permissions"]["ask"])
+needed = {f"{tool}(./{path}/**)" for tool in ("Edit", "Write") for path in (".claude", ".githooks", ".github", "tools/dev")}
+missing = needed - ask
+if missing:
+    sys.exit("manquent : " + ", ".join(sorted(missing)))
+hooks = s["hooks"]["PreToolUse"][0]
+assert hooks["matcher"] == "Bash"
+assert "garde-branche-main.sh" in hooks["hooks"][0]["command"]
+PY
+then
+  ok "[settings] settings.json valide, ask sur les garde-fous, hook Bash branché"
+else
+  ko "[settings] settings.json" "$(first_line "$(cat "$TMP/err")")"
 fi
 
 # ---------------------------------------------------------------------------
@@ -212,25 +298,39 @@ garde DENY  "push sans refspec sur main"              "$M" 'git push'
 garde DENY  "push origin HEAD sur main"               "$M" 'git push origin HEAD'
 garde DENY  "push origin HEAD 2>&1 sur main"          "$M" 'git push origin HEAD 2>&1'
 garde DENY  "pull --rebase sur main"                  "$M" 'git pull --rebase'
+garde DENY  "bash heredoc qui commite sur main"       "$M" "$(printf "bash <<'EOF'\ngit commit -m x\nEOF")"
 garde ALLOW "status sur main"                         "$M" 'git status'
 garde ALLOW "log sur main"                            "$M" 'git log --oneline -5'
 garde ALLOW "pull --ff-only sur main"                 "$M" 'git pull --ff-only origin main'
 garde ALLOW "checkout -b depuis main"                 "$M" 'git checkout -b feat/x'
+garde ALLOW "checkout -b puis commit"                 "$M" 'git checkout -q -b feat/y && git commit -m "feat(T0.1): x"'
 garde ALLOW "fetch sur main"                          "$M" 'git fetch origin'
 garde ALLOW "diff sur main"                           "$M" 'git diff --stat'
+
+# Changement de branche dans la même commande : suivi.
+garde DENY  "checkout main puis commit"               "$B" 'git checkout main && git commit -am "x"'
+garde DENY  "switch main puis merge"                  "$B" 'git switch main; git merge feat/x'
+garde DENY  "switch main puis push HEAD"              "$B" 'git switch main && git push origin HEAD'
+garde DENY  "switch - puis commit"                    "$B" 'git switch - && git commit -m "x"'
 
 # Partout : contournements et écritures dangereuses.
 garde ASK   "push --force (exception demandée)"       "$B" 'git push --force origin feat/x'
 garde ASK   "push --force-with-lease"                 "$B" 'git push --force-with-lease'
+garde ASK   "push --force-w (abrégé)"                 "$B" 'git push --force-w origin feat/x'
 garde ASK   "push -f"                                 "$B" 'git push -f origin feat/x'
+garde ASK   "push -fn"                                "$B" 'git push -fn origin feat/x'
 garde ASK   "push +main"                              "$B" 'git push origin +main'
 garde ASK   "push --force origin main"                "$B" 'git push --force origin main'
 garde DENY  "push HEAD:main"                          "$B" 'git push origin HEAD:main'
 garde DENY  "push feat:main"                          "$B" 'git push origin feat/x:main'
 garde DENY  "push origin main"                        "$B" 'git push origin main'
 garde DENY  "push --delete"                           "$B" 'git push --delete origin feat/x'
+garde DENY  "push --del (abrégé)"                     "$B" 'git push --del origin feat/x'
+garde DENY  "push -d"                                 "$B" 'git push -d origin feat/x'
 garde DENY  "push --mirror"                           "$B" 'git push --mirror origin'
 garde DENY  "commit --no-verify"                      "$B" 'git commit --no-verify -m "feat(T0.1): x"'
+garde DENY  "commit --no-veri (abrégé)"               "$B" 'git commit --no-veri -m "feat(T0.1): x"'
+garde DENY  "merge --no-verif (abrégé)"               "$B" 'git merge --no-verif feat/x'
 garde DENY  "commit -n"                               "$B" 'git commit -n -m "feat(T0.1): x"'
 garde DENY  "commit -anm"                             "$B" 'git commit -anm "feat(T0.1): x"'
 garde DENY  "-c core.hooksPath"                       "$B" 'git -c core.hooksPath=/dev/null commit -m "x"'
@@ -240,10 +340,14 @@ garde DENY  "branch -f main"                          "$B" 'git branch -f main H
 garde DENY  "update-ref main"                         "$B" 'git update-ref refs/heads/main HEAD~1'
 garde DENY  "filter-branch"                           "$B" 'git filter-branch --env-filter "x" -- --all'
 garde DENY  "config core.hooksPath"                   "$B" 'git config core.hooksPath /dev/null'
+garde DENY  "config --file .git/config"               "$B" 'git config --file .git/config core.hooksPath x'
+garde DENY  "config set core.hooksPath"               "$B" 'git config set core.hooksPath x'
 garde DENY  "config alias"                            "$B" 'git config alias.st "push --force"'
 garde DENY  "env GIT_DIR"                             "$B" 'env GIT_DIR=/x git status'
+garde DENY  "export GIT_CONFIG_* puis commit"         "$B" 'export GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=core.hooksPath GIT_CONFIG_VALUE_0=/dev/null; git commit -m "x"'
+garde DENY  "export GIT_DIR puis commit"              "$B" 'export GIT_DIR=../autre/.git; git commit -m "x"'
+garde DENY  "redirection vers .git/config"            "$B" 'echo "[core]" >> .git/config'
 garde DENY  "variable comme commande"                 "$B" 'G=git; $G push --force'
-garde DENY  "push -fn (contourne les hooks)"          "$B" 'git push -fn origin feat/x'
 garde DENY  "git -C vers un dépôt sur main"           "$B" "/usr/bin/git -C $M commit -m \"x\""
 garde DENY  "cd vers un dépôt sur main"               "$B" "cd $M && git commit -m \"x\""
 garde DENY  "cd hors dépôt puis commit"               "$B" 'cd .. && git commit -m "x"'
@@ -256,8 +360,17 @@ garde DENY  "gh pr merge --admin"                     "$B" 'gh pr merge 3 --admi
 garde DENY  "gh repo delete"                          "$B" 'gh repo delete Torof/flane --yes'
 garde DENY  "redirection vers .githooks"              "$B" 'echo x > .githooks/pre-commit'
 garde DENY  "redirection >> vers .claude"             "$B" 'echo x >> .claude/settings.json'
+garde DENY  "redirection vers .github"                "$B" 'echo x > .github/workflows/ci.yml'
+garde DENY  "redirection vers chemin dynamique"       "$B" 'D=.githooks; echo x > $D/pre-commit'
+garde DENY  "cd .githooks puis écriture"              "$B" 'cd .githooks && echo x > pre-commit'
+garde DENY  "tee avec accolades"                      "$B" 'tee .githoo{ks,}/pre-commit'
 garde DENY  "sed -i sur le garde-fou"                 "$B" 'sed -i s/a/b/ .claude/hooks/garde-branche-main.sh'
+garde DENY  "sed w vers .githooks"                    "$B" "sed -n 'w .githooks/x' f"
+garde DENY  "awk écrivant dans .githooks"             "$B" "awk 'BEGIN{print 1 > \".githooks/pre-commit\"}'"
+garde DENY  "sort -o vers .githooks"                  "$B" 'sort -o .githooks/pre-commit x'
+garde DENY  "find -fprint vers .githooks"             "$B" 'find . -fprint .githooks/x'
 garde DENY  "cp vers .githooks"                       "$B" 'cp x .githooks/pre-commit'
+garde DENY  "cp vers chemin dynamique"                "$B" 'cp x "$D/pre-commit"'
 garde DENY  "rm -rf .claude"                          "$B" 'rm -rf .claude'
 garde DENY  "rm -rf tools/dev"                        "$B" 'rm -rf tools/dev'
 garde DENY  "tee vers settings.json"                  "$B" 'tee .claude/settings.json < x'
@@ -268,16 +381,22 @@ garde DENY  "git clean -fd"                           "$B" 'git clean -fd'
 garde DENY  "git tag -d"                              "$B" 'git tag -d v0.0.1'
 garde DENY  "sudo git"                                "$B" 'sudo git status'
 garde DENY  "chmod 777 sur un hook"                   "$B" 'chmod 777 .githooks/pre-commit'
-garde DENY  "python3 -c écrivant dans .claude"        "$B" 'python3 -c "open(\".claude/x\",\"w\")" .claude/x'
+garde DENY  "bash avec script dynamique"              "$B" 'bash "$HOOK"'
 
-# Demandé : commandes indirectes et portes.
+# Demandé : commandes indirectes, scripts externes et portes.
 garde ASK   "bash -c git commit"                      "$B" 'bash -c "git commit -m x"'
 garde ASK   "sh -c git push"                          "$B" "sh -c 'git push'"
 garde ASK   "eval git push"                           "$B" 'eval "git push"'
 garde ASK   "xargs git push"                          "$B" 'echo origin | xargs git push'
 garde ASK   "substitution dans un push"               "$B" 'git push origin $(git branch --show-current)'
+garde ASK   "python3 -c mentionnant .githooks"        "$B" "python3 -c \"open('.githooks/pre-commit','w')\""
+garde ASK   "python3 heredoc avec git"                "$M" "$(printf "python3 - <<'EOF'\nimport subprocess; subprocess.run([\"git\",\"commit\"])\nEOF")"
+garde ASK   "awk system(git)"                         "$B" "awk 'BEGIN{system(\"git commit -m x\")}'"
+garde ASK   "bash script hors projet"                 "$B" 'bash /tmp/x.sh'
+garde ASK   "bash lisant un fichier"                  "$B" 'bash < /tmp/x.sh'
 garde ASK   "gh pr merge"                             "$B" 'gh pr merge 3 --merge --delete-branch'
 garde ASK   "gh repo edit"                            "$B" 'gh repo edit --visibility public'
+garde ASK   "gh repo sync --force"                    "$B" 'gh repo sync --force'
 garde ASK   "gh api PUT vulnerability-alerts"         "$B" 'gh api -X PUT repos/x/y/vulnerability-alerts'
 garde ASK   "gh api POST rulesets"                    "$B" 'gh api -X POST repos/x/y/rulesets -f name=x'
 garde ASK   "git config user.name"                    "$B" 'git config user.name x'
@@ -290,17 +409,24 @@ garde ALLOW "message contenant && git commit"         "$B" 'git commit -m "echo 
 garde ALLOW "echo contenant git commit"               "$B" 'echo "a && git commit"'
 garde ALLOW "push -u origin branche"                  "$B" 'git push -u origin feat/T0.1-test'
 garde ALLOW "push sans refspec sur une branche"       "$B" 'git push'
+garde ALLOW "push -n (dry-run) sur une branche"       "$B" 'git push -n origin feat/x'
 garde ALLOW "git add dans .claude"                    "$B" 'git add .claude/hooks/x.py'
+garde ALLOW "git remote -v"                           "$B" 'git remote -v'
 garde ALLOW "update-index --chmod=+x"                 "$B" 'git update-index --chmod=+x tools/dev/setup.sh'
 garde ALLOW "chmod +x sur un hook"                    "$B" 'chmod +x .githooks/pre-commit tools/dev/setup.sh'
 garde ALLOW "cat settings.json"                       "$B" 'cat .claude/settings.json'
 garde ALLOW "ls .claude"                              "$B" 'ls -la .claude'
 garde ALLOW "grep -r dans .githooks"                  "$B" 'grep -rn foo .githooks'
 garde ALLOW "sed -n (lecture) sur un hook"            "$B" 'sed -n 1,5p .githooks/pre-commit'
-garde ALLOW "bash tools/dev/test-hooks.sh"            "$B" 'bash tools/dev/test-hooks.sh'
+garde ALLOW "awk lecture"                             "$B" "awk '{print \$1}' docs/x.md"
+garde ALLOW "sort lecture"                            "$B" 'sort docs/x.md'
+garde ALLOW "bash tools/dev/test-hooks.sh"            "$B" 'bash tools/dev/test-hooks.sh -v'
 garde ALLOW "bash .githooks/commit-msg"               "$B" 'bash .githooks/commit-msg /tmp/m'
+garde ALLOW "bash -n (syntaxe) sur un hook"           "$B" 'bash -n .githooks/pre-commit'
 garde ALLOW "python3 -I sur le garde-fou"             "$B" 'python3 -I .claude/hooks/garde-branche-main.py < x.json'
-garde ALLOW "cd sans git"                             "$B" 'cd app && npm test'
+garde ALLOW "python3 heredoc sans git"                "$B" "$(printf "python3 - <<'EOF'\nprint(1)\nEOF")"
+garde ALLOW "cd sans git"                             "$B" 'cd docs && npm test'
+garde ALLOW "cd docs puis écriture"                   "$B" 'cd docs && echo x > x.md'
 garde ALLOW "cd dans le dépôt puis commit"            "$B" "cd $B && git commit -m \"x\""
 garde ALLOW "substitution sans git"                   "$B" 'echo $(date)'
 garde ALLOW "git log | head"                          "$B" 'git log --format=%s | head -n 3'
@@ -319,14 +445,22 @@ garde ALLOW "wc -l"                                   "$B" 'wc -l CLAUDE.md'
 garde ALLOW "gitleaks git (sous-commande git)"        "$B" 'gitleaks git --no-banner --redact .'
 garde ALLOW "commande multi-lignes sur branche"       "$B" "$(printf 'git add docs\ngit commit -m "docs(T0.1): x"\ngit push')"
 
-# Cas spéciaux : entrée invalide, cwd absent, autre outil.
-garde_run "" '{pas du json'
+# Cas spéciaux : entrée invalide, cwd absent, dépôt vide, autre outil.
 G_OUT="$(printf '{pas du json' | bash "$HOOK" 2>"$TMP/err")"; G_RC=$?; G_ERR="$(cat "$TMP/err")"
 if [ "$G_RC" -eq 2 ]; then ok "[garde-fou] JSON invalide → DENY" "$(first_line "$G_ERR")"; else ko "[garde-fou] JSON invalide" "code $G_RC"; fi
 
-(cd "$M" && garde_run "" 'git commit -m "x"'; [ "$(classify)" = DENY ]) && ok "[garde-fou] sans cwd, depuis main → DENY" || ko "[garde-fou] sans cwd, depuis main" "attendu DENY"
-(cd "$B" && garde_run "" 'git commit -m "x"'; [ "$(classify)" = ALLOW ]) && ok "[garde-fou] sans cwd, depuis une branche → ALLOW" || ko "[garde-fou] sans cwd, depuis une branche" "attendu ALLOW"
-(cd "$TMP" && CLAUDE_PROJECT_DIR="$M" garde_run "" 'git commit -m "x"'; [ "$(classify)" = DENY ]) && ok "[garde-fou] sans cwd, CLAUDE_PROJECT_DIR sur main → DENY" || ko "[garde-fou] sans cwd, CLAUDE_PROJECT_DIR sur main" "attendu DENY"
+sans_cwd() { # <nom> <attendu> <dossier> <commande> [VAR=valeur]
+  local name="$1" expected="$2" dir="$3" cmd="$4" var="${5:-}" got
+  got="$(cd "$dir" && { [ -n "$var" ] && export "$var"; garde_run "" "$cmd"; classify; })"
+  if [ "$got" = "$expected" ]; then
+    ok "[garde-fou] $name → $expected"
+  else
+    ko "[garde-fou] $name" "attendu $expected, obtenu $got"
+  fi
+}
+sans_cwd "sans cwd, depuis main"                     DENY  "$M"   'git commit -m "x"'
+sans_cwd "sans cwd, depuis une branche"              ALLOW "$B"   'git commit -m "x"'
+sans_cwd "sans cwd, CLAUDE_PROJECT_DIR sur main"     DENY  "$TMP" 'git commit -m "x"' "CLAUDE_PROJECT_DIR=$M"
 garde ALLOW "premier commit d'un dépôt vide"          "$TMP/depot-vide" 'git commit -m "docs: starter kit"'
 garde DENY  "cwd inexistant"                          "$TMP/nexiste-pas" 'git commit -m "x"'
 garde DENY  "cwd hors dépôt"                          "$TMP/pas-un-depot" 'git commit -m "x"'

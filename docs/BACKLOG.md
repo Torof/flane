@@ -4,7 +4,7 @@ Statuts : **Idée** → **Prête** (fiche validée) → **En cours** → **À te
 
 ## En cours
 
-**T0.1 — Dépôt et garde-fous**, étape Construire. Fiche : `docs/tranches/T0.1-repo-conventions.md`. Branche : `chore/T0.1-repo-conventions`. Budget : 2 sessions, validée le 2026-10-20.
+Aucune tranche en cours. Prochaine : **T0.1b** (kit Claude), fiche à planifier.
 
 ## Questions ouvertes
 
@@ -21,7 +21,7 @@ Statuts : **Idée** → **Prête** (fiche validée) → **En cours** → **À te
 
 | ID | Tranche | Statut |
 | --- | --- | --- |
-| T0.1 | Dépôt et garde-fous : hooks git locaux dans `.githooks/` (secrets avec gitleaks, format des commits, pré-push) avec banc de tests, garde-fou de Claude durci et fermé par défaut, `.editorconfig`, licence AGPL-3.0 et passage en public, modèles d'issues et de PR (définition de « fini » en cases), réglages GitHub (règle sur `main`, recherche de secrets, alertes), D-017 à D-019. Fiche `docs/tranches/T0.1-repo-conventions.md`, branche `chore/T0.1-repo-conventions`, budget 2 sessions. Étape Observer : l'utilisateur lance le banc de tests, vérifie le dépôt et relance `/debut` | En cours |
+| T0.1 | Dépôt et garde-fous : hooks git locaux dans `.githooks/` (secrets avec gitleaks, format des commits, pré-push) avec banc de tests, garde-fou de Claude durci et fermé par défaut, `.editorconfig`, licence AGPL-3.0 et passage en public, modèles d'issues et de PR (définition de « fini » en cases), réglages GitHub (règle sur `main`, recherche de secrets, alertes), D-017 à D-019. Fiche `docs/tranches/T0.1-repo-conventions.md`, branche `chore/T0.1-repo-conventions`, budget 2 sessions, faite en 1 | Faite |
 | T0.1b | Kit Claude : démarrage automatique (hook `SessionStart` borné : jamais le corps des issues, dix au plus, délai sur `gh`), liste `allow` entrée par entrée, vérification des compétences et agents, `/debut` adapté. Budget 1 session | Idée |
 | T0.2 | Vérifications automatiques (GitHub Actions) : types, lint, tests, audit des dépendances, recherche de secrets, licences, `expo-doctor`, vérification de la méthode (cases de « fini » cochées, journal modifié avec le code), exécution hebdomadaire, actions épinglées par commit et permissions minimales, `dependabot.yml` (`github-actions`), CodeQL ; vérifications exigées par la règle sur `main` ; filtre de sortie des tests pour Claude | Idée |
 | T0.3 | Squelette de l'appli Expo : TypeScript strict, ESLint et Prettier, hook de format et lint à l'écriture pour Claude, fichiers de traduction, notice SPDX en tête des fichiers, `.npmrc` (`ignore-scripts`, `save-exact`), `.nvmrc`, Dependabot `npm`, compilation de développement installée sur Android | Idée |
