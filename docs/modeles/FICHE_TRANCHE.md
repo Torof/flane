@@ -1,0 +1,67 @@
+# Tx.y — Nom de la tranche
+
+**Jalon** : Jx — …
+**Étape du cycle** : Planifier | Discuter | Choisir | Construire | Observer | Sécuriser | Valider
+**Statut dans le backlog** : Idée | Prête | En cours | À tester sur la route | Faite
+**Budget** : … session(s)
+**Branche** : `feat/Tx.y-nom-court` (ou `fix/`, `chore/` selon la nature de la tranche)
+**Validée le** : (date, à l'étape Choisir)
+
+## Objectif
+
+Une ou deux phrases : ce que l'utilisateur pourra faire à la fin.
+
+## Critère de réussite
+
+Comment on saura, concrètement, que c'est réussi. Vérifiable par l'utilisateur.
+
+## Dedans
+
+- …
+
+## Dehors
+
+- … (et où ça ira : autre tranche, parking)
+
+## Approche
+
+Les grandes lignes techniques. Les fichiers ou dossiers concernés.
+
+## Dépendances ajoutées
+
+| Bibliothèque | Pourquoi | Alternatives | Licence | Maintenance |
+| --- | --- | --- | --- | --- |
+| — | | | | |
+
+## Données touchées
+
+Quelles données, où elles vivent, si elles quittent le téléphone. Mettre à jour `docs/DONNEES.md`.
+
+## Risques de sécurité
+
+Les risques propres à cette tranche, et leur parade. Renvoyer à `docs/SECURITE.md`.
+
+## Plan de tests
+
+- Cas nominal : …
+- Cas limites : pas de réseau, aucun lieu trouvé, permission refusée, données invalides, batterie faible…
+- Test sur le téléphone : …
+
+## Prévoir sans construire
+
+Ce que cette tranche prépare pour la suite (partage, avis, iOS), sans le développer.
+
+## Objections de l'avocat du diable
+
+(Collées après l'étape Discuter, avec la réponse retenue pour chacune.)
+
+## Définition de « fini »
+
+- [ ] Critère de réussite atteint et constaté par l'utilisateur
+- [ ] Tests écrits et verts, cas limites compris
+- [ ] Vérifications automatiques vertes
+- [ ] Audit de sécurité : aucun point bloquant ouvert
+- [ ] Relecture : aucun point bloquant ouvert
+- [ ] `DONNEES.md`, glossaire, décisions à jour si nécessaire
+- [ ] Journal et backlog à jour
+- [ ] Intégrée à `main` par pull request

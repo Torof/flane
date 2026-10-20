@@ -1,0 +1,39 @@
+# Secrets — ne jamais enregistrer
+.env
+.env.*
+!.env.example
+*.keystore
+*.jks
+*.p8
+*.p12
+*.pem
+*.key
+google-services.json
+GoogleService-Info.plist
+
+# Dépendances et compilations
+node_modules/
+.expo/
+dist/
+build/
+android/app/build/
+*.apk
+*.aab
+
+# Chaîne de fabrication des paquets
+data-pipeline/out/
+data-pipeline/cache/
+
+# Enregistrements de trajets réels (contiennent des positions)
+tools/simulator/recordings/
+
+# Claude Code : réglages personnels
+.claude/settings.local.json
+
+# Systèmes et éditeurs
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+*.log
