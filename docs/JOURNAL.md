@@ -21,7 +21,7 @@ Lu au début de chaque session (`/debut`), complété à la fin (`/fin`). Les en
 - La construction a duré bien plus que prévu à cause d'un bug d'environnement : Node 22.15.0 (installé sur le PC) ne retrouve pas ses modules dans un chemin qui contient un accent (« Flâne ») ; les tests échouaient avec « Cannot find module » sur des paquets présents, de façon changeante. Diagnostic par bissection (même arbre dans un chemin sans accent : vert ; Node 24 dans le chemin accentué : vert). Le projet passe à Node 24.22.0 ; `setup.sh` l'installe par nvm.
 - Claude a lancé `eas` par `node $(which eas)` : la commande `eas` n'est pas dans la liste des commandes autorisées, et la modification des réglages de Claude Code lui est refusée. À ajouter par l'utilisateur dans `.claude/settings.json` (`Bash(eas *)`) s'il le souhaite.
 - Dossiers de diagnostic `tmp-jest-*` créés puis supprimés par Claude (`rm -r`) dans le dépôt : jamais enregistrés dans git.
-- Les premières compilations EAS ont été lancées avant les corrections de l'audit et de la relecture ; elles ont servi à lire le manifeste. Les APK proposés à l'utilisateur sont recompilés depuis le commit final.
+- Les premières compilations EAS ont été lancées avant les corrections de l'audit et de la relecture ; elles ont servi à lire le manifeste (quatre permissions ajoutées par Expo, depuis bloquées). La deuxième série a échoué à l'installation des dépendances : en retirant les tildes de `package.json`, Claude avait ramené `babel-preset-expo` à `58.0.0` et le lockfile ne correspondait plus. Troisième série réussie depuis le commit final : manifeste conforme (`INTERNET` seule, `allowBackup=false`).
 
 **Questions ouvertes**
 - Faut-il ajouter `Bash(eas *)` aux réglages de Claude Code ? (décision de l'utilisateur)
