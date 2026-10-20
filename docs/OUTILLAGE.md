@@ -14,11 +14,12 @@ L'inventaire de tout ce qui automatise, vérifie ou protège le travail sur Flâ
 
 | Outil | Rôle | Où | État |
 | --- | --- | --- | --- |
-| Garde-fou `main` | Bloque commit, merge, rebase sur `main`, push vers `main`, push forcé | `.claude/hooks/garde-branche-main.sh` | En place. À affiner en T0.1 : lire la commande et non son contenu (faux positifs sur un texte contenant « git » et « commit ») |
+| Garde-fou `main` | Analyse chaque commande Bash de Claude. Bloque : commit, merge, rebase, reset sur `main` ; push vers `main`, push forcé, `--no-verify`, `-c core.hooksPath`, réécriture de références, écriture directe sur le dépôt par l'API GitHub, écriture par Bash dans les dossiers protégés. Demande : commandes indirectes (`bash -c`, `eval`, substitution) avec git, `gh pr merge` (porte Intégrer), réglages du dépôt. En cas de doute, bloque. Toute panne du hook = blocage | `.claude/hooks/garde-branche-main.sh` (enveloppe) et `.py` (analyse) | En place, durci en T0.1. Testé par `tools/dev/test-hooks.sh` |
+| Protection des garde-fous | `Write` et `Edit` sur `.claude/**`, `.githooks/**`, `tools/dev/**` demandent l'accord de l'utilisateur ; l'écriture par Bash vers ces chemins est bloquée | `.claude/settings.json` (`ask`) et garde-fou | En place (T0.1) |
 | Fichiers interdits en lecture | Claude ne peut pas lire `.env`, keystores, clés, `google-services.json`, `node_modules` | `.claude/settings.json` (`deny`) | En place |
-| Démarrage automatique | Au début de chaque session, injecte la dernière entrée du journal et la section « En cours » du backlog | hook `SessionStart` | Prévu T0.1 |
-| Avertissement de fin de session | Quand Claude s'arrête, signale les modifications non enregistrées et la branche courante | hook `Stop` | Prévu T0.1 |
-| Liste d'autorisations | Commandes sûres sans demande de permission : lecture seule git et gh, tests, lint, types. Les modifications de fichiers restent soumises à l'utilisateur | `.claude/settings.json` (`allow`) | Prévu T0.1 |
+| Démarrage automatique | Au début de chaque session, injecte la dernière entrée du journal, la section « En cours » du backlog, la branche, l'état de l'arbre et les issues ouvertes (numéro, titre tronqué, auteur, étiquettes ; jamais le corps ; dix au plus ; délai sur `gh`) | hook `SessionStart` | Prévu T0.1b |
+| Avertissement de fin de session | Signaler les modifications non enregistrées | hook `Stop` | Retiré en T0.1 : ce hook se déclenche à chaque réponse, pas en fin de session. `/fin` et le démarrage automatique couvrent le besoin |
+| Liste d'autorisations | Commandes sûres sans demande de permission, listées une par une. Les modifications de fichiers restent soumises à l'utilisateur | `.claude/settings.json` (`allow`) | Prévu T0.1b |
 | Format et lint à l'écriture | Après chaque modification d'un fichier TypeScript, Prettier et ESLint sur ce fichier ; seules les erreurs remontent | hook `PostToolUse` | Prévu T0.3 (avec ESLint et Prettier) |
 | Tests filtrés | Lance les tests et ne renvoie que les échecs, pour économiser le contexte | `tools/dev/test-summary.sh` | Prévu T0.2 |
 
@@ -38,13 +39,16 @@ La mémoire persistante de Claude Code (hors dépôt) ne sert qu'aux préférenc
 
 ## Garde-fous git locaux (`.githooks/`)
 
-Activés par `git config core.hooksPath .githooks`, sans dépendance. Prévus en T0.1 ; les vérifications qui demandent du code (types, lint) ne s'activent que lorsque `app/` existe (T0.3).
+Activés par `tools/dev/setup.sh` (`git config core.hooksPath .githooks`), sans dépendance npm. En place depuis T0.1 ; les vérifications qui demandent du code (types, lint) ne s'activent que lorsque `app/` existe (T0.3). Règle commune : en cas de doute, on refuse.
 
-| Hook | Rôle | État |
+| Outil | Rôle | État |
 | --- | --- | --- |
-| `pre-commit` | Recherche de secrets (gitleaks) sur les fichiers indexés | Prévu T0.1 |
-| `commit-msg` | Format Conventional Commits avec scope `Tx.y` ou `meta` | Prévu T0.1 |
-| `pre-push` | Types, lint et tests rapides avant d'envoyer | Prévu T0.1, actif à partir de T0.3 |
+| `pre-commit` | Recherche de secrets sur les fichiers indexés avec gitleaks 8.30.1 ; gitleaks absent ou en erreur = commit refusé ; le secret n'est jamais affiché | En place (T0.1) |
+| `commit-msg` | Format Conventional Commits avec scope `Tx.y`, `Tx.yb` ou `meta`, marqueur `!` ; exceptions `Revert "…"` et fusions git et GitHub | En place (T0.1) |
+| `pre-push` | Types, lint et tests avant d'envoyer, dès que `app/package.json` existe | En place (T0.1), actif à partir de T0.3 |
+| `tools/dev/setup.sh` | Active les hooks, installe gitleaks (version épinglée, SHA-256 vérifié, Linux x86_64) dans `~/.local/bin`, affiche l'état. À lancer après chaque clonage | En place (T0.1) |
+| `tools/dev/test-hooks.sh` | Banc de tests des hooks git et du garde-fou de Claude, dans des dépôts temporaires : une ligne par cas, sortie 1 si un échec | En place (T0.1), 139 cas |
+| Mise à jour de gitleaks | Manuelle : changer la version et la somme de contrôle dans `setup.sh`, relancer le banc | Revue au bilan de chaque jalon |
 
 ## Vérifications automatiques (`.github/workflows/`)
 
@@ -58,6 +62,8 @@ Prévues en T0.2. Toutes les actions sont épinglées sur un commit précis, cha
 | Licences | Toute dépendance sous licence compatible AGPL-3.0, sinon échec | Prévu T0.2 |
 | Santé Expo | `expo-doctor` | Prévu T0.2, actif à partir de T0.3 |
 | Méthode | La PR échoue si une case de « fini » n'est pas cochée, ou si du code a changé sans que `docs/JOURNAL.md` change | Prévu T0.2 |
+| Vérifications exigées | La règle GitHub sur `main` exige les vérifications vertes avant fusion | Prévu T0.2 |
+| CodeQL | Analyse de code GitHub, gratuite sur dépôt public | Prévu T0.2 ou T0.3, quand il y a du code |
 | Exécution hebdomadaire | Audit des dépendances et recherche de secrets sur `main`, chaque semaine, même sans PR | Prévu T0.2 |
 | Banc d'essai en PR | Le banc d'essai des suggestions tourne sur le trajet de référence et poste la différence avec `main` en commentaire | Parking, après T2.8 |
 
@@ -65,13 +71,16 @@ Prévues en T0.2. Toutes les actions sont épinglées sur un commit précis, cha
 
 | Réglage | Rôle | État |
 | --- | --- | --- |
-| Modèles d'issues et de PR | Le modèle de PR reprend la définition de « fini » en cases à cocher et renvoie à la fiche | Prévu T0.1 |
-| Alertes de vulnérabilité et correctifs automatiques | GitHub signale et propose les correctifs de sécurité | Prévu T0.1 |
-| Dependabot | Mises à jour groupées, une PR par semaine, soumises aux mêmes vérifications | Prévu T0.1 (actif à partir de T0.3) |
-| Protection de `main` | Interdire le push direct, exiger les vérifications vertes. À tester sur le dépôt privé plutôt que supposer payant | Prévu T0.1 |
-| `.npmrc` | `ignore-scripts=true` (aucun script d'installation tiers), `save-exact=true` | Prévu T0.1 |
-| `.nvmrc` et `engines` | Version de Node fixée (LTS) | Prévu T0.1 |
-| `.editorconfig` | Fins de ligne, indentation, encodage | Prévu T0.1 |
+| Dépôt public, licence AGPL-3.0 | `LICENSE`, section « Licence » du `README.md`, notice SPDX dans le code dès T0.3 (D-019) | En place (T0.1) |
+| Modèles d'issues et de PR | Le modèle de PR reprend la définition de « fini » en cases à cocher et renvoie à la fiche ; deux modèles d'issues (bug sur la route, idée), sans issue vierge, qui n'invitent à aucune position | En place (T0.1) |
+| Règle GitHub sur `main` | Pas de push direct, pas de push forcé, pas de suppression ; aucun contournement. Refusée sur le dépôt privé gratuit, obtenue par le passage en public | En place (T0.1) ; vérifications exigées en T0.2 |
+| Recherche de secrets GitHub | Alertes et blocage des push contenant un secret, côté serveur | En place (T0.1) |
+| Alertes de vulnérabilité et correctifs automatiques | GitHub signale et propose les correctifs de sécurité | En place (T0.1) |
+| Fusion par merge uniquement, branche supprimée après fusion, projets désactivés | D-017, D-018 | En place (T0.1) |
+| Dependabot | Mises à jour groupées, une PR par semaine, soumises aux mêmes vérifications | Prévu T0.2 (`github-actions`), T0.3 (`npm`) |
+| `.npmrc` | `ignore-scripts=true` (aucun script d'installation tiers), `save-exact=true` | Prévu T0.3 |
+| `.nvmrc` et `engines` | Version de Node fixée, selon le SDK Expo | Prévu T0.3 |
+| `.editorconfig` | Fins de ligne, indentation, encodage | En place (T0.1) |
 | `SECURITY.md` | Politique de signalement des failles | Parking, au passage en public (jalon 5) |
 
 ## Versions

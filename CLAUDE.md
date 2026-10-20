@@ -18,7 +18,7 @@ L'utilisateur parle français et anglais : répondre dans la langue de son derni
 
 ## Ouvrir et clore une session
 
-- **Toute première fois** : si le dossier n'est pas encore un dépôt git, lancer `/installation` avant tout le reste.
+- **Toute première fois** : si le dossier n'est pas encore un dépôt git, lancer `/installation` avant tout le reste. Sur un nouveau clone : `tools/dev/setup.sh` (hooks git et gitleaks).
 - **Début** : lancer `/debut`. Lire `docs/JOURNAL.md` (dernière entrée) et `docs/BACKLOG.md`, puis annoncer : jalon en cours, tranche en cours, étape du cycle, prochaine action.
 - **Fin** : lancer `/fin`. Vérifier la définition de « fini » si une tranche se termine, mettre à jour le journal et le backlog, proposer `/clear`.
 - **Une session ne traite qu'une seule tranche** (une tranche peut prendre une à trois sessions). Entre deux sessions, ou après une pause de plus d'une heure : `/fin`, `/clear`, `/debut`.

@@ -1,6 +1,6 @@
 ---
 name: installation
-description: Installe le projet Flâne la première fois — vérifie les outils, crée le dépôt git et le dépôt GitHub privé, enregistre le kit. À lancer quand le dossier contient le kit mais n'est pas encore un dépôt git.
+description: Installe le projet Flâne la première fois — vérifie les outils, crée le dépôt git et le dépôt GitHub, enregistre le kit, active les garde-fous locaux. À lancer quand le dossier contient le kit mais n'est pas encore un dépôt git. Sur un clone existant, lancer seulement tools/dev/setup.sh.
 ---
 
 # Installer Flâne (une seule fois)
@@ -20,8 +20,9 @@ Pour chaque outil manquant, dire lequel et comment l'installer sur le système d
 Annoncer ce qui va être fait :
 1. Créer le dépôt git local, sur la branche `main`.
 2. Enregistrer le kit dans un premier commit : `docs: starter kit`.
-3. Créer le dépôt GitHub **privé** `flane` (ou le nom choisi par l'utilisateur) et y envoyer ce premier commit.
-4. Consigner l'installation dans le journal, sur une branche `docs/meta-AAAA-MM-JJ`, et ouvrir la pull request correspondante.
+3. Créer le dépôt GitHub `flane` (ou le nom choisi par l'utilisateur), public sous AGPL-3.0 (D-019) sauf demande contraire, et y envoyer ce premier commit.
+4. Activer les garde-fous locaux : `bash tools/dev/setup.sh` (hooks git, gitleaks).
+5. Consigner l'installation dans le journal, sur une branche `docs/meta-AAAA-MM-JJ`, et ouvrir la pull request correspondante.
 
 ## 3. Exécuter, avec l'accord
 
@@ -29,12 +30,14 @@ Annoncer ce qui va être fait :
 git init -b main
 git add .
 git commit -m "docs: starter kit"
-gh repo create flane --private --source=. --push
+gh repo create flane --public --source=. --push
+bash tools/dev/setup.sh
+bash tools/dev/test-hooks.sh
 ```
 
-Le garde-fou de `.claude/hooks/` laisse passer ce tout premier commit, car la branche `main` n'existe pas encore. Il bloquera ensuite toute modification directe de `main`.
+Le garde-fou de `.claude/hooks/` laisse passer ce tout premier commit, car la branche `main` n'a pas encore de commit. Il bloquera ensuite toute modification directe de `main`.
 
-Vérifier : `git log --oneline`, `gh repo view --json name,visibility,url`.
+Vérifier : `git log --oneline`, `gh repo view --json name,visibility,url`, banc de tests au vert.
 
 ## 4. Consigner
 
