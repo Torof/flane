@@ -15,8 +15,12 @@
       "Read(./data-pipeline/out/**)"
     ],
     "ask": [
-      "Edit(./.claude/hooks/**)",
-      "Edit(./.claude/settings.json)"
+      "Edit(./.claude/**)",
+      "Write(./.claude/**)",
+      "Edit(./.githooks/**)",
+      "Write(./.githooks/**)",
+      "Edit(./tools/dev/**)",
+      "Write(./tools/dev/**)"
     ]
   },
   "hooks": {

@@ -1,33 +1,28 @@
 #!/usr/bin/env bash
-# Garde-fou Flâne : empêche Claude de modifier directement la branche main
-# et de forcer un push. Lit l'appel d'outil (JSON) sur l'entrée standard.
-# Code de sortie 2 = l'appel est bloqué, et le message est renvoyé à Claude.
-# Limite : ces règles ne remplacent pas la protection de branche côté GitHub.
+# Garde-fou Flâne : enveloppe du hook PreToolUse (outil Bash) de Claude Code.
+# L'analyse est faite par garde-branche-main.py (bibliothèque standard python).
+# Toute panne (python3 absent, exception, délai) = appel bloqué (sortie 2) :
+# Claude Code laisserait passer l'appel si le hook échouait autrement.
+# Testé par tools/dev/test-hooks.sh. Limite : ne remplace pas la règle GitHub
+# qui protège main côté serveur.
+set -u
 
-input="$(cat)"
+dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-# Push forcé : toujours bloqué.
-if printf '%s' "$input" | grep -qE 'git[^"]*push[^"]*(--force|-f( |"|$))'; then
-  echo "Bloqué par le garde-fou Flâne : pas de push forcé. En discuter avec l'utilisateur." >&2
+if ! command -v python3 >/dev/null 2>&1; then
+  echo "Bloqué par le garde-fou Flâne : python3 introuvable, la commande ne peut pas être analysée. Installer python3 ou en discuter avec l'utilisateur." >&2
   exit 2
 fi
 
-# Push explicite vers main : bloqué.
-if printf '%s' "$input" | grep -qE 'git[^"]*push[^"]*[ :]main( |"|$)'; then
-  echo "Bloqué par le garde-fou Flâne : pas de push vers main. Passer par une branche et une pull request." >&2
-  exit 2
+if command -v timeout >/dev/null 2>&1; then
+  timeout 20 python3 -I -B -X utf8 "$dir/garde-branche-main.py"
+else
+  python3 -I -B -X utf8 "$dir/garde-branche-main.py"
 fi
+rc=$?
 
-# Commit, merge, rebase ou cherry-pick alors qu'on est sur main : bloqué.
-if printf '%s' "$input" | grep -qE 'git[^"]* (commit|merge|rebase|cherry-pick)( |"|$)'; then
-  # Dossier courant de l'appel (compatible avec les worktrees), sinon le projet.
-  dir="$(printf '%s' "$input" | grep -oE '"cwd"[[:space:]]*:[[:space:]]*"[^"]*"' | head -n1 | sed -E 's/.*:[[:space:]]*"([^"]*)"/\1/')"
-  [ -n "$dir" ] || dir="${CLAUDE_PROJECT_DIR:-.}"
-  branch="$(git -C "$dir" rev-parse --abbrev-ref HEAD 2>/dev/null)"
-  if [ "$branch" = "main" ]; then
-    echo "Bloqué par le garde-fou Flâne : on est sur main. Créer d'abord une branche (voir docs/CONVENTIONS.md)." >&2
-    exit 2
-  fi
-fi
-
-exit 0
+case "$rc" in
+  0|2) exit "$rc" ;;
+  124) echo "Bloqué par le garde-fou Flâne : analyse trop longue (délai dépassé). Réessayer ou en discuter avec l'utilisateur." >&2; exit 2 ;;
+  *)   echo "Bloqué par le garde-fou Flâne : garde-fou en panne (code $rc). Ne pas contourner ; en discuter avec l'utilisateur." >&2; exit 2 ;;
+esac
