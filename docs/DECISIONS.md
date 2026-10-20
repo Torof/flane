@@ -4,6 +4,9 @@ Les choix structurants, avec leurs raisons. Une décision n'est jamais effacée 
 
 ---
 
+## D-016 — Trois portes de validation, autonomie entre elles · 2026-10-20 · Acceptée
+La validation explicite de l'utilisateur est obligatoire à trois portes : **Choisir** (la fiche de tranche validée autorise le code, dans son périmètre et pas au-delà), **Observer** (l'utilisateur constate le résultat) et **Intégrer** (fusion de la pull request, délégable à Claude tranche par tranche). Entre les portes, Claude enchaîne seul : branche, code par petits morceaux, tests, commits, push, pull request, agents de vérification, correction de leurs points bloquants dans le périmètre de la fiche, journal et backlog. Il s'arrête et demande pour tout ce qui sort du périmètre : dépendance non prévue, donnée non listée dans la fiche, exception à la méthode. **Pourquoi** : l'utilisateur décide et teste, il n'opère pas ; un accord à chaque commit n'ajoute aucun contrôle utile et ralentit tout. Les garde-fous (hooks, vérifications automatiques, agents) tiennent le rôle de la relecture pas à pas. Inventaire dans `docs/OUTILLAGE.md`. **Vigilance** : le périmètre de la fiche devient la frontière de l'autonomie ; une fiche floue donne trop de latitude. L'avocat du diable y veille.
+
 ## D-015 — Identifiant de l'appli : `app.flane` · 2026-10-20 · Acceptée
 Identifiant de paquet Android `app.flane` ; nom affiché « Flâne » ; dépôt GitHub `flane`. **Pourquoi** : l'identifiant est définitif une fois publié sur Google Play ; il doit donc être court, sans accent et sans référence à un pays, pour une appli qui commence en France mais vise l'international. `fr.flane` écarté pour cette raison ; `com.flane.app` et `io.flane` écartés car plus longs sans avantage. Correspond au domaine `flane.app`, non acheté à ce jour. **Vigilance** : vérifier à la première publication (T5.4) qu'aucune appli ne porte déjà cet identifiant ; envisager l'achat du domaine `flane.app`.
 

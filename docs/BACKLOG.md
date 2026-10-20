@@ -20,9 +20,9 @@ Aucune tranche en cours. Prochaine : **T0.1** (questions ouvertes répondues, fi
 
 | ID | Tranche | Statut |
 | --- | --- | --- |
-| T0.1 | Dépôt et conventions : structure des dossiers, `.gitignore`, modèles d'issues et de pull requests, vérification du kit Claude (commandes, agents, garde-fou), protection de `main` si le compte GitHub le permet (payant pour un dépôt privé). Branche `chore/T0.1-repo-conventions`. Étape Observer : l'utilisateur vérifie le dépôt et relance `/debut` | Idée |
-| T0.2 | Vérifications automatiques (GitHub Actions) : types, lint, tests, audit des dépendances, recherche de secrets, licences ; filtre de sortie des tests pour Claude | Idée |
-| T0.3 | Squelette de l'appli Expo : TypeScript strict, ESLint et Prettier, fichiers de traduction, compilation de développement installée sur Android | Idée |
+| T0.1 | Dépôt et conventions : structure des dossiers, modèles d'issues et de pull requests (définition de « fini » en cases à cocher), garde-fous git locaux dans `.githooks/` (secrets, format des commits, pré-push), `.npmrc` (`ignore-scripts`, `save-exact`), `.nvmrc`, `.editorconfig`, réglages GitHub (alertes de vulnérabilité, Dependabot, protection de `main` à tester), kit Claude vérifié et complété (garde-fou affiné, démarrage automatique, avertissement de fin de session, liste d'autorisations). Détail dans `docs/OUTILLAGE.md`. Branche `chore/T0.1-repo-conventions`. Étape Observer : l'utilisateur vérifie le dépôt et relance `/debut` | Idée |
+| T0.2 | Vérifications automatiques (GitHub Actions) : types, lint, tests, audit des dépendances, recherche de secrets, licences, `expo-doctor`, vérification de la méthode (cases de « fini » cochées, journal modifié avec le code), exécution hebdomadaire, actions épinglées par commit et permissions minimales ; filtre de sortie des tests pour Claude | Idée |
+| T0.3 | Squelette de l'appli Expo : TypeScript strict, ESLint et Prettier, hook de format et lint à l'écriture pour Claude, fichiers de traduction, compilation de développement installée sur Android | Idée |
 | T0.4 | Historique des versions automatique (à partir des messages de commit) et version par jalon | Idée |
 
 ## Jalon 1 — Je vois les bons coins de ma région
@@ -119,3 +119,7 @@ Idées notées, traitées en fin de jalon. Ne pas s'y attaquer avant.
 - Convoi de plusieurs voitures.
 - Vélo, moto, van ; usage domicile-travail ; autres pays ; iOS.
 - Tests de parcours complets (Maestro), galerie d'écrans (Storybook), carnet de route transcrit par Claude.
+
+**Outillage (voir `docs/OUTILLAGE.md`)**
+- Banc d'essai en PR : le banc d'essai tourne sur le trajet de référence à chaque pull request et poste la différence avec `main` (après T2.8).
+- `SECURITY.md` et politique de signalement des failles, au passage en public (jalon 5).

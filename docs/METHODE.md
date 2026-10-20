@@ -28,6 +28,18 @@ Une méthode pour construire à deux (l'utilisateur et Claude) : les forces de l
 
 Une étape n'est jamais commencée avant que la précédente soit cochée.
 
+## Les trois portes
+
+La validation de l'utilisateur est obligatoire à trois moments, et seulement là (D-016) :
+
+| Porte | Ce que l'utilisateur valide | Ce que ça autorise |
+| --- | --- | --- |
+| **Choisir** | La fiche de tranche, après l'avocat du diable | Le code, dans le périmètre de la fiche et pas au-delà |
+| **Observer** | Le résultat, constaté sur son téléphone ou dans le dépôt | Le passage à Sécuriser puis Valider |
+| **Intégrer** | La fusion de la pull request (délégable à Claude, tranche par tranche) | L'intégration à `main` |
+
+Entre les portes, Claude enchaîne seul : branche, code par petits morceaux, tests, commits, push, pull request, agents de vérification, correction de leurs points bloquants dans le périmètre de la fiche, journal et backlog. Il rend compte à chaque porte par un résumé court. Il s'arrête et demande pour tout ce qui sort du périmètre : dépendance non prévue, donnée non listée, exception à la méthode.
+
 ## La définition de « fini »
 
 Une tranche est finie quand **toutes** ces cases sont cochées :
@@ -87,16 +99,4 @@ L'utilisateur reste le décideur. Une étape peut être sautée, mais **jamais e
 
 ## Les outils de développement
 
-À construire dans les premières tranches, car le reste s'appuie dessus :
-
-- **Vérifications automatiques** (GitHub Actions) : tests, types, failles des dépendances, secrets, licences.
-- **Simulateur de trajet** : rejouer un trajet enregistré, éventuellement en accéléré.
-- **Trajet de référence** : le même scénario pour toutes les tranches.
-- **Visualiseur de lieux** : une carte web du contenu d'un paquet régional.
-- **« Pourquoi ce lieu ? »** : d'où vient une suggestion, quelle règle l'a fait monter.
-- **Banc d'essai des suggestions** : la liste de ce que Flâne propose sur le trajet de référence, comparée d'une version à l'autre.
-- **Vérificateur de paquets** : comptes par type et région, anomalies, signature.
-- **Écouteur de phrases** : toutes les formulations dites par la synthèse vocale, avec leur durée.
-- **Mesure de la batterie** pendant un trajet simulé.
-- **Carnet de route** : les notes prises pendant un trajet test (`docs/carnet-de-route/`).
-- Plus tard : tests de parcours complets (Maestro), galerie d'écrans (Storybook), carnet de route transcrit par Claude.
+La méthode est vérifiée par la machine autant que possible : hooks locaux, vérifications automatiques, agents. Les outils d'atelier (garde-fous, vérifications) se construisent au jalon 0, car le reste s'appuie dessus ; les outils du produit (simulateur, visualiseur, banc d'essai, écouteur de phrases…) arrivent avec les tranches qui en ont besoin. L'inventaire complet, avec l'état et la tranche propriétaire de chaque outil, vit dans `docs/OUTILLAGE.md`.

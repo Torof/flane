@@ -4,6 +4,29 @@ Lu au début de chaque session (`/debut`), complété à la fin (`/fin`). Les en
 
 ---
 
+## 2026-10-20 — Automatisation du processus
+
+**Tranche** : aucune (méthode, hors cycle).
+**Étape** : —
+
+**Fait**
+- Discussion sur l'automatisation du processus de développement : rapide, sûr, sans trous découverts après coup.
+- D-016 : trois portes de validation (Choisir, Observer, Intégrer), autonomie de Claude entre elles ; règle d'or précisée dans `CLAUDE.md` et `docs/METHODE.md`.
+- `docs/OUTILLAGE.md` créé : inventaire des garde-fous, compétences, vérifications, réglages et outils du produit, avec l'état et la tranche propriétaire de chacun.
+- Backlog : T0.1, T0.2 et T0.3 détaillés ; parking enrichi (banc d'essai en PR, `SECURITY.md`).
+- Modèle de fiche : liste des « trous fréquents » à passer en revue avant l'étape Discuter.
+- Pull request numéro 1 intégrée par Claude, à la demande de l'utilisateur (fusion sans squash, pour garder les messages de commit).
+
+**Décisions** : D-016 (trois portes).
+
+**Exceptions à la méthode** : aucune.
+
+**Questions ouvertes**
+- Aucune.
+
+**Prochaine étape**
+- `/tranche` pour la fiche de T0.1.
+
 ## 2026-10-20 — Installation
 
 **Tranche** : aucune (installation, hors cycle).
