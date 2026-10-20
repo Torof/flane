@@ -4,6 +4,28 @@ Lu au début de chaque session (`/debut`), complété à la fin (`/fin`). Les en
 
 ---
 
+## 2026-10-20 — T0.1b Kit Claude : zéro interruption inutile
+
+**Tranche** : T0.1b — Kit Claude (jalon 0).
+**Étape** : Valider.
+
+**Fait**
+- L'utilisateur, épuisé par les demandes d'accord de Claude Code, a demandé un processus réellement automatique. Fiche courte, attaquée par l'avocat du diable (douze objections, redécoupée : le démarrage automatique part en T0.1c), validée.
+- Livré : mode « accept edits » permanent (D-020) ; liste `allow` courte et figée dans le banc, dans la forme que cette version de Claude Code reconnaît (`Bash(git commit *)`) ; garde-fou durci pour que son silence vaille accord (dérivés dangereux de chaque préfixe autorisé bloqués ou demandés) ; `ask` étendu à `CLAUDE.md`, `.gitignore`, `.mcp.json`, `.git/**` ; commande du hook qui bloque si le script manque ; `settings.local.json` vidé ; conventions de commande ; D-021 (le produit se décide ensemble, la technique par Claude).
+- Sécuriser : audit « bloquant » (retours en arrière par `switch -c`/`--orphan`/`-`, `diff --no-index`, `/dev/tcp`, `add -f`, `commit -F`, `gh --comments`/`-R`), tout fermé avec tests ; relecture « à corriger », tout traité.
+
+**Décisions** : D-020, D-021.
+
+**Exceptions à la méthode**
+- Porte Observer reportée à la session suivante, décidée par Claude : les réglages de Claude Code ne se chargent qu'au redémarrage, et l'utilisateur ne pouvait pas rester devant l'écran. À constater au prochain `/debut` : plus aucune demande pour lire, éditer, tester, commiter, pousser, ouvrir une PR.
+- Cette tranche a elle-même généré beaucoup de demandes d'accord : elle modifie les fichiers protégés par conception. C'est la dernière qui les touche en volume.
+
+**Questions ouvertes**
+- Si des demandes subsistent à la session suivante pour des commandes de la liste `allow`, vérifier la forme des règles et le rechargement des réglages.
+
+**Prochaine étape**
+- `/clear`, puis `/debut` dans une nouvelle session. Constater le silence. Puis `/tranche` pour T0.2 (ou T0.1c).
+
 ## 2026-10-20 — T0.1 Dépôt et garde-fous
 
 **Tranche** : T0.1 — Dépôt et garde-fous (jalon 0).

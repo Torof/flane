@@ -1,5 +1,6 @@
 {
   "permissions": {
+    "defaultMode": "acceptEdits",
     "deny": [
       "Read(./.env)",
       "Read(./.env.*)",
@@ -21,8 +22,50 @@
       "Write(./.githooks/**)",
       "Edit(./.github/**)",
       "Write(./.github/**)",
+      "Edit(./.git/**)",
+      "Write(./.git/**)",
       "Edit(./tools/dev/**)",
-      "Write(./tools/dev/**)"
+      "Write(./tools/dev/**)",
+      "Edit(./CLAUDE.md)",
+      "Write(./CLAUDE.md)",
+      "Edit(./.gitignore)",
+      "Write(./.gitignore)",
+      "Edit(./.mcp.json)",
+      "Write(./.mcp.json)"
+    ],
+    "allow": [
+      "Bash(git status *)",
+      "Bash(git status)",
+      "Bash(git log *)",
+      "Bash(git diff *)",
+      "Bash(git diff)",
+      "Bash(git show *)",
+      "Bash(git branch --show-current)",
+      "Bash(git branch -a)",
+      "Bash(git branch --list *)",
+      "Bash(git rev-parse *)",
+      "Bash(git ls-files *)",
+      "Bash(git merge-base *)",
+      "Bash(git remote -v)",
+      "Bash(git fetch *)",
+      "Bash(git fetch)",
+      "Bash(git stash list)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git push *)",
+      "Bash(git push)",
+      "Bash(git switch *)",
+      "Bash(gh pr view *)",
+      "Bash(gh pr list *)",
+      "Bash(gh pr create *)",
+      "Bash(gh pr checks *)",
+      "Bash(gh issue list *)",
+      "Bash(gh run list *)",
+      "Bash(gh repo view *)",
+      "Bash(gh label list *)",
+      "Bash(bash tools/dev/test-hooks.sh *)",
+      "Bash(bash tools/dev/test-hooks.sh)",
+      "Bash(bash tools/dev/setup.sh)"
     ]
   },
   "hooks": {
@@ -32,7 +75,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash \"${CLAUDE_PROJECT_DIR}/.claude/hooks/garde-branche-main.sh\""
+            "command": "f=\"${CLAUDE_PROJECT_DIR}/.claude/hooks/garde-branche-main.sh\"; if [ -f \"$f\" ]; then bash \"$f\"; else echo 'Bloqué par le garde-fou Flâne : script du garde-fou absent, ne pas contourner.' >&2; exit 2; fi"
           }
         ]
       }

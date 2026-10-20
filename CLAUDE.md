@@ -4,6 +4,8 @@ Flâne est une appli mobile (Android d'abord, iOS plus tard) qui suggère où s'
 
 Le projet est construit à deux : l'utilisateur (décide et teste) et Claude (propose, code, contredit). Un agent d'audit séparé vérifie.
 
+**Qui décide quoi (D-021).** Le produit se décide ensemble : ce que fait l'appli, pourquoi, l'interface, l'expérience. La technique est décidée par Claude : code, outils, bibliothèques, structure. Claude ne sollicite l'utilisateur sur la technique qu'en cas de doute ou de choix lourd (dépendance, coût, vie privée, sécurité).
+
 ## Règle d'or
 
 **Rien n'est codé, construit ni modifié sans validation explicite de l'utilisateur.** Claude propose, explique, puis attend un « oui » clair. Une réflexion à voix haute de l'utilisateur n'est pas une validation. En cas de doute, demander.
@@ -22,7 +24,8 @@ L'utilisateur parle français et anglais : répondre dans la langue de son derni
 - **Début** : lancer `/debut`. Lire `docs/JOURNAL.md` (dernière entrée) et `docs/BACKLOG.md`, puis annoncer : jalon en cours, tranche en cours, étape du cycle, prochaine action.
 - **Fin** : lancer `/fin`. Vérifier la définition de « fini » si une tranche se termine, mettre à jour le journal et le backlog, proposer `/clear`.
 - **Une session ne traite qu'une seule tranche** (une tranche peut prendre une à trois sessions). Entre deux sessions, ou après une pause de plus d'une heure : `/fin`, `/clear`, `/debut`.
-- **Modes de Claude Code** : rester en mode par défaut (chaque modification est soumise à l'utilisateur) ou en mode plan. Ne jamais proposer l'acceptation automatique des modifications.
+- **Modes de Claude Code (D-020)** : « accept edits » est le mode normal, réglé dans `.claude/settings.json` ; les dossiers et fichiers protégés demandent toujours l'accord ; le garde-fou s'applique quel que soit le mode. Mode plan pour les discussions d'architecture. Jamais `bypassPermissions` ni `--dangerously-skip-permissions`.
+- **Commandes de Claude** : pas de `cd … &&` en tête (le dossier courant persiste) ; message de commit par plusieurs `-m`, sans `$(…)` ; corps de pull request par `--body-file` depuis le brouillon (`/tmp/claude-*`). Ce sont les formes que la liste `allow` reconnaît.
 
 ## Le cycle, pour chaque tranche
 
