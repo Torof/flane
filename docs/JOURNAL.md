@@ -4,6 +4,26 @@ Lu au début de chaque session (`/debut`), complété à la fin (`/fin`). Les en
 
 ---
 
+## 2026-10-21 — T0.4c: type-only packages
+
+**Slice**: T0.4c — Type-only packages do not count as an app change (found during T0.8)
+**Moment of the ritual**: closing
+
+**Done**
+- `version-check` ignores `@types/*` and `undici-types` when npm counts them as production; aliases, links and install scripts still count. 13 tests; checked on the real T0.8 lockfile.
+
+**Version**: none.
+
+**What worked / what got stuck**
+- Worked: the reflex « something outside the sheet: stop, options, the owner chooses » took one message.
+- Stuck: Claude said « green locally » for a check run before the commit; a check runs on a commit, never before.
+
+**Method**: a discovery during a slice became its own mini slice; the slice in progress (T0.8) waits, then resumes.
+
+**Skipped moments**: devil's advocate (five-line rule chosen by the owner); trial: the T0.8 pull request turning green is the trial.
+
+---
+
 ## 2026-10-21 — T0.4b: full CI
 
 **Slice**: T0.4b — Full CI
