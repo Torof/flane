@@ -8,7 +8,7 @@ Aucune tranche en cours. Prochaines proposées : traduire le reste du dépôt (T
 
 ## Questions ouvertes
 
-- [ ] **Double authentification du compte Expo** : remise à plus tard le 2026-10-20. À activer avant la première donnée personnelle stockée par la version de test, en même temps que la signature des mises à jour (déclencheur dans `docs/SECURITE.md`).
+- [ ] **Double authentification du compte Expo** : remise à plus tard le 2026-10-20. À activer avant la première donnée personnelle stockée par la version de test, en même temps que la signature des mises à jour (déclencheur dans `docs/SECURITY.md`).
 - [ ] **Dépôt de marque « Flâne » (INPI)** : quand ? Depuis le passage en public (D-019), le nom est la seule chose que la licence ne protège pas. Prévu en T5.5 ; à avancer si possible.
 - [x] **Région du premier paquet** (jalon 1) : les Hautes-Alpes (05). *Répondu le 2026-10-20.*
 - [x] **Trajet de référence** : Briançon–Embrun (trajet connu par cœur) ; trajet long : Briançon–Marseille. *Répondu le 2026-10-20.*
@@ -27,12 +27,12 @@ Aucune tranche en cours. Prochaines proposées : traduire le reste du dépôt (T
 | T0.2 | Vérifications automatiques (GitHub Actions) : types, lint, tests, audit des dépendances, recherche de secrets, licences ; exigées par la règle sur `main` ; Dependabot ; résumé court des échecs pour Claude | Faite |
 | T0.3 | Squelette de l'appli Expo : TypeScript strict, ESLint et Prettier, fichiers de traduction, notice SPDX en tête des fichiers, `.npmrc` (`ignore-scripts`, `save-exact`), `.nvmrc`, trois onglets vides, variantes `app.flane.dev` / `app.flane`, APK `preview` et client de développement par EAS Build | Faite |
 | T0.5 | Mises à jour instantanées (EAS Update) pour la variante de test `app.flane.dev`, version native visible, une version par tranche (D-023) ; passée avant T0.2 à la demande de l'utilisateur pour accélérer la boucle de test | Faite |
-| T0.4a | Pilotage, voir et arrêter : issue épinglée « État de Flâne », pull request suivie en direct dès le premier commit, veto (signaux lus par `tools/dev/owner-signals.mjs` à chaque point de contrôle), « Remarqué en route » des agents. Fiche `docs/tranches/T0.4-pilotage.md` ; veto réel reporté à T0.6 | Faite |
+| T0.4a | Pilotage, voir et arrêter : issue épinglée « État de Flâne », pull request suivie en direct dès le premier commit, veto (signaux lus par `tools/dev/owner-signals.mjs` à chaque point de contrôle), « Remarqué en route » des agents. Fiche `docs/slices/T0.4-pilotage.md` ; veto réel reporté à T0.6 | Faite |
 | T0.6 | Notre méthode, en direct : rituel partagé et réflexes à la place des portes, `METHOD.md` et `CLAUDE.md` en anglais, D-027 (langue), D-028 (rituel), D-029 (versions nommées), commits descriptifs, issue « État » retirée, hooks d'ouverture de session et de veto | Faite |
-| T0.8 | Monthly dependencies, October 2026: `@types/node` 24.19.2 (Dependabot #13 redone, D-025). Sheet `docs/tranches/T0.8-deps-2026-10.md` | Faite |
+| T0.8 | Monthly dependencies, October 2026: `@types/node` 24.19.2 (Dependabot #13 redone, D-025). Sheet `docs/slices/T0.8-deps-2026-10.md` | Faite |
 | T0.7 | Translate the rest of the repository into English (D-027): vision, security, data, conventions, glossary, backlog, journal, agents, scripts' messages | Idée |
-| T0.4b | Full CI: the app assembles in `app-check`, `version-check` (version goes up when the app changes, every tool test on GitHub), required on `main`. Sheet `docs/tranches/T0.4b-full-ci.md` | Faite |
-| T0.4c | Type-only packages (`@types/*`, `undici-types`) do not count as an app change in `version-check`. Sheet `docs/tranches/T0.4c-types-packages.md` | Faite |
+| T0.4b | Full CI: the app assembles in `app-check`, `version-check` (version goes up when the app changes, every tool test on GitHub), required on `main`. Sheet `docs/slices/T0.4b-full-ci.md` | Faite |
+| T0.4c | Type-only packages (`@types/*`, `undici-types`) do not count as an app change in `version-check`. Sheet `docs/slices/T0.4c-types-packages.md` | Faite |
 
 ## Jalon 1 — Je vois les bons coins de ma région
 
@@ -94,7 +94,7 @@ Aucune tranche en cours. Prochaines proposées : traduire le reste du dépôt (T
 | ID | Tranche | Statut |
 | --- | --- | --- |
 | T5.1 | Paquets pour d'autres régions et mises à jour partielles | Idée |
-| T5.2 | Politique de confidentialité (à partir de `docs/DONNEES.md`) | Idée |
+| T5.2 | Politique de confidentialité (à partir de `docs/DATA.md`) | Idée |
 | T5.3 | Bouton « signaler un problème » (export des journaux, sans position) | Idée |
 | T5.4 | Diffusion en test fermé sur Google Play (formulaire des données, justification de la localisation) | Idée |
 | T5.5 | Licence : avis juridique, décision finale, dépôt de marque | Idée |

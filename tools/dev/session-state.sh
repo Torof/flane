@@ -7,7 +7,7 @@
 set -u
 cd "${CLAUDE_PROJECT_DIR:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}" || exit 0
 
-echo "Flâne session state — open the session with the ritual (docs/METHOD.md, skill debut) at the owner's first message."
+echo "Flâne session state — open the session with the ritual (docs/METHOD.md, skill session-open) at the owner's first message."
 echo
 echo "## Repository"
 git status --short --branch 2>/dev/null | head -n 15

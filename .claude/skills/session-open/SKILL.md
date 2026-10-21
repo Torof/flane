@@ -1,5 +1,5 @@
 ---
-name: debut
+name: session-open
 description: Opens a Flâne session with the ritual. Claude runs it itself at the owner's first message of a session, whatever the message, before any other work (a real question is answered first).
 ---
 

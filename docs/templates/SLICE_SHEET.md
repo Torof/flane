@@ -35,11 +35,11 @@ Les grandes lignes techniques. Les fichiers ou dossiers concernés.
 
 ## Données touchées
 
-Quelles données, où elles vivent, si elles quittent le téléphone. Mettre à jour `docs/DONNEES.md`.
+Quelles données, où elles vivent, si elles quittent le téléphone. Mettre à jour `docs/DATA.md`.
 
 ## Risques de sécurité
 
-Les risques propres à cette tranche, et leur parade. Renvoyer à `docs/SECURITE.md`.
+Les risques propres à cette tranche, et leur parade. Renvoyer à `docs/SECURITY.md`.
 
 ## Plan de tests
 
@@ -57,11 +57,11 @@ Ce que cette tranche prépare pour la suite (partage, avis, iOS), sans le dével
 
 - [ ] Sans réseau, sans lieu trouvé, permission refusée, données invalides : comportement défini
 - [ ] Textes affichés : tous dans les fichiers de traduction
-- [ ] Données touchées : listées, avec ce qui quitte le téléphone (`docs/DONNEES.md`)
+- [ ] Données touchées : listées, avec ce qui quitte le téléphone (`docs/DATA.md`)
 - [ ] Nouveaux termes : dans le glossaire, et dans les noms du code
 - [ ] Nouvelles dépendances : justifiées, licence vérifiée
 - [ ] Nouvelles permissions Android : nécessaires et justifiées
-- [ ] Mises à jour instantanées : la tranche franchit-elle le déclencheur de signature (permission sensible, donnée personnelle stockée, second appareil ou canal) ? Si oui, la signature vient d'abord (`docs/SECURITE.md`)
+- [ ] Mises à jour instantanées : la tranche franchit-elle le déclencheur de signature (permission sensible, donnée personnelle stockée, second appareil ou canal) ? Si oui, la signature vient d'abord (`docs/SECURITY.md`)
 - [ ] Ce que la tranche laisse en place pour la suite (identifiants stables, actions, affichage séparé)
 - [ ] Ce que l'utilisateur devra constater à l'étape Observer, et comment
 
@@ -76,7 +76,7 @@ Ce que cette tranche prépare pour la suite (partage, avis, iOS), sans le dével
 - [ ] Vérifications automatiques vertes
 - [ ] Audit de sécurité : aucun point bloquant ouvert
 - [ ] Relecture : aucun point bloquant ouvert
-- [ ] `DONNEES.md`, glossaire, décisions à jour si nécessaire
+- [ ] `DATA.md`, glossaire, décisions à jour si nécessaire
 - [ ] Version montée dans `app/package.json` (une par tranche, voir `docs/CONVENTIONS.md`) ; nouvel APK si la version native change
 - [ ] Journal et backlog à jour
 - [ ] Intégrée à `main` par pull request

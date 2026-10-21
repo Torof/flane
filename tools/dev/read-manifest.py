@@ -2,7 +2,7 @@
 # Minimal Android binary XML (AXML) reader, with no dependency: prints the
 # uses-permission entries, application flags, exported components and intent
 # schemes of an APK. Usage: python3 -I tools/dev/read-manifest.py <file.apk>
-# Used to check the permission list of each built APK (docs/SECURITE.md).
+# Used to check the permission list of each built APK (docs/SECURITY.md).
 import struct, sys, zipfile
 
 def read_strings(data, off):

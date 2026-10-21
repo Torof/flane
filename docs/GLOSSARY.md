@@ -54,12 +54,12 @@ Attention au mot **« étape »**, qui a trois sens. Pour lever l'ambiguïté :
 | --- | --- |
 | Tranche | Une petite fonctionnalité complète, finissable en une à trois sessions. Identifiant `Tx.y`. |
 | Jalon | Un moment d'usage réel avec un critère vérifiable. Identifiant `Jx`. |
-| Fiche de tranche | Le document de planification d'une tranche (`docs/tranches/`). |
+| Fiche de tranche | Le document de planification d'une tranche (`docs/slices/`). |
 | Budget | Le nombre de sessions alloué à une tranche. |
 | Parking | La liste des idées nouvelles, revues en fin de jalon. |
 | Définition de « fini » | La liste de contrôle qui dit qu'une tranche est terminée. |
 | Journal | Le fichier qui dit où on en est (`docs/JOURNAL.md`). |
-| Carnet de route | Les notes prises pendant un trajet test (`docs/carnet-de-route/`). |
+| Carnet de route | Les notes prises pendant un trajet test (`docs/trip-notes/`). |
 | Trajet de référence | Le scénario fixe utilisé pour tester et comparer toutes les versions. |
 | Banc d'essai | L'outil qui sort la liste des suggestions sur le trajet de référence. |
 | Simulateur de trajet | L'outil qui rejoue un trajet enregistré. |
