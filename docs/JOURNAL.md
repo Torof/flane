@@ -4,6 +4,31 @@ Lu au début de chaque session (`/debut`), complété à la fin (`/fin`). Les en
 
 ---
 
+## 2026-10-21 — T0.8: monthly dependencies
+
+**Slice**: T0.8 — Monthly dependencies, October 2026
+**Moment of the ritual**: closing
+
+**Done**
+- Dependabot #13 redone under D-025: `@types/node` 24.19.2, development only; native fingerprint unchanged; #13 closed.
+- The lockfile's own version, stuck at 0.0.1 since T0.5, is back in line (0.0.2).
+
+**Version**: none (no app change; `version-check` green, its first real case).
+
+**Decisions**: none.
+
+**What worked / what got stuck**
+- Worked: a short sheet and a quarter of an hour, as planned.
+
+**Method**: the trial of a development-only slice is the four green checks; the owner's yes covered it.
+
+**Skipped moments**: devil's advocate (development dependency, same native fingerprint).
+
+**Next step**
+- T0.7 (translation), milestone 0 review, milestone 1.
+
+---
+
 ## 2026-10-21 — T0.4c: type-only packages
 
 **Slice**: T0.4c — Type-only packages do not count as an app change (found during T0.8)
