@@ -4,7 +4,7 @@ Statuses: **Idea** → **Ready** (sheet approved) → **In progress** → **To t
 
 ## In progress
 
-No slice in progress. Next: milestone 0 review, then milestone 1.
+No slice in progress. **Milestone 0 review in progress**: product, method, security pass and parking done; milestone 1 waits for the design brainstorm (`docs/vision-draft-2026-10-21.md`, mockups) to be finished with the owner.
 
 ## Open questions
 
@@ -123,6 +123,9 @@ Ideas written down, handled at the end of a milestone. Do not tackle them before
 - Supabase for reviews and sharing.
 
 **Later**
+- Home-screen widget: « tu es là, j'ai des suggestions », on foot too (design brainstorm, 2026-10-21).
+- A third category of places, « made here, by people »: small markets, local producers, craftspeople (design brainstorm; where to draw the line is open).
+- Revenue model: to discuss when the owner is ready (design brainstorm).
 - Importing a trip from Google Maps (level 2).
 - Voice answer « oui » / « non », then natural-language requests with an AI.
 - Professionals (shops, tourist offices) with verification.
@@ -131,7 +134,9 @@ Ideas written down, handled at the end of a milestone. Do not tackle them before
 - Bike, motorbike, van; home-to-work use; other countries; iOS.
 - Full journey tests (Maestro), screen gallery (Storybook), trip notes transcribed by Claude.
 
-**Tooling**
+**Tooling** (never decided alone: Claude asks the owner whether it is needed now — milestone 0 review)
+- `github-settings.sh --check` also checks secret scanning and push protection (milestone 0 security pass).
+- A guard against an accidental build of the public `production` profile before T5.4 (milestone 0 security pass).
 - Dark mode (night mode for driving) and landscape orientation: light theme and portrait only since T0.3; to handle with the moving view (milestone 3), through `app/src/ui/theme.ts`.
 - English and detection of the phone's language: an `en.json` file next to `fr.json`, no code to change.
 - Final icon and splash screen (the Expo template icon kept in T0.3).
@@ -141,11 +146,8 @@ Ideas written down, handled at the end of a milestone. Do not tackle them before
 - Test bench in PRs: the test bench runs on the reference trip on every pull request and posts the difference with `main` (after T2.8).
 - A root-level `SECURITY.md` and vulnerability disclosure policy (milestone 5).
 - Debug log in the test variant, without position: to decide in the sheet of the first slice of milestone 1 that touches the app.
-- Dashboard outside GitHub, email notifications (GitHub already warns about a failed run).
 - Claude running without an open session (scheduled tasks, cloud agents): to revisit when development has a rhythm.
-- Approving several sheets in a batch: milestone 1 review.
-- Commit message format checked in GitHub Actions.
-- Claude Code permission list: `Bash(rm *)` is allowed and only `rm -rf`/`rm -fr` ask; `rm -r -f` or `rm -Rf` pass (T0.6 audit). Short `fix/` slice.
+- **Owner's moment at the first pull request of milestone 1** (settings the owner commits): `rm -r -f`/`rm -Rf` ask like `rm -rf` (T0.6 audit); `Read(./**/credentials.json)` denied (milestone 0 security pass); and the real veto test, never done yet.
 - `version-check` that compares the built app itself (fingerprint of the export) between `main` and the pull request, instead of guessing from the files (T0.4c).
 - Observe more deeply what the agents do (quality of their reports, what they miss, their cost): at a milestone review, once we have some distance.
 - Next slice that touches the app: the comment in `app/app.config.ts` still names `docs/DONNEES.md` (now `docs/DATA.md`); left out of T0.7 so as not to change the app without a version.

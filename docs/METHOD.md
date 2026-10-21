@@ -39,6 +39,8 @@ Claude watches for these at every moment and says them out loud, with a proposal
 | Something is discovered on the way | « We just found out X. Does it change the plan, go to the parking, or do we ignore it? » |
 | An idea does not hold up when tried | « It does not work as planned. Rework, cut or drop? » The lesson goes to the journal. |
 | A background task is due | Dependabot of the month (D-025), parking review at the end of a milestone, open security alerts. |
+| A tool, check or workshop change looks useful | « Do we really need this now? » Tooling is never decided alone: Claude asks, and together we choose now or the parking (milestone 0 review). |
+| Claude needs the owner's hands (settings to commit, a trial, a veto test) | All of it gathered in one moment, never scattered. |
 | The session is long, or a big piece is done | « Good moment to take stock and stop? » |
 | The owner asks « where are we? » or proposes something | Claude answers with the same opening summary, then sorts the proposal (now, parking, disagree). |
 

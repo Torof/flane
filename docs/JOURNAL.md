@@ -6,6 +6,33 @@ Entries before 2026-10-21 (T0.6) are kept in French, as written (D-027).
 
 ---
 
+## 2026-10-21 — Milestone 0 review, then a design brainstorm
+
+**Moment of the ritual**: closing (the owner pauses the project for a while)
+
+**Done**
+- T0.7 merged: the repository is in English.
+- Milestone 0 review, points 1 to 4: criterion met; method changes (tooling never decided alone, the owner's hands in one moment, the veto test at the first milestone-1 pull request); full security pass, `docs/SECURITY.md` made truthful (Expo two-factor authentication not yet enabled, `allowBackup` limit, GraphQL merges, development tooling); parking sorted. `docs/reviews/M0-review.md`.
+- Point 5 (milestone 1) paused at the owner's request: talk about interface and design first. Brainstorm: mockups in the « Alpage » direction (validated: Explore map, short sheet then full page, planning, floating bubble over the GPS app), and a deeper vision: Flâne beyond the car, the aggregator of pleasant places with no purpose, three layers (soul, « made here », shops), three modes (Suggestion, Planning, Flâne), feeling plus descriptive labels, protecting locals' places. Draft: `docs/vision-draft-2026-10-21.md`.
+
+**Version**: none.
+
+**Decisions**: none recorded yet; the floating bubble (with its « display over other apps » permission) was chosen by the owner and will be recorded with the vision.
+
+**What worked / what got stuck**
+- Worked: the brainstorm on concrete mockups; the owner's ideas (three modes, feelings instead of grades, removal on request) sharpened the vision.
+- Stuck: Claude went too fast twice (straight to slices, then to a plan when the owner was still thinking).
+
+**Method**: in a brainstorm, Claude answers and asks; it does not turn ideas into plans until the owner says the discussion is done.
+
+**Open questions**
+- See section 9 of the vision draft; revenue when the owner is ready.
+
+**Next step**
+- Read the vision draft together, finish the brainstorm, then decide milestone 1 (and where T2.0 goes, since Explore opens on the user's position).
+
+---
+
 ## 2026-10-21 — T0.7: the repository in English
 
 **Slice**: T0.7 — The repository in English (D-027)
