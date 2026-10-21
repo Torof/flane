@@ -74,11 +74,13 @@ Attention au mot **« étape »**, qui a trois sens. Pour lever l'ambiguïté :
 | Vérifications automatiques | Le workflow GitHub Actions `checks` (`app-check`, `secrets-check`, `deps-check`) qui contrôle chaque pull request. Les trois sont **obligatoires** : la règle `protect-main` refuse la fusion tant qu'ils ne sont pas verts ; `deps-check` ne passe au rouge sur une pull request que si elle touche les fichiers de paquets. |
 | Alerte acceptée | Une alerte `npm audit` haute ou critique que `deps-check` ne bloque pas, parce que le paquet n'est chargé par aucun module de l'appli (outillage sur le PC). Inscrite dans `tools/dev/audit-accepted.json` avec ses chemins et sa date (`docs/CONVENTIONS.md`). |
 | Tranche de dépendances | La tranche courte qui reprend une pull request Dependabot entre deux tranches (D-025). |
-| Issue « État » | L'issue épinglée « État de Flâne » (#16) : où on en est, ce qui t'attend, ce qui a marché ou cassé, les remarques ouvertes. Réécrite par Claude à chaque étape et à `/fin` (T0.4a). |
 | Veto | L'arrêt demandé par l'utilisateur, à tout moment : pull request fermée ou repassée en brouillon, commentaire qui commence par « veto » ou « stop ». |
-| Point de contrôle | Le moment où Claude lit les signaux de l'utilisateur (`tools/dev/owner-signals.mjs`) : avant chaque commit, push, agent, publication, compilation et fusion, et au début de `/debut`. |
+| Point de contrôle | Le moment où Claude lit les signaux de l'utilisateur (`tools/dev/owner-signals.mjs`) : avant chaque commit, push, agent, publication, compilation et fusion, et à l'ouverture de chaque session. |
 | Signature de Claude | La ligne cachée `<!-- flane:claude -->` en tête de chaque commentaire posté par Claude, qui utilise le compte de l'utilisateur. |
-| Remarqué en route | La rubrique de fin de chaque rapport d'agent et de chaque pull request : trois remarques au plus, *problème*, *réussite* ou *idée*. |
+| Noticed on the way (remarqué en route) | La rubrique de fin de chaque rapport d'agent et de chaque pull request : trois remarques au plus, *problème*, *réussite* ou *idée*. |
+| Rituel | La suite de moments d'une session (ouverture, idée, fiche, construction, passe de sécurité, essai, clôture) que Claude mène et annonce, avec ses réflexes (D-028, `docs/METHOD.md`). |
+| Réflexe | Ce que Claude dit de lui-même au bon moment : parking, couper, nouvelle version, passe de sécurité, découverte, pas de côté (`docs/METHOD.md`). |
+| Pas de côté | Un point hors de la tâche que Claude soulève à l'ouverture et à la clôture : risque qui monte, autre façon de faire, idée du parking devenue mûre. |
 | Boîte de réception | GitHub Issues : les retours et idées venus de l'extérieur, vidés vers le backlog ou le parking à chaque début de session (D-017). |
 
 ## L'étape 2 (pour mémoire)

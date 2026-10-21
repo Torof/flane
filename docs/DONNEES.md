@@ -24,7 +24,7 @@ Aucun compte utilisateur, aucun identifiant publicitaire, aucun outil de statist
 
 ## Pilotage du projet (T0.4a)
 
-Aucune donnée d'usage de l'appli. Le corps de l'issue « État de Flâne », celui des pull requests et les commentaires de Claude sont **publics**, comme le dépôt : contenu borné par `docs/CONVENTIONS.md` (ni position, ni trajet, ni préférence, ni adresse, ni détail d'une faille ouverte). `tools/dev/owner-signals.mjs` lit ces commentaires publics par `gh`, sur le PC, et ne les envoie nulle part ; il n'affiche pas le texte des commentaires d'autres comptes. Son état local, `.git/flane-signals.json`, ne contient que des dates et des états de pull request, hors du dépôt.
+Aucune donnée d'usage de l'appli. Le corps des pull requests et les commentaires de Claude sont **publics**, comme le dépôt : contenu borné par `docs/CONVENTIONS.md` (ni position, ni trajet, ni préférence, ni adresse, ni détail d'une faille ouverte). `tools/dev/owner-signals.mjs` lit ces commentaires publics par `gh`, sur le PC, et ne les envoie nulle part ; il n'affiche pas le texte des commentaires d'autres comptes. Son état local, `.git/flane-signals.json`, ne contient que des dates et des états de pull request, hors du dépôt.
 
 ## Données publiques utilisées
 
