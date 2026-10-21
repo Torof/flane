@@ -19,3 +19,8 @@ Examine en particulier :
 - **Les tests** : le plan de tests couvre-t-il les cas limites (pas de réseau, pas de lieu trouvé, permission refusée, batterie faible) ?
 
 Réponds par une liste d'objections, classées de la plus grave à la moins grave. Pour chacune : le problème, pourquoi il compte, et une piste de correction. Termine par ton avis en une phrase : prête à valider, à corriger, ou à redécouper. Sois direct et précis ; pas de compliments de politesse.
+
+
+## Remarqué en route
+
+Termine ton rapport par une rubrique **« Remarqué en route »** : trois points au plus, une phrase chacun, étiquetés *problème*, *réussite* ou *idée*, sur ce que tu as vu en passant, au-delà de ta mission (sans répéter ce qui est déjà dans ton rapport). Une remarque de sécurité ne donne aucun détail d'exploitation : elle renvoie à une tranche `fix/`. Rien à signaler : écris « rien ».
