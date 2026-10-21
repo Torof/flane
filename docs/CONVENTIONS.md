@@ -48,7 +48,7 @@ Trois numéros, trois rôles.
 | Tranche qui ne change rien dans `app/` (méthode, documentation, outils du dépôt, vérifications GitHub) | pas de version |
 | Première publication sur Google Play | `1.0.0` (T5.4) |
 
-Chaque version reçoit un nom qui dit ce qu'elle apporte, quelques lignes dans `CHANGELOG.md` et une étiquette annotée sur le commit de fusion (`v0.1.0`, D-029, `docs/METHOD.md`).
+La montée est contrôlée par `version-check` : tout fichier de `app/` compte, sauf les tests, `app/src/tools/`, la documentation, la configuration ESLint et Prettier, `.nvmrc` ; dans `package.json`, seuls `devDependencies`, `jest` et les scripts qui ne s'exécutent ni à l'installation ni à la compilation sont ignorés ; dans le lockfile, seules les entrées de développement. Chaque version reçoit un nom qui dit ce qu'elle apporte, quelques lignes dans `CHANGELOG.md` et une étiquette annotée sur le commit de fusion (`v0.1.0`, D-029, `docs/METHOD.md`).
 
 **La version native** (`runtimeVersion`, calculée par empreinte des modules natifs : `@expo/fingerprint`) ne change que quand un module natif entre ou sort, ou qu'un réglage natif de `app.config.ts` change. C'est elle qui dit « il faut un nouvel APK » : une mise à jour instantanée ne s'applique qu'aux APK de la même version native. « À propos » en montre les huit premiers caractères. Elle ne dépend pas de la version de l'appli (test `app/src/config.test.ts`).
 
@@ -129,12 +129,13 @@ Le workflow `checks` (`.github/workflows/checks.yml`) tourne sur chaque pull req
 
 | Job | Fait | Obligatoire sur `main` |
 | --- | --- | --- |
-| `app-check` | `npm ci` puis `npm run check` (types, lint, formatage, notices SPDX, tests) et `npm run licenses` dans `app/` | Oui |
+| `app-check` | `npm ci` puis `npm run check` (types, lint, formatage, notices SPDX, tests), `npm run licenses`, et l'assemblage de la variante de test (`expo export`, hors ligne, sans clé, rien n'est envoyé) dans `app/` | Oui |
 | `secrets-check` | gitleaks sur tout l'historique (sortie expurgée, aucun rapport déposé) ; refus d'une configuration gitleaks du dépôt et des annotations d'exception, comme le hook `pre-commit` | Oui |
+| `version-check` | tests de tous les scripts du dépôt (`tools/dev/*.test.mjs`) ; sur une pull request, la version de l'appli doit monter si l'appli change (`tools/dev/check-version-bump.mjs`, fermé par défaut, D-029) | Oui |
 | `deps-check` | tests de `tools/dev/audit.mjs`, puis `npm audit --omit=dev` comparé aux alertes acceptées ; tourne aussi chaque lundi sur `main` | Oui, mais le job décide lui-même : un rouge ne bloque que si la pull request touche `app/package.json` ou `app/package-lock.json` (sinon le job passe, avec le rouge en résumé, à corriger dans une tranche de dépendances) ; sur `main` et le lundi, un rouge est rouge |
 
 Règles :
-- Les noms des trois jobs sont inscrits dans la règle `protect-main` : les renommer sans mettre à jour `REQUIRED_CHECKS` dans `tools/dev/github-settings.sh` et relancer le script bloque toute pull request. `tools/dev/github-settings.sh --check` compare les réglages du dépôt à l'état attendu et sort en 1 s'ils diffèrent.
+- Les noms des quatre jobs sont inscrits dans la règle `protect-main` : les renommer sans mettre à jour `REQUIRED_CHECKS` dans `tools/dev/github-settings.sh` et relancer le script bloque toute pull request. `tools/dev/github-settings.sh --check` compare les réglages du dépôt à l'état attendu et sort en 1 s'ils diffèrent.
 - Les actions GitHub sont épinglées par SHA de commit (le dépôt l'exige) et limitées à celles de GitHub ; Dependabot propose les montées.
 - Un échec se lit en une commande : `gh run view <id> --log-failed`, ou le résumé du job dans l'onglet Actions (la première ligne nomme le job et la cause).
 - Un avis publié dans la nuit ne bloque pas une pull request de documentation : `deps-check` ne bloque que les pull requests qui touchent les fichiers de paquets. Les vérifications obligatoires prouvent qu'un job de ce nom a été lancé par GitHub Actions, pas qu'il vient du workflow de `main` : une pull request qui modifie `.github/`, `tools/dev/audit*`, `tools/dev/audit-accepted.json` ou `tools/dev/gitleaks.env` modifie les vérifications elles-mêmes et se relit comme telle (liste de contrôle de `docs/SECURITE.md`).

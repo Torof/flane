@@ -4,13 +4,16 @@
 // blocks the command on a stop (docs/METHOD.md). It reads with --dry-run, so
 // the checkpoint Claude takes itself is unchanged.
 //
-// A seatbelt against forgetting, not a sandbox: a command hidden behind a
-// variable or `eval`, or an edit of this script, gets around it. What it
-// catches: `gh … pr merge` (flags anywhere, number, `#n` or `/pull/n`), `gh api`
-// on `pulls/<n>/merge`, and `eas` or `eas-cli` `update`, `build`, `submit`,
-// `workflow:run`, in every part of a compound command. It blocks what it cannot
-// resolve: a merge target that is not a number, `-R`/`--repo`, a guarded command
-// with no pull request for the branch.
+// A seatbelt against forgetting, not a sandbox: a command held in a variable,
+// written to a script file and run, or an edit of this script, gets around it.
+// What it catches: `gh … pr merge` (flags anywhere, number, `#n` or `/pull/n`),
+// `gh api` on `pulls/<n>/merge`, and `eas` or `eas-cli` `update`, `build`,
+// `submit`, `workflow:run`, in every part of a compound command, inside `$(…)`
+// and backticks, in the argument of `sh -c`/`bash -c`/`zsh -c` and `eval`, and in
+// a here-document fed to a shell. Quoted text and other here-documents are data:
+// they are not read. It blocks what it cannot resolve: a merge target that is
+// not a number, `-R`/`--repo`, arguments from `xargs` or `<<<`, a guarded
+// command with no pull request for the branch.
 //
 // Input: the hook JSON on stdin ({ tool_name, tool_input: { command } }).
 // Exit code: 0 allow, 2 block (stderr is shown to Claude). Every failure blocks.
@@ -20,7 +23,10 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const EAS = /\beas(-cli)?(@\S+)?["')]*\s+(update|build|submit|workflow:run)\b/;
+// A program word (once `(`, `$(` and `)` are trimmed) and the subcommand after it.
+const EAS_PROGRAM = /(^|[/\s])eas(-cli)?(@[^/\s]*)?$/;
+const EAS_SUBCOMMAND = /^(update|build|submit|workflow:run)(:|$)/;
+const clean = (w) => w.replace(/^\$?\(+/, '').replace(/\)+$/, '');
 // gh pr merge flags that take a value.
 const VALUE_FLAGS = new Set([
   '-R',
@@ -52,11 +58,11 @@ export function words(command) {
       else word += ch;
     } else if (ch === '"' || ch === "'") {
       quote = ch;
-    } else if (/\s/.test(ch)) {
-      flush();
-    } else if (';&|()\n'.includes(ch)) {
+    } else if (';&|\n'.includes(ch)) {
       flush();
       out.push(';');
+    } else if (/\s/.test(ch)) {
+      flush();
     } else {
       word += ch;
     }
@@ -65,10 +71,43 @@ export function words(command) {
   return out;
 }
 
+const SHELL = /^(.*\/)?(ba|z|da)?sh$/;
+
+/**
+ * Removes here-document bodies (text fed to a command, not a command) and keeps
+ * the opener line. A body fed to a shell or to `eval` is kept: it is commands.
+ */
+export function withoutHeredocs(command) {
+  return command.replace(
+    /([^\n]*?)<<-?\s*(['"]?)([A-Za-z_]\w*)\2([^\n]*)\n(?:[\s\S]*?\n)?[\t ]*\3[\t ]*(?=\n|$)/g,
+    (match, before, _q, _tag, after) => {
+      const feeder =
+        words(before)
+          .filter((w) => w !== ';')
+          .at(-1) ?? '';
+      if (SHELL.test(clean(feeder)) || feeder === 'eval') return match;
+      return `${before}${after}`;
+    },
+  );
+}
+
+/** The insides of `$(…)` and backticks: commands the shell runs, even inside double quotes. */
+export function substitutions(command) {
+  const inner = [];
+  for (const m of command.matchAll(/\$\(([^()]*)\)|`([^`]*)`/g)) inner.push(m[1] ?? m[2]);
+  return inner;
+}
+
 /** The targets of one command: { prs: [n | 'current'], blocked: reason | null }. */
-export function targets(command) {
+export function targets(command, depth = 0) {
+  if (depth > 3) return { prs: [], blocked: 'command nested too deep to check' };
   const prs = [];
-  const all = words(command);
+  for (const inner of substitutions(command)) {
+    const sub = targets(inner, depth + 1);
+    if (sub.blocked) return sub;
+    prs.push(...sub.prs);
+  }
+  const all = words(withoutHeredocs(command)).map((w) => (w === ';' ? w : clean(w)));
   const segments = [];
   let current = [];
   for (const w of all) {
@@ -80,11 +119,29 @@ export function targets(command) {
   if (current.length) segments.push(current);
 
   for (const seg of segments) {
+    // The argument of `sh -c` and the rest of an `eval` are commands too.
+    const sh = seg.findIndex((w) => SHELL.test(w));
+    const nested = [];
+    if (sh >= 0 && /^-[a-z]*c[a-z]*$/.test(seg[sh + 1] ?? '') && seg[sh + 2] !== undefined) {
+      nested.push(seg[sh + 2]);
+    }
+    if (seg.includes('eval')) nested.push(seg.slice(seg.indexOf('eval') + 1).join(' '));
+    for (const inner of nested) {
+      const sub = targets(inner, depth + 1);
+      if (sub.blocked) return sub;
+      prs.push(...sub.prs);
+    }
     const gh = seg.findIndex((w) => /(^|\/)gh$/.test(w));
     if (gh >= 0) {
       const rest = seg.slice(gh + 1);
       const pr = rest.indexOf('pr');
       if (pr >= 0 && rest[pr + 1] === 'merge') {
+        if (seg.slice(0, gh).includes('xargs') || rest.some((w) => /^\d*</.test(w))) {
+          return {
+            prs,
+            blocked: 'merge arguments read from input (xargs, <, <<<) are not checked',
+          };
+        }
         if (rest.some((w) => w === '-R' || w === '--repo' || w.startsWith('--repo='))) {
           return {
             prs,
@@ -116,7 +173,12 @@ export function targets(command) {
       }
     }
   }
-  if (EAS.test(command)) prs.push('current');
+  for (let i = 0; i < all.length - 1; i++) {
+    if (EAS_PROGRAM.test(all[i]) && EAS_SUBCOMMAND.test(all[i + 1])) {
+      prs.push('current');
+      break;
+    }
+  }
   return { prs, blocked: null };
 }
 

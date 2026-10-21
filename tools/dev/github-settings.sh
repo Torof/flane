@@ -9,7 +9,7 @@
 #     GITHUB_TOKEN, approval required for workflows of every outside contributor.
 #   - Dependabot automatic security pull requests: disabled (alerts stay on).
 #   - Ruleset protect-main: enforcement active, no bypass, required status checks
-#     app-check, secrets-check and deps-check (strict: false) posted by GitHub
+#     app-check, secrets-check, deps-check and version-check (strict: false) posted by GitHub
 #     Actions only; the other rules (deletion, non_fast_forward, pull_request
 #     with merge only) are kept as they are and checked.
 set -euo pipefail
@@ -17,7 +17,7 @@ set -euo pipefail
 REPO="${FLANE_REPO:-Torof/flane}"
 RULESET_NAME="protect-main"
 GITHUB_ACTIONS_APP_ID=15368
-REQUIRED_CHECKS=("app-check" "deps-check" "secrets-check")
+REQUIRED_CHECKS=("app-check" "deps-check" "secrets-check" "version-check")
 
 mode="apply"
 case "${1:-}" in
