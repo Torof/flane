@@ -147,4 +147,5 @@ Idées notées, traitées en fin de jalon. Ne pas s'y attaquer avant.
 - Format des messages de commit vérifié dans GitHub Actions.
 - Liste des permissions de Claude Code : `Bash(rm *)` est autorisé et seuls `rm -rf`/`rm -fr` demandent ; `rm -r -f` ou `rm -Rf` passent (audit de T0.6). Tranche `fix/` courte.
 - `version-check` qui compare l'appli assemblée elle-même (empreinte de l'export) entre `main` et la pull request, au lieu de deviner à partir des fichiers (T0.4c).
+- Observer plus en profondeur ce que font les agents (qualité de leurs rapports, ce qu'ils ratent, leur coût) : au bilan d'un jalon, quand on aura du recul.
 - Vérification automatique des renvois morts (`METHODE.md`, vocabulaire des portes) dans `app-check`.

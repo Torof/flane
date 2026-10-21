@@ -4,6 +4,17 @@ Lu au début de chaque session (`/debut`), complété à la fin (`/fin`). Les en
 
 ---
 
+## 2026-10-21 — End of day: the owner's view on the method
+
+**Moment of the ritual**: closing
+
+**Method** (the owner, after T0.6, T0.4b, T0.8, T0.4c): « Il y a une vraie communication. J'ai l'impression d'avoir une vue sur un peu tout. C'est automatisé, donc ça va vite, mais ça va pas plus vite que ce que j'arrive à analyser et comprendre. J'ai un choix, on en discute. » Keep the method as it is; a deeper look at the agents later.
+
+**Next step**
+- T0.7 (translate the rest of the repository), milestone 0 review, milestone 1.
+
+---
+
 ## 2026-10-21 — T0.8: monthly dependencies
 
 **Slice**: T0.8 — Monthly dependencies, October 2026
