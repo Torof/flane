@@ -2,7 +2,7 @@
 
 The structuring choices, with their reasons. A decision is never erased: if it changes, a new one is added that replaces it. Template: `docs/templates/DECISION.md`. The most recent at the top.
 
-Decisions D-001 to D-026 are kept in French, as written (D-027).
+Decisions D-001 to D-026 are kept in French, as written (D-027); the English status suffixes on their headings (« kept by », « replaced by ») were added later.
 
 ---
 

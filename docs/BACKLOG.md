@@ -148,4 +148,6 @@ Ideas written down, handled at the end of a milestone. Do not tackle them before
 - Claude Code permission list: `Bash(rm *)` is allowed and only `rm -rf`/`rm -fr` ask; `rm -r -f` or `rm -Rf` pass (T0.6 audit). Short `fix/` slice.
 - `version-check` that compares the built app itself (fingerprint of the export) between `main` and the pull request, instead of guessing from the files (T0.4c).
 - Observe more deeply what the agents do (quality of their reports, what they miss, their cost): at a milestone review, once we have some distance.
+- Next slice that touches the app: the comment in `app/app.config.ts` still names `docs/DONNEES.md` (now `docs/DATA.md`); left out of T0.7 so as not to change the app without a version.
+- A check that flags accented French words in non-history files (T0.7 review).
 - Automatic check for dead references (`METHODE.md`, vocabulary of the gates) in `app-check`.

@@ -1,9 +1,9 @@
-# Dependabot (T0.2) : un rendez-vous mensuel, une pull request groupée par
-# écosystème. Une pull request Dependabot n'est jamais fusionnée telle quelle :
-# elle est reprise dans une tranche de dépendances (D-025, docs/CONVENTIONS.md).
-# La famille Expo et React est exclue : ces paquets suivent le SDK par
-# `npx expo install --check` ; pour un 0.x comme react-native, Dependabot
-# classerait une rupture en « mineure ».
+# Dependabot (T0.2): a monthly appointment, one grouped pull request per
+# ecosystem. A Dependabot pull request is never merged as is: it is redone in
+# a dependency slice (D-025, docs/CONVENTIONS.md).
+# The Expo and React family is excluded: those packages follow the SDK through
+# `npx expo install --check`; for a 0.x like react-native, Dependabot would
+# call a breaking change « minor ».
 version: 2
 updates:
   - package-ecosystem: github-actions
