@@ -27,7 +27,7 @@ Statuts : **Idée** → **Prête** (fiche validée) → **En cours** → **À te
 | T0.2 | Vérifications automatiques (GitHub Actions) : types, lint, tests, audit des dépendances, recherche de secrets, licences ; exigées par la règle sur `main` ; Dependabot ; résumé court des échecs pour Claude | En cours |
 | T0.3 | Squelette de l'appli Expo : TypeScript strict, ESLint et Prettier, fichiers de traduction, notice SPDX en tête des fichiers, `.npmrc` (`ignore-scripts`, `save-exact`), `.nvmrc`, trois onglets vides, variantes `app.flane.dev` / `app.flane`, APK `preview` et client de développement par EAS Build | Faite |
 | T0.5 | Mises à jour instantanées (EAS Update) pour la variante de test `app.flane.dev`, version native visible, une version par tranche (D-023) ; passée avant T0.2 à la demande de l'utilisateur pour accélérer la boucle de test | Faite |
-| T0.4 | Historique des versions automatique (à partir des messages de commit), étiquettes Git par version, et contrôle « la version monte quand `app/` change » (reporté de T0.2) | Idée |
+| T0.4 | Pilotage : issue « État », pull request suivie en direct, veto, remarques des agents (T0.4a) ; assemblage de l'appli, contrôle de version, fiche courte (T0.4b). Fiche en discussion : `docs/tranches/T0.4-pilotage.md`. L'historique des versions et les étiquettes sont abandonnés (D-026) | Idée |
 
 ## Jalon 1 — Je vois les bons coins de ma région
 

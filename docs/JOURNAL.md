@@ -4,6 +4,31 @@ Lu au début de chaque session (`/debut`), complété à la fin (`/fin`). Les en
 
 ---
 
+## 2026-10-21 — État des lieux du jalon 0, et la fiche du pilotage
+
+**Tranche** : T0.2 (toujours à la porte Observer) ; fiche de T0.4 en discussion.
+**Étape** : T0.2 Observer ; T0.4 Choisir (fiche corrigée, deux choix et le oui attendus).
+
+**Fait**
+- À la demande de l'utilisateur, état des lieux : l'atelier (méthode, garde-fous, vérifications, mises à jour instantanées) est en place, aucune fonction du produit n'existe encore. L'utilisateur l'accepte, à condition que le développement soit ensuite rapide, guidé, sûr, et qu'il voie tout.
+- Audit du système par Claude : six manques relevés et acceptés par l'utilisateur. Cycle trop lourd pour les petites tranches et budget non suivi ; vérifications qui n'assemblent pas l'appli ; aucune vue des erreurs sur le téléphone ; tranche de sécurité manquante avant la première donnée personnelle ; rien qui fait remonter les idées ; pas de direction d'interface.
+- Nouvelle demande de l'utilisateur : tout voir (fait, en cours, à venir, ce qui marche ou casse), droit de veto sur tout et à tout moment, remontée des remarques des agents (problèmes, réussites, idées), le tout automatisé, sans devoir être présent.
+- Fiche `docs/tranches/T0.4-pilotage.md` rédigée, attaquée par l'avocat du diable (14 objections, 3 bloquantes sur le veto : Claude poste avec le compte de l'utilisateur, lecture des commentaires incomplète, rien relu avant la fusion). Toutes retenues ; proposé : issue épinglée « État de Flâne », signaux de veto (fermer la pull request, la repasser en brouillon, commentaire « veto »/« stop »), points de contrôle avant commit, push, agent, publication, compilation et fusion, découpage en T0.4a (voir et arrêter) et T0.4b (vérifications, fiche courte).
+- Indiqué à l'utilisateur comment retirer la règle `ask` sur `gh pr merge` de `.claude/settings.json` ; il le fera lui-même.
+
+**Décisions** : D-026 (versions sans étiquettes ni historique des versions).
+
+**Exceptions à la méthode**
+- La fiche de T0.4 a été rédigée et attaquée pendant que T0.2 attend sa porte Observer : planifier la suivante n'est pas la construire. Elle est enregistrée en brouillon dans cette pull request, sans validation.
+
+**Questions ouvertes**
+- Porte Observer de T0.2 : constater que la pull request 12 est bloquée (bouton « Merge » grisé).
+- T0.4 : issue épinglée ou fichier pour l'état ; découpage en T0.4a et T0.4b ; oui sur la fiche.
+- Double authentification Expo et GitHub : intégrée à la future T2.0.
+
+**Prochaine étape**
+- `/debut`, porte Observer de T0.2 (pull request 12), fusion de la 11 et fermeture de la 12, puis les deux choix et le oui de T0.4, et la construction de T0.4a.
+
 ## 2026-10-20 — T0.2 Vérifications automatiques : la machine relit avant la fusion
 
 **Tranche** : T0.2 — Vérifications automatiques (GitHub Actions), jalon 0.
