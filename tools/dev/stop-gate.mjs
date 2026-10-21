@@ -20,7 +20,10 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const EAS = /\beas(-cli)?(@\S+)?["')]*\s+(update|build|submit|workflow:run)\b/;
+// A program word (once `(`, `$(` and `)` are trimmed) and the subcommand after it.
+const EAS_PROGRAM = /(^|[/\s])eas(-cli)?(@[^/\s]*)?$/;
+const EAS_SUBCOMMAND = /^(update|build|submit|workflow:run)(:|$)/;
+const clean = (w) => w.replace(/^\$?\(+/, '').replace(/\)+$/, '');
 // gh pr merge flags that take a value.
 const VALUE_FLAGS = new Set([
   '-R',
@@ -54,7 +57,7 @@ export function words(command) {
       quote = ch;
     } else if (/\s/.test(ch)) {
       flush();
-    } else if (';&|()\n'.includes(ch)) {
+    } else if (';&|\n'.includes(ch)) {
       flush();
       out.push(';');
     } else {
@@ -66,9 +69,17 @@ export function words(command) {
 }
 
 /** The targets of one command: { prs: [n | 'current'], blocked: reason | null }. */
+/** Removes here-document bodies: text fed to a command, not a command. */
+export function withoutHeredocs(command) {
+  return command.replace(
+    /<<-?\s*(['"]?)([A-Za-z_]\w*)\1[^\n]*\n[\s\S]*?\n[\t ]*\2[\t ]*(?=\n|$)/g,
+    '',
+  );
+}
+
 export function targets(command) {
   const prs = [];
-  const all = words(command);
+  const all = words(withoutHeredocs(command)).map((w) => (w === ';' ? w : clean(w)));
   const segments = [];
   let current = [];
   for (const w of all) {
@@ -116,7 +127,12 @@ export function targets(command) {
       }
     }
   }
-  if (EAS.test(command)) prs.push('current');
+  for (let i = 0; i < all.length - 1; i++) {
+    if (EAS_PROGRAM.test(all[i]) && EAS_SUBCOMMAND.test(all[i + 1])) {
+      prs.push('current');
+      break;
+    }
+  }
   return { prs, blocked: null };
 }
 

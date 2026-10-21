@@ -38,6 +38,9 @@ test('ordinary commands pass without reading anything', () => {
     'gh pr create --title "how to gh pr merge 5" --body x',
     'npm test',
     'echo "eas updated"',
+    'git commit -m "Run eas update before the trial"',
+    "cat > sheet.md <<'EOF'\nthe variant eas update publishes\ngh pr merge 5\nEOF\ngit add sheet.md",
+    'grep -n "eas build" docs/METHOD.md',
     'gh api repos/Torof/flane/pulls/5/comments',
     undefined,
   ]) {
@@ -76,6 +79,8 @@ test('publish, build and submit: eas and eas-cli in every shape', () => {
     'eas update:republish --group x',
     'eas submit -p android',
     'eas workflow:run deploy.yml',
+    '(cd app && eas update --channel preview)',
+    'cd app; npx -y eas-cli@16.3.0 build -p android',
   ]) {
     assert.deepEqual(targets(command).prs, ['current'], command);
   }
