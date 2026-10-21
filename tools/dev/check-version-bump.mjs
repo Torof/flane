@@ -5,7 +5,8 @@
 // except the ones listed in DOES_NOT_COUNT; in app/package.json only the
 // sections that change nothing in the app are ignored (install and build
 // hooks in `scripts` do count), and in app/package-lock.json only the
-// development entries. Renames count as a deletion plus an addition, and file
+// development entries and the type-only packages (`@types/*`, `undici-types`,
+// never aliased, linked or with an install script). Renames count as a deletion plus an addition, and file
 // names are read raw (-z), accents included. No dependency.
 //
 // Not a security boundary: a pull request can edit this script to pass itself;
@@ -57,13 +58,20 @@ const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 // Packages made only of type declarations: never in the assembled app, even when
 // npm counts them as production because a production tool (Jest, Metro) requires them.
 const TYPES_ONLY = /(^|\/)node_modules\/(@types\/[^/]+|undici-types)$/;
+// Only the real package: not an npm alias (its `name` differs from its path),
+// a local link, or anything with an install script.
+const isTypesOnly = (path, entry) =>
+  TYPES_ONLY.test(path) &&
+  (entry.name === undefined || path.endsWith(`node_modules/${entry.name}`)) &&
+  !entry.link &&
+  !entry.hasInstallScript;
 
 /** The part of a lockfile that ships: non-dev, non-type entries, without the project's own version. */
 export function productionLock(lock) {
   const packages = {};
   for (const [path, entry] of Object.entries(lock?.packages ?? {})) {
     if (path === '') packages[path] = { dependencies: entry.dependencies ?? {} };
-    else if (!entry.dev && !TYPES_ONLY.test(path)) packages[path] = entry;
+    else if (!entry.dev && !isTypesOnly(path, entry)) packages[path] = entry;
   }
   return packages;
 }

@@ -240,3 +240,22 @@ test('type-only packages counted as production by npm do not count; a real one n
     'app/package-lock.json (production entries)',
   ]);
 });
+
+test('look-alikes, code under a types package, aliases and links still count', () => {
+  const base = { ...baseFiles, 'app/package-lock.json': lock('0.0.2', {}) };
+  const counts = (entries) =>
+    appChanges(
+      ['app/package-lock.json'],
+      reader(base, { ...baseFiles, 'app/package-lock.json': lock('0.0.2', entries) }),
+    ).length === 1;
+  assert.equal(counts({ 'node_modules/undici': { version: '7.0.0' } }), true);
+  assert.equal(counts({ 'node_modules/undici-types-x': { version: '1.0.0' } }), true);
+  assert.equal(counts({ 'node_modules/@types/node/node_modules/x': { version: '1.0.0' } }), true);
+  assert.equal(counts({ 'node_modules/@types/x': { name: 'left-pad', version: '1.0.0' } }), true);
+  assert.equal(counts({ 'node_modules/@types/x': { version: '1.0.0', link: true } }), true);
+  assert.equal(
+    counts({ 'node_modules/undici-types': { version: '1.0.0', hasInstallScript: true } }),
+    true,
+  );
+  assert.equal(counts({ 'node_modules/@types/x': { name: '@types/x', version: '1.0.0' } }), false);
+});
