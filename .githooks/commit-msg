@@ -1,39 +1,33 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: AGPL-3.0-or-later
-# Hook commit-msg Flâne : impose le format des messages de commit
-# (docs/CONVENTIONS.md) : type(Tx.y|meta): sujet. Les messages de fusion
-# produits par git ou GitHub et les « Revert » passent. Tout le reste est refusé.
+# Flâne commit-msg hook: the title must describe the change in plain English
+# (docs/METHOD.md), so it only checks that a title exists and fits in 72
+# characters. Merge messages from git or GitHub and « Revert » always pass.
 set -u
 
 file="${1:-}"
 if [ -z "$file" ] || [ ! -r "$file" ]; then
-  echo "commit-msg : fichier de message introuvable. Commit refusé." >&2
+  echo "commit-msg: message file not found. Commit refused." >&2
   exit 1
 fi
 
-# Première ligne utile : ni commentaire, ni vide.
+# First useful line: neither a comment nor blank.
 subject="$(grep -v '^#' "$file" | grep -m1 -v '^[[:space:]]*$' || true)"
 
-conventional='^(feat|fix|docs|test|refactor|chore|perf)\((T[0-9]+\.[0-9]+[a-z]?|meta)\)!?: .+'
-revert='^Revert "'
-merge='^Merge (branch|pull request #[0-9]+) '
-
-if printf '%s' "$subject" | grep -Eq "$conventional" \
-  || printf '%s' "$subject" | grep -Eq "$revert" \
-  || printf '%s' "$subject" | grep -Eq "$merge"; then
+if printf '%s' "$subject" | grep -Eq '^(Revert "|Merge (branch|pull request #[0-9]+) )'; then
   exit 0
 fi
 
-cat >&2 <<EOF
-commit-msg : message refusé.
-  Reçu   : ${subject:-(vide)}
-  Attendu: type(scope): sujet
-    type  : feat | fix | docs | test | refactor | chore | perf
-    scope : identifiant de tranche (T0.1, T0.1b, T2.4…) ou meta
-  Exemples :
-    feat(T1.2): extract viewpoints and picnic sites from OSM
-    docs(meta): update journal after T0.1
-    fix(T2.4)!: change route request format
-  Voir docs/CONVENTIONS.md. Les hooks ne se contournent pas (--no-verify est bloqué).
-EOF
+length="$(printf '%s' "$subject" | LC_ALL=C.UTF-8 wc -m)"
+if [ -n "$subject" ] && [ "$length" -le 72 ]; then
+  exit 0
+fi
+
+cat >&2 <<MSG
+commit-msg: message refused.
+  Got     : ${subject:-(empty)}
+  Expected: a title of 72 characters at most saying what changes, in plain English.
+  Example : Stop signals also catch "véto" and quoted stops
+  See docs/METHOD.md. Hooks are never bypassed.
+MSG
 exit 1
