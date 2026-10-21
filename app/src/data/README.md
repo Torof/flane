@@ -1,1 +1,1 @@
-Stockage local, lecture et vérification des paquets régionaux. Naît en T2.1 et T2.2.
+Local storage, reading and verification of regional packs. Born in T2.1 and T2.2.

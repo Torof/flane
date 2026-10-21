@@ -1,24 +1,24 @@
-name: Bug sur la route
-description: Quelque chose s'est mal passé pendant un trajet ou en préparant un trajet.
+name: Bug on the road
+description: Something went wrong during a trip or while preparing a trip.
 title: "[Bug] "
 labels: ["bug"]
 body:
   - type: markdown
     attributes:
       value: |
-        Merci. Deux règles pour protéger votre vie privée : **ne collez ni coordonnées GPS, ni capture d'écran montrant votre position**, et décrivez le lieu par un tronçon approximatif (« entre Briançon et Embrun »), jamais par une adresse.
+        Thank you. Two rules to protect your privacy: **paste neither GPS coordinates nor a screenshot showing your position**, and describe the place by an approximate stretch of road (« between Briançon and Embrun »), never by an address.
   - type: textarea
     id: quoi
     attributes:
-      label: Ce qui s'est passé
-      description: Ce que Flâne a fait, et ce que vous attendiez.
+      label: What happened
+      description: What Flâne did, and what you expected.
     validations:
       required: true
   - type: input
     id: troncon
     attributes:
-      label: Tronçon approximatif
-      placeholder: "entre Briançon et Embrun"
+      label: Approximate stretch of road
+      placeholder: "between Briançon and Embrun"
     validations:
       required: false
   - type: dropdown
@@ -26,23 +26,23 @@ body:
     attributes:
       label: Moment
       options:
-        - En préparant le trajet (à l'arrêt)
-        - En route (en mouvement)
-        - À l'arrêt pendant le trajet
-        - Autre
+        - While preparing the trip (stopped)
+        - On the road (moving)
+        - Stopped during the trip
+        - Other
     validations:
       required: true
   - type: input
     id: version
     attributes:
-      label: Version de Flâne et modèle de téléphone
+      label: Flâne version and phone model
       placeholder: "0.1.0, Pixel 7"
     validations:
       required: false
   - type: checkboxes
     id: vieprivee
     attributes:
-      label: Vie privée
+      label: Privacy
       options:
-        - label: Je n'ai collé ni coordonnées, ni adresse, ni capture montrant ma position.
+        - label: I pasted no coordinates, no address, and no screenshot showing my position.
           required: true

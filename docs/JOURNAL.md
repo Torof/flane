@@ -1,6 +1,8 @@
-# Journal de session
+# Session journal
 
-Lu au début de chaque session (`/debut`), complété à la fin (`/fin`). Les entrées les plus récentes en haut. Modèle : `docs/templates/JOURNAL_ENTRY.md`.
+Read when Claude opens a session (`session-open`), completed when it closes one (`session-close`). The most recent entries at the top. Template: `docs/templates/JOURNAL_ENTRY.md`.
+
+Entries before 2026-10-21 (T0.6) are kept in French, as written (D-027).
 
 ---
 

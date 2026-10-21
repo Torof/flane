@@ -1,24 +1,24 @@
 # Architecture
 
-Le principe : **le téléphone fait presque tout**. Les lieux y sont stockés, les suggestions y sont calculées, la position n'en sort que dans les cas listés ci-dessous. Les serveurs se limitent à distribuer des paquets et à calculer des itinéraires.
+The principle: **the phone does almost everything**. Places are stored on it, suggestions are computed on it, and the position only leaves it in the cases listed below. Servers are limited to distributing packs and computing routes.
 
-## Flâne seule
+## Flâne alone
 
 ```mermaid
 flowchart LR
-  subgraph Coulisses["Coulisses (régulièrement)"]
-    OSM[(OpenStreetMap)] --> PIPE[Chaîne de fabrication<br/>filtrage · règles de tri · signature]
+  subgraph Coulisses["Behind the scenes (regularly)"]
+    OSM[(OpenStreetMap)] --> PIPE[Data pipeline<br/>filtering · ranking rules · signing]
     DT[(DATAtourisme)] --> PIPE
-    CFG[Types d'arrêts<br/>configuration] --> PIPE
-    PIPE --> PACKS[(Paquets régionaux<br/>signés)]
+    CFG[Stop types<br/>configuration] --> PIPE
+    PIPE --> PACKS[(Signed<br/>regional packs)]
   end
 
-  subgraph Telephone["Téléphone"]
-    STORE[(Stockage local<br/>trajets · préférences · notes)]
-    LOCAL[(Paquet régional<br/>vérifié)]
-    ENGINE[Moteur de suggestions<br/>niveaux 1 · 3 · 4]
-    UI[Interface<br/>vue complète · vue en mouvement · voix]
-    GPS[Position<br/>pendant un trajet]
+  subgraph Telephone["Phone"]
+    STORE[(Local storage<br/>trips · preferences · ratings)]
+    LOCAL[(Verified<br/>regional pack)]
+    ENGINE[Suggestion engine<br/>levels 1 · 3 · 4]
+    UI[Interface<br/>full view · on-the-move view · voice]
+    GPS[Position<br/>during a trip]
     LOCAL --> ENGINE
     STORE --> ENGINE
     GPS --> ENGINE
@@ -26,21 +26,21 @@ flowchart LR
     UI --> STORE
   end
 
-  PACKS -- téléchargement HTTPS --> LOCAL
-  ENGINE -- départ et arrivée<br/>position lors d'un recalcul --> ROUTE[Serveur d'itinéraire<br/>OSRM · Valhalla · GraphHopper<br/>sans journalisation]
-  ROUTE -- itinéraire --> ENGINE
-  UI -- lien --> NAV[Google Maps / Waze]
-  UI -- lien --> GFICHE[Fiche Google Maps du lieu]
+  PACKS -- HTTPS download --> LOCAL
+  ENGINE -- start and destination<br/>position during a recalculation --> ROUTE[Routing server<br/>OSRM · Valhalla · GraphHopper<br/>no logging]
+  ROUTE -- route --> ENGINE
+  UI -- link --> NAV[Google Maps / Waze]
+  UI -- link --> GFICHE[Google Maps page of the place]
 ```
 
-## Ce qui sort du téléphone
+## What leaves the phone
 
-| Vers | Quoi | Quand |
+| To | What | When |
 | --- | --- | --- |
-| Serveur de paquets | La région demandée (et, techniquement, l'adresse IP) | Au téléchargement d'une région |
-| Serveur d'itinéraire | Départ et arrivée ; la position courante lors d'un recalcul (et l'adresse IP) | À la planification, ou au recalcul après un détour |
-| Google Maps / Waze | La destination ou les étapes, par lien | Quand l'utilisateur appuie sur « On y va » ou envoie son trajet |
+| Pack server | The requested region (and, technically, the IP address) | When a region is downloaded |
+| Routing server | Start and destination; the current position during a recalculation (and the IP address) | When planning, or when recalculating after a detour |
+| Google Maps / Waze | The destination or the waypoints, by link | When the user taps « On y va » or sends their trip |
 
-## À l'étape 2
+## At stage 2
 
-Supabase (Postgres et PostGIS) s'ajoute pour les avis et les trajets partagés. Les avis enrichissent les paquets (palier 1). Les trajets partagés passent par des actions (`TripAction`) envoyées d'un téléphone à l'autre.
+Supabase (Postgres and PostGIS) is added for reviews and shared trips. Reviews enrich the packs (tier 1). Shared trips go through actions (`TripAction`) sent from one phone to the other.

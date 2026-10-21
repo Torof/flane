@@ -1,92 +1,92 @@
-# Glossaire
+# Glossary
 
-Les mêmes mots partout : dans les documents, dans les conversations et dans le code. La colonne « Dans le code » donne le nom anglais à utiliser (types, variables, fichiers). Toute tranche qui introduit un terme l'ajoute ici.
+The same words everywhere: in the documents, in conversations and in the code. The « In code » column gives the English name to use (types, variables, files). Any slice that introduces a term adds it here.
 
-## Le produit
+## The product
 
-| Terme | Définition | Dans le code |
+| Term | Definition | In code |
 | --- | --- | --- |
-| Flâne | L'appli. | `flane` |
-| Flâneur | Un utilisateur de Flâne. | `user` |
-| Trajet | Un déplacement d'un départ à une arrivée, planifié ou non. Objet à part entière, avec un identifiant stable. | `Trip` |
-| Halte | Un arrêt retenu dans un trajet. | `Stop` |
-| Lieu | Un endroit où l'on peut s'arrêter, issu des données. Identifiant stable. | `Place` |
-| Type d'arrêt | Une catégorie de lieu (boulangerie, point de vue…), définie en configuration. | `StopType` |
-| Famille | Un regroupement de types d'arrêts (Manger, Pause, Nature, Chiens, Patrimoine, Moments, Pratique). | `StopFamily` |
-| Préférences | Les réglages permanents de l'utilisateur (chiens, pique-nique, détour max…). | `Preferences` |
-| Moment | Un besoin placé dans le temps sur le trajet (« manger vers 2 h de route »). | `Moment` |
-| Demande | Une recherche structurée : type d'arrêt, moment ou position, critères. Ce que la voix ou une IA fabriquera plus tard. | `StopRequest` |
-| Suggestion | Un lieu proposé en réponse à une demande, avec sa justification. | `Suggestion` |
-| Couloir | La zone autour de l'itinéraire où l'on cherche des haltes, selon le détour maximum. | `Corridor` |
-| Détour | Le temps ou la distance supplémentaire pour rejoindre une halte. | `detour` |
-| Action | Une modification élémentaire d'un trajet (« halte ajoutée », « halte retirée »). Base du futur partage. | `TripAction` |
+| Flâne | The app. | `flane` |
+| Flâneur (a Flâne user) | A user of Flâne. | `user` |
+| Trip (trajet) | A journey from a start to a destination, planned or not. A full-fledged object, with a stable identifier. | `Trip` |
+| Stop (halte) | A stop chosen in a trip. | `Stop` |
+| Place (lieu) | A spot where you can stop, taken from the data. Stable identifier. | `Place` |
+| Stop type (type d'arrêt) | A category of place (bakery, viewpoint…), defined in configuration. | `StopType` |
+| Family (famille) | A grouping of stop types (Manger, Pause, Nature, Chiens, Patrimoine, Moments, Pratique). | `StopFamily` |
+| Preferences (préférences) | The user's permanent settings (dogs, picnic, max detour…). | `Preferences` |
+| Moment (moment) | A need placed in time on the trip (« manger vers 2 h de route »). | `Moment` |
+| Request (demande) | A structured search: stop type, moment or position, criteria. What voice or an AI will produce later. | `StopRequest` |
+| Suggestion (suggestion) | A place offered in answer to a request, with its justification. | `Suggestion` |
+| Corridor (couloir) | The area around the route where stops are searched for, according to the maximum detour. | `Corridor` |
+| Detour (détour) | The extra time or distance to reach a stop. | `detour` |
+| Action (action) | An elementary change to a trip (« halte ajoutée », « halte retirée »). Basis of future sharing. | `TripAction` |
 
-## Ce que Flâne sait de la route
+## What Flâne knows about the route
 
-| Terme | Définition | Dans le code |
+| Term | Definition | In code |
 | --- | --- | --- |
-| Niveau de connaissance | Ce que Flâne sait de la route : 1 planifié, 2 importé, 3 destination seule, 4 rien (autour de moi). | `RouteKnowledge` (`planned`, `imported`, `destination`, `none`) |
-| Mode découverte | Le niveau 4 : suggestions autour de soi, plus courtes et plus prudentes. | `discovery` |
-| Moment calme | Un moment où Flâne a le droit de parler (pas en ville, pas sur un échangeur, pas avant une sortie). | `quietWindow` |
+| Route knowledge level (niveau de connaissance) | What Flâne knows about the route: 1 planned, 2 imported, 3 destination only, 4 nothing (around me). | `RouteKnowledge` (`planned`, `imported`, `destination`, `none`) |
+| Discovery mode (mode découverte) | Level 4: suggestions around you, shorter and more cautious. | `discovery` |
+| Quiet window (moment calme) | A moment when Flâne is allowed to speak (not in town, not on an interchange, not before an exit). | `quietWindow` |
 
-## Les données
+## The data
 
-| Terme | Définition | Dans le code |
+| Term | Definition | In code |
 | --- | --- | --- |
-| Paquet régional | La base de lieux d'une région, téléchargée sur le téléphone, signée. | `RegionPack` |
-| Chaîne de fabrication | Le script qui produit les paquets à partir d'OSM et de DATAtourisme. | `data-pipeline` |
-| Palier de source | La source qui juge un lieu : 1 avis, 2 notes personnelles, 3 règles, 4 OSM brut. | `SourceTier` |
-| Règle de tri | Une règle simple qui fait monter ou descendre un lieu (nommé, présent dans DATAtourisme, labellisé…). | `RankingRule` |
-| Note de confiance | La force de ce que Flâne sait d'un lieu ; elle décide du ton. | `confidence` |
-| Étiquette | Une caractéristique factuelle d'un lieu (ombragé, chiens bienvenus…). | `Tag` |
-| Onglet | Une des entrées du bas de l'écran (Trajet, Préférences, À propos). | `Tabs`, `(tabs)/` |
-| Route mince | Un fichier de `src/app/` qui ne fait que désigner l'écran à afficher ; l'écran lui-même vit dans `src/ui/`. | `src/app/(tabs)/about.tsx` |
-| Traduction | Un texte affiché, toujours lu par `t('clé')` dans un fichier de langue, jamais écrit en dur. | `t`, `src/i18n/fr.json` |
+| Regional pack (paquet régional) | The place database of a region, downloaded onto the phone, signed. | `RegionPack` |
+| Data pipeline (chaîne de fabrication) | The script that produces the packs from OSM and DATAtourisme. | `data-pipeline` |
+| Source tier (palier de source) | The source that judges a place: 1 reviews, 2 personal ratings, 3 rules, 4 raw OSM. | `SourceTier` |
+| Ranking rule (règle de tri) | A simple rule that moves a place up or down (named, present in DATAtourisme, labelled…). | `RankingRule` |
+| Confidence score (note de confiance) | The strength of what Flâne knows about a place; it decides the tone. | `confidence` |
+| Tag (étiquette) | A factual feature of a place (shaded, dogs welcome…). | `Tag` |
+| Tab (onglet) | One of the entries at the bottom of the screen (Trajet, Préférences, À propos). | `Tabs`, `(tabs)/` |
+| Thin route | A file in `src/app/` that only names the screen to display; the screen itself lives in `src/ui/`. | `src/app/(tabs)/about.tsx` |
+| Translation | A displayed text, always read through `t('clé')` from a language file, never hard-coded. | `t`, `src/i18n/fr.json` |
 
-## La méthode
+## The method
 
-Attention au mot **« étape »**, qui a trois sens. Pour lever l'ambiguïté :
-- **étape du cycle** : l'une des sept étapes d'une tranche (Planifier… Valider) ;
-- **étape du produit** : Flâne seule (étape 1), Flâne communautaire et partagée (étape 2) ;
-- **halte** (et non « étape ») pour un arrêt d'un trajet. On ne parle d'« étapes » que pour les points de passage envoyés à Google Maps (`waypoints` dans le code).
+Beware of the French word **« étape »**, which has three meanings. To remove the ambiguity:
+- **moment of the ritual**: one of the seven moments of a session, from opening to closing (`docs/METHOD.md`, D-028);
+- **product stage**: Flâne alone (stage 1), community and shared Flâne (stage 2);
+- **stop** (« halte », not « étape ») for a stop on a trip. « Étapes » are only used for the waypoints sent to Google Maps (`waypoints` in code).
 
-| Terme | Définition |
+| Term | Definition |
 | --- | --- |
-| Tranche | Une petite fonctionnalité complète, finissable en une à trois sessions. Identifiant `Tx.y`. |
-| Jalon | Un moment d'usage réel avec un critère vérifiable. Identifiant `Jx`. |
-| Fiche de tranche | Le document de planification d'une tranche (`docs/slices/`). |
-| Budget | Le nombre de sessions alloué à une tranche. |
-| Parking | La liste des idées nouvelles, revues en fin de jalon. |
-| Définition de « fini » | La liste de contrôle qui dit qu'une tranche est terminée. |
-| Journal | Le fichier qui dit où on en est (`docs/JOURNAL.md`). |
-| Carnet de route | Les notes prises pendant un trajet test (`docs/trip-notes/`). |
-| Trajet de référence | Le scénario fixe utilisé pour tester et comparer toutes les versions. |
-| Banc d'essai | L'outil qui sort la liste des suggestions sur le trajet de référence. |
-| Simulateur de trajet | L'outil qui rejoue un trajet enregistré. |
-| Porte | Ancien nom (D-016) des moments où l'utilisateur valide ; remplacé par les moments du rituel (D-028) : son oui sur la fiche, l'essai. |
-| Garde-fou | Un contrôle automatique qui bloque une action interdite : hook git (`.githooks/`), règle GitHub sur `main`. Le hook de Claude Code qui analysait chaque commande a été retiré (D-022). |
-| Variante | Une version de l'appli construite avec son propre identifiant Android : `app.flane.dev` pour le développement et les essais, `app.flane` pour la publication (D-015). Les deux cohabitent sur un téléphone. Choisie par `APP_VARIANT` dans `app/app.config.ts`. |
-| Client de développement | L'appli compilée avec `expo-dev-client` : elle charge le code depuis le PC (Metro) et accepte les modules natifs. Ne marche pas sans le PC. Profil EAS `development`. |
-| APK d'essai | L'appli compilée avec le code embarqué, installable et utilisable sans PC. C'est elle qu'on teste à l'essai. Profil EAS `preview`. |
-| Mise à jour instantanée | Le code JavaScript d'une tranche livré à l'APK d'essai sans réinstallation (EAS Update, `expo-updates`), publié par Claude à l'essai sur le canal `preview`. Réservé à `app.flane.dev` (D-023). |
-| Version native | L'empreinte des modules natifs de l'APK (`runtimeVersion`). Une mise à jour instantanée ne s'applique qu'à la même version native ; quand elle change, il faut un nouvel APK. Visible dans « À propos ». |
-| Canal | Le nom sous lequel un APK reçoit ses mises à jour instantanées (`preview`). Un futur canal `beta` servira aux testeurs amis. |
-| Vérifications automatiques | Le workflow GitHub Actions `checks` (`app-check`, `secrets-check`, `deps-check`, `version-check`) qui contrôle chaque pull request. Les quatre sont **obligatoires** : la règle `protect-main` refuse la fusion tant qu'ils ne sont pas verts ; `deps-check` ne passe au rouge sur une pull request que si elle touche les fichiers de paquets. |
-| Alerte acceptée | Une alerte `npm audit` haute ou critique que `deps-check` ne bloque pas, parce que le paquet n'est chargé par aucun module de l'appli (outillage sur le PC). Inscrite dans `tools/dev/audit-accepted.json` avec ses chemins et sa date (`docs/CONVENTIONS.md`). |
-| Tranche de dépendances | La tranche courte qui reprend une pull request Dependabot entre deux tranches (D-025). |
-| Veto | L'arrêt demandé par l'utilisateur, à tout moment : pull request fermée ou repassée en brouillon, commentaire qui commence par « veto » ou « stop ». |
-| Point de contrôle | Le moment où Claude lit les signaux de l'utilisateur (`tools/dev/owner-signals.mjs`) : avant chaque commit, push, agent, publication, compilation et fusion, et à l'ouverture de chaque session. |
-| Signature de Claude | La ligne cachée `<!-- flane:claude -->` en tête de chaque commentaire posté par Claude, qui utilise le compte de l'utilisateur. |
-| Noticed on the way (remarqué en route) | La rubrique de fin de chaque rapport d'agent et de chaque pull request : trois remarques au plus, *problème*, *réussite* ou *idée*. |
-| Rituel | La suite de moments d'une session (ouverture, idée, fiche, construction, passe de sécurité, essai, clôture) que Claude mène et annonce, avec ses réflexes (D-028, `docs/METHOD.md`). |
-| Réflexe | Ce que Claude dit de lui-même au bon moment : parking, couper, nouvelle version, passe de sécurité, découverte, pas de côté (`docs/METHOD.md`). |
-| Pas de côté | Un point hors de la tâche que Claude soulève à l'ouverture et à la clôture : risque qui monte, autre façon de faire, idée du parking devenue mûre. |
-| Boîte de réception | GitHub Issues : les retours et idées venus de l'extérieur, vidés vers le backlog ou le parking à chaque début de session (D-017). |
+| Slice | A small complete feature, finishable in one to three sessions. Identifier `Tx.y`. |
+| Milestone | A moment of real use with a verifiable criterion. Identifier `Jx`. |
+| Slice sheet | The planning document of a slice (`docs/slices/`). |
+| Budget | The number of sessions allocated to a slice. |
+| Parking | The list of new ideas, reviewed at the end of a milestone. |
+| Definition of « done » | The checklist that says a slice is finished. |
+| Journal | The file that says where we stand (`docs/JOURNAL.md`). |
+| Trip notes | The notes taken during a test trip (`docs/trip-notes/`). |
+| Reference trip | The fixed scenario used to test and compare all versions. |
+| Test bench | The tool that outputs the list of suggestions on the reference trip. |
+| Trip simulator | The tool that replays a recorded trip. |
+| Gate | Former name (D-016) of the moments when the owner validates; replaced by the moments of the ritual (D-028): their yes on the sheet, the trial. |
+| Guardrail | An automatic check that blocks a forbidden action: git hook (`.githooks/`), GitHub rule on `main`. The Claude Code hook that analysed every command has been removed (D-022). |
+| Variant | A version of the app built with its own Android identifier: `app.flane.dev` for development and trials, `app.flane` for publication (D-015). Both coexist on a phone. Chosen by `APP_VARIANT` in `app/app.config.ts`. |
+| Development client | The app built with `expo-dev-client`: it loads the code from the PC (Metro) and accepts native modules. Does not work without the PC. EAS profile `development`. |
+| Trial APK | The app built with the code embedded, installable and usable without a PC. It is the one tested during the trial. EAS profile `preview`. |
+| Instant update | The JavaScript code of a slice delivered to the trial APK without reinstalling (EAS Update, `expo-updates`), published by Claude at the trial on the `preview` channel. Reserved for `app.flane.dev` (D-023). |
+| Native version | The fingerprint of the APK's native modules (`runtimeVersion`). An instant update only applies to the same native version; when it changes, a new APK is needed. Visible in « À propos ». |
+| Channel | The name under which an APK receives its instant updates (`preview`). A future `beta` channel will serve friend testers. |
+| Automatic checks | The GitHub Actions workflow `checks` (`app-check`, `secrets-check`, `deps-check`, `version-check`) that checks every pull request. All four are **required**: the `protect-main` rule refuses the merge until they are green; `deps-check` only turns red on a pull request if it touches the package files. |
+| Accepted alert | A high or critical `npm audit` alert that `deps-check` does not block, because the package is loaded by no module of the app (tooling on the PC). Recorded in `tools/dev/audit-accepted.json` with its paths and date (`docs/CONVENTIONS.md`). |
+| Dependencies slice | The short slice that takes over a Dependabot pull request between two slices (D-025). |
+| Veto | The stop requested by the owner, at any time: pull request closed or turned back into a draft, comment starting with « veto » or « stop ». |
+| Checkpoint | The moment when Claude reads the owner's signals (`tools/dev/owner-signals.mjs`): before each commit, push, agent, publish, build and merge, and at the opening of each session. |
+| Claude's signature | The hidden line `<!-- flane:claude -->` at the top of each comment posted by Claude, which uses the owner's account. |
+| Noticed on the way (remarqué en route) | The closing section of every agent report and every pull request: three remarks at most, *problem*, *success* or *idea*. |
+| Ritual | The sequence of moments of a session (opening, idea, sheet, build, security pass, trial, closing) that Claude leads and announces, with its reflexes (D-028, `docs/METHOD.md`). |
+| Reflex | What Claude says on its own at the right moment: parking, cut, new version, security pass, discovery, step aside (`docs/METHOD.md`). |
+| Step aside | A point outside the task that Claude raises at opening and closing: a rising risk, another way of doing things, a parking idea that has become ripe. |
+| Inbox | GitHub Issues: feedback and ideas from outside, emptied into the backlog or the parking at the start of each session (D-017). |
 
-## L'étape 2 (pour mémoire)
+## Stage 2 (for the record)
 
-| Terme | Définition | Dans le code |
+| Term | Definition | In code |
 | --- | --- | --- |
-| Avis | La note « ça valait le détour ? », un commentaire et des étiquettes. | `Review` |
-| Vue conducteur / vue passager | Les deux affichages de l'appli dans un trajet partagé. | `driverView` / `passengerView` |
-| Trajet partagé | Un trajet suivi par plusieurs téléphones d'une même voiture. | `SharedTrip` |
+| Review (avis) | The « ça valait le détour ? » rating, a comment and tags. | `Review` |
+| Driver view / passenger view (vue conducteur / vue passager) | The two displays of the app in a shared trip. | `driverView` / `passengerView` |
+| Shared trip (trajet partagé) | A trip followed by several phones in the same car. | `SharedTrip` |

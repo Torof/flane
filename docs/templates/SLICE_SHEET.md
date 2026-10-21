@@ -1,82 +1,82 @@
-# Tx.y — Nom de la tranche
+# Tx.y — Slice name
 
-**Jalon** : Jx — …
-**Étape du cycle** : Planifier | Discuter | Choisir | Construire | Observer | Sécuriser | Valider
-**Statut dans le backlog** : Idée | Prête | En cours | À tester sur la route | Faite
-**Budget** : … session(s)
-**Branche** : `feat/Tx.y-nom-court` (ou `fix/`, `chore/` selon la nature de la tranche)
-**Validée le** : (date, à l'étape Choisir)
+**Milestone**: Jx — …
+**Moment of the ritual**: idea | sheet | building | security pass | trial | closing
+**Status in the backlog**: Idea | Ready | In progress | To try on the road | Done
+**Budget**: … session(s)
+**Branch**: `feat/Tx.y-short-name` (or `fix/`, `chore/` depending on the nature of the slice)
+**Approved on**: (date of the owner's yes on the sheet)
 
-## Objectif
+## Goal
 
-Une ou deux phrases : ce que l'utilisateur pourra faire à la fin.
+One or two sentences: what the owner will be able to do at the end.
 
-## Critère de réussite
+## Success criterion
 
-Comment on saura, concrètement, que c'est réussi. Vérifiable par l'utilisateur.
+How we will know, concretely, that it worked. Checkable by the owner.
 
-## Dedans
+## In
 
 - …
 
-## Dehors
+## Out
 
-- … (et où ça ira : autre tranche, parking)
+- … (and where it will go: another slice, parking)
 
-## Approche
+## Approach
 
-Les grandes lignes techniques. Les fichiers ou dossiers concernés.
+The technical outline. The files or folders concerned.
 
-## Dépendances ajoutées
+## Added dependencies
 
-| Bibliothèque | Pourquoi | Alternatives | Licence | Maintenance |
+| Library | Why | Alternatives | License | Maintenance |
 | --- | --- | --- | --- | --- |
 | — | | | | |
 
-## Données touchées
+## Data touched
 
-Quelles données, où elles vivent, si elles quittent le téléphone. Mettre à jour `docs/DATA.md`.
+Which data, where it lives, whether it leaves the phone. Update `docs/DATA.md`.
 
-## Risques de sécurité
+## Security risks
 
-Les risques propres à cette tranche, et leur parade. Renvoyer à `docs/SECURITY.md`.
+The risks specific to this slice, and their countermeasure. Refer to `docs/SECURITY.md`.
 
-## Plan de tests
+## Test plan
 
-- Cas nominal : …
-- Cas limites : pas de réseau, aucun lieu trouvé, permission refusée, données invalides, batterie faible…
-- Test sur le téléphone : …
+- Nominal case: …
+- Edge cases: no network, no place found, permission denied, invalid data, low battery…
+- Test on the phone: …
 
-## Prévoir sans construire
+## Plan without building
 
-Ce que cette tranche prépare pour la suite (partage, avis, iOS), sans le développer.
+What this slice prepares for later (sharing, reviews, iOS), without developing it.
 
-## Trous fréquents
+## Common gaps
 
-À passer en revue avant l'étape Discuter. Pour chaque point : traité dans la fiche, non concerné, ou renvoyé à une autre tranche.
+To go through before the devil's advocate. For each point: handled in the sheet, not concerned, or referred to another slice.
 
-- [ ] Sans réseau, sans lieu trouvé, permission refusée, données invalides : comportement défini
-- [ ] Textes affichés : tous dans les fichiers de traduction
-- [ ] Données touchées : listées, avec ce qui quitte le téléphone (`docs/DATA.md`)
-- [ ] Nouveaux termes : dans le glossaire, et dans les noms du code
-- [ ] Nouvelles dépendances : justifiées, licence vérifiée
-- [ ] Nouvelles permissions Android : nécessaires et justifiées
-- [ ] Mises à jour instantanées : la tranche franchit-elle le déclencheur de signature (permission sensible, donnée personnelle stockée, second appareil ou canal) ? Si oui, la signature vient d'abord (`docs/SECURITY.md`)
-- [ ] Ce que la tranche laisse en place pour la suite (identifiants stables, actions, affichage séparé)
-- [ ] Ce que l'utilisateur devra constater à l'étape Observer, et comment
+- [ ] No network, no place found, permission denied, invalid data: behavior defined
+- [ ] Text shown: all in the translation files
+- [ ] Data touched: listed, with what leaves the phone (`docs/DATA.md`)
+- [ ] New terms: in the glossary, and in the names in the code
+- [ ] New dependencies: justified, license checked
+- [ ] New Android permissions: necessary and justified
+- [ ] Instant updates: does the slice cross the signing trigger (sensitive permission, stored personal data, second device or channel)? If so, signing comes first (`docs/SECURITY.md`)
+- [ ] What the slice leaves in place for later (stable identifiers, actions, separate display)
+- [ ] What the owner will need to see at the trial, and how
 
-## Objections de l'avocat du diable
+## Devil's advocate objections
 
-(Collées après l'étape Discuter, avec la réponse retenue pour chacune.)
+(The three best objections, with the answer chosen for each one.)
 
-## Définition de « fini »
+## Definition of « done »
 
-- [ ] Critère de réussite atteint et constaté par l'utilisateur
-- [ ] Tests écrits et verts, cas limites compris
-- [ ] Vérifications automatiques vertes
-- [ ] Audit de sécurité : aucun point bloquant ouvert
-- [ ] Relecture : aucun point bloquant ouvert
-- [ ] `DATA.md`, glossaire, décisions à jour si nécessaire
-- [ ] Version montée dans `app/package.json` (une par tranche, voir `docs/CONVENTIONS.md`) ; nouvel APK si la version native change
-- [ ] Journal et backlog à jour
-- [ ] Intégrée à `main` par pull request
+- [ ] Success criterion reached and seen by the owner
+- [ ] Tests written and green, edge cases included
+- [ ] Automatic checks green
+- [ ] Security audit: no blocking point open
+- [ ] Review: no blocking point open
+- [ ] `DATA.md`, glossary, decisions up to date if needed
+- [ ] Version bumped in `app/package.json` (one per slice, see `docs/CONVENTIONS.md`); new APK if the native version changes
+- [ ] Journal and backlog up to date
+- [ ] Integrated into `main` through a pull request

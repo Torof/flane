@@ -1,6 +1,8 @@
-# Journal des décisions
+# Decision log
 
-Les choix structurants, avec leurs raisons. Une décision n'est jamais effacée : si elle change, on en ajoute une nouvelle qui la remplace. Modèle : `docs/templates/DECISION.md`. Les plus récentes en haut.
+The structuring choices, with their reasons. A decision is never erased: if it changes, a new one is added that replaces it. Template: `docs/templates/DECISION.md`. The most recent at the top.
+
+Decisions D-001 to D-026 are kept in French, as written (D-027).
 
 ---
 

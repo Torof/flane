@@ -1,41 +1,41 @@
-# Bilan du jalon Jx — Nom
+# Milestone Jx review — Name
 
-**Date** : AAAA-MM-JJ
-**Version** : v0.x.0
-**Trajet test** : date, trajet, conditions
+**Date**: YYYY-MM-DD
+**Version**: v0.x.0
+**Test trip**: date, trip, conditions
 
-## Le produit
+## The product
 
-**Critère du jalon** : (rappel)
-**Atteint ?** Oui / En partie / Non — pourquoi.
+**Milestone criterion**: (reminder)
+**Reached?** Yes / Partly / No — why.
 
-**Ce qui a marché sur la route**
+**What worked on the road**
 - …
 
-**Ce qui a cloché** (depuis le carnet de route)
-- … → tranche Tx.y / parking / abandonné
+**What went wrong** (from the trip notes)
+- … → slice Tx.y / parking / dropped
 
-## La méthode
+## The method
 
-**Ce qui a bien marché**
+**What worked well**
 - …
 
-**Ce qui a frotté**
+**What rubbed**
 - …
 
-**Ce qu'on ajuste** (et dans quel document)
+**What we adjust** (and in which document)
 - …
 
-**Enseignements de /insights**
+**Lessons from /insights**
 - …
 
-## Le parking
+## The parking
 
-| Idée | Décision (tranche, garder, abandonner) |
+| Idea | Decision (slice, keep, drop) |
 | --- | --- |
 | … | … |
 
-## Le jalon suivant
+## The next milestone
 
-Tranches retenues, dans l'ordre :
+Slices chosen, in order:
 1. …

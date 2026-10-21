@@ -17,7 +17,7 @@ echo "## Last journal entry"
 grep -m1 '^## 20' docs/JOURNAL.md 2>/dev/null || echo "(none)"
 echo
 echo "## In progress (backlog)"
-awk '/^## En cours/{f=1;next} /^## /{f=0} f && NF' docs/BACKLOG.md 2>/dev/null | head -n 5
+awk '/^## In progress/{f=1;next} /^## /{f=0} f && NF' docs/BACKLOG.md 2>/dev/null | head -n 5
 echo
 if ! command -v gh >/dev/null 2>&1; then
   echo "(gh not available: read pull requests and stop signals by hand)"

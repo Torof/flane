@@ -200,9 +200,9 @@ export function evaluate({ advisories, lock, accepted, today }) {
 
 function line(adv) {
   const reach = adv.paths
-    ? ` — requis par ${adv.paths.requiredBy.join(', ') || '?'} ; depuis ${adv.paths.reachableFrom.join(', ') || '?'}`
+    ? ` — required by ${adv.paths.requiredBy.join(', ') || '?'}; from ${adv.paths.reachableFrom.join(', ') || '?'}`
     : '';
-  return `- ${adv.ghsa} ${adv.package} ${adv.range} (${adv.severity}) : ${adv.title}${reach}`;
+  return `- ${adv.ghsa} ${adv.package} ${adv.range} (${adv.severity}): ${adv.title}${reach}`;
 }
 
 /** Markdown summary; the first line names the outcome. */
@@ -210,31 +210,31 @@ export function renderSummary(r) {
   const out = [];
   out.push(
     r.blocking.length
-      ? `## deps-check : ROUGE, ${r.blocking.length} alerte(s) haute(s) ou critique(s) non acceptée(s)`
-      : `## deps-check : vert (${r.accepted.length} acceptée(s), ${r.informative.length} informative(s))`,
+      ? `## deps-check: RED, ${r.blocking.length} high or critical advisory(ies) not accepted`
+      : `## deps-check: green (${r.accepted.length} accepted, ${r.informative.length} informative)`,
   );
   if (r.blocking.length) {
-    out.push('', '### Bloquantes', ...r.blocking.map((a) => `${line(a)} — ${a.reason}`));
+    out.push('', '### Blocking', ...r.blocking.map((a) => `${line(a)} — ${a.reason}`));
     out.push(
       '',
-      'Corriger la dépendance, ou, si le paquet ne tourne pas dans l’appli, l’accepter dans ' +
-        '`tools/dev/audit-accepted.json` avec ses chemins et la date (voir `docs/CONVENTIONS.md`).',
+      'Fix the dependency or, if the package does not run in the app, accept it in ' +
+        '`tools/dev/audit-accepted.json` with its paths and the date (see `docs/CONVENTIONS.md`).',
     );
   }
   if (r.accepted.length) {
-    out.push('', '### Acceptées (outillage, hors appli)');
+    out.push('', '### Accepted (tooling, outside the app)');
     for (const a of r.accepted) {
-      out.push(`${line(a)} — revue le ${a.entry.reviewed} : ${a.entry.reason}`);
-      for (const p of a.problems) out.push(`  - à revoir : ${p}`);
+      out.push(`${line(a)} — reviewed on ${a.entry.reviewed}: ${a.entry.reason}`);
+      for (const p of a.problems) out.push(`  - to review: ${p}`);
     }
   }
-  if (r.informative.length) out.push('', '### Modérées et basses (informatives)', ...r.informative.map(line));
+  if (r.informative.length) out.push('', '### Moderate and low (informative)', ...r.informative.map(line));
   if (r.old.length) {
-    out.push('', `### Acceptations de plus de ${REVIEW_AGE_DAYS} jours (à revoir)`);
-    out.push(...r.old.map((a) => `- ${a.ghsa} ${a.package} : revue le ${a.entry.reviewed} (${a.age} jours)`));
+    out.push('', `### Acceptances older than ${REVIEW_AGE_DAYS} days (to review)`);
+    out.push(...r.old.map((a) => `- ${a.ghsa} ${a.package}: reviewed on ${a.entry.reviewed} (${a.age} days)`));
   }
   if (r.unmatched.length) {
-    out.push('', '### Entrées acceptées sans alerte correspondante (à retirer)');
+    out.push('', '### Accepted entries without a matching advisory (to remove)');
     out.push(...r.unmatched.map((e) => `- ${e.ghsa} ${e.package}`));
   }
   return out.join('\n') + '\n';
@@ -286,7 +286,7 @@ export function main(argv, io = { stdout: (t) => process.stdout.write(t), stderr
     accepted = readJson(args.accepted);
     validateAccepted(accepted);
   } catch (e) {
-    emit(`## deps-check : INDÉTERMINÉ, entrées inutilisables\n\n${e.message}\n`, args.summary, io);
+    emit(`## deps-check: UNDETERMINED, unusable inputs\n\n${e.message}\n`, args.summary, io);
     return 2;
   }
   const result = evaluate({ advisories, lock, accepted, today: args.today });

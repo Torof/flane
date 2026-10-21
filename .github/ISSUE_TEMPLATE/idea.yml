@@ -1,22 +1,22 @@
-name: Idée
-description: Une suggestion pour Flâne. Elle ira au parking du backlog, revu en fin de jalon.
-title: "[Idée] "
-labels: ["idée"]
+name: Idea
+description: A suggestion for Flâne. It will go to the backlog's parking, reviewed at the end of each milestone.
+title: "[Idea] "
+labels: ["idea"]
 body:
   - type: markdown
     attributes:
       value: |
-        Les idées sont lues à chaque début de session et notées au parking (`docs/BACKLOG.md`). Elles sont revues en fin de jalon. Pas besoin de détailler la solution : le besoin suffit.
+        Ideas are read at the start of each session and noted in the parking (`docs/BACKLOG.md`). They are reviewed at the end of each milestone. No need to detail the solution: the need is enough.
   - type: textarea
     id: besoin
     attributes:
-      label: Le besoin
-      description: Dans quelle situation, sur la route ou avant, cette idée vous aiderait ?
+      label: The need
+      description: In what situation, on the road or before, would this idea help you?
     validations:
       required: true
   - type: textarea
     id: piste
     attributes:
-      label: Une piste (facultatif)
+      label: A possible approach (optional)
     validations:
       required: false

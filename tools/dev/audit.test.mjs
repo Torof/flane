@@ -104,7 +104,7 @@ test('a high advisory that is not accepted blocks; a moderate one is informative
     r.informative.map((a) => a.package),
     ['uuid'],
   );
-  assert.match(renderSummary(r), /^## deps-check : ROUGE, 1 alerte/);
+  assert.match(renderSummary(r), /^## deps-check: RED, 1 high or critical advisory/);
 });
 
 test('an accepted advisory with the same paths passes', () => {
@@ -112,7 +112,7 @@ test('an accepted advisory with the same paths passes', () => {
   assert.equal(r.blocking.length, 0);
   assert.deepEqual(r.accepted[0].problems, []);
   assert.equal(r.old.length, 0);
-  assert.match(renderSummary(r), /^## deps-check : vert \(1 acceptée/);
+  assert.match(renderSummary(r), /^## deps-check: green \(1 accepted/);
 });
 
 test('an accepted advisory whose paths changed blocks again', () => {
@@ -142,14 +142,14 @@ test('a moderate acceptance whose paths changed is reported without blocking', (
   assert.equal(r.blocking.length, 0);
   const uuid = r.accepted.find((a) => a.package === 'uuid');
   assert.match(uuid.problems.join(' '), /requiredBy changed: \[nested, tool\]/);
-  assert.match(renderSummary(r), /à revoir : requiredBy changed/);
+  assert.match(renderSummary(r), /to review: requiredBy changed/);
 });
 
 test('an old acceptance is reported but does not block', () => {
   const r = run({ accepted: [acceptedBraces], today: '2027-02-01' });
   assert.equal(r.blocking.length, 0);
   assert.equal(r.old.length, 1);
-  assert.match(renderSummary(r), /Acceptations de plus de 90 jours/);
+  assert.match(renderSummary(r), /Acceptances older than 90 days/);
 });
 
 test('an accepted entry without a matching advisory is reported as unmatched', () => {
@@ -158,7 +158,7 @@ test('an accepted entry without a matching advisory is reported as unmatched', (
     r.unmatched.map((e) => e.package),
     ['gone'],
   );
-  assert.match(renderSummary(r), /sans alerte correspondante/);
+  assert.match(renderSummary(r), /without a matching advisory/);
 });
 
 test('an advisory without a GHSA identifier or with an unknown severity blocks', () => {
@@ -213,7 +213,7 @@ test('main returns 1 on a blocking advisory and writes the summary file', () => 
   const paths = fixture({ 'audit.json': report, 'lock.json': lock, 'accepted.json': [] });
   const { code, out } = runMain(paths);
   assert.equal(code, 1);
-  assert.match(out, /^## deps-check : ROUGE/);
+  assert.match(out, /^## deps-check: RED/);
   assert.equal(readFileSync(paths.summary, 'utf8'), out);
 });
 
@@ -230,9 +230,9 @@ test('main returns 2 on a registry error, an empty or invalid file, a malformed 
   });
   const r1 = runMain(registry);
   assert.equal(r1.code, 2);
-  assert.match(r1.out, /^## deps-check : INDÉTERMINÉ/);
+  assert.match(r1.out, /^## deps-check: UNDETERMINED/);
   assert.match(r1.out, /registry unreachable/);
-  assert.match(readFileSync(registry.summary, 'utf8'), /INDÉTERMINÉ/);
+  assert.match(readFileSync(registry.summary, 'utf8'), /UNDETERMINED/);
 
   const empty = fixture({ 'audit.json': '', 'lock.json': lock, 'accepted.json': [] });
   assert.equal(runMain(empty).code, 2);

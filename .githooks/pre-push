@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: AGPL-3.0-or-later
-# Hook pre-push Flâne : toutes les vérifications locales (npm run check :
-# types, lint, formatage, notices SPDX, tests) avant d'envoyer, dès que l'appli
-# existe (app/package.json). Tant qu'elle n'existe pas, ne fait rien.
+# Flâne pre-push hook: all the local checks (npm run check: types, lint,
+# formatting, SPDX notices, tests) before sending, as soon as the app exists
+# (app/package.json). As long as it does not exist, does nothing.
 set -u
 
 root="$(git rev-parse --show-toplevel 2>/dev/null)" || exit 1
@@ -12,7 +12,7 @@ fi
 
 cd "$root/app" || exit 1
 
-# Node : la version de .nvmrc. Avec nvm, on l'active ici ; sinon on compare et on explique.
+# Node: the version of .nvmrc. With nvm, it is activated here; otherwise we compare and explain.
 wanted="$(tr -d '[:space:]' < .nvmrc)"
 nvm_sh="${NVM_DIR:-$HOME/.nvm}/nvm.sh"
 if [ -s "$nvm_sh" ]; then
@@ -22,11 +22,11 @@ if [ -s "$nvm_sh" ]; then
 fi
 current="$(node -v 2>/dev/null | sed 's/^v//')"
 if [ "$current" != "$wanted" ]; then
-  echo "pre-push : Node $wanted attendu (app/.nvmrc), $current trouvé. Lancer « nvm install $wanted » puis « nvm use » dans app/." >&2
+  echo "pre-push: Node $wanted expected (app/.nvmrc), $current found. Run « nvm install $wanted » then « nvm use » in app/." >&2
   exit 1
 fi
 if [ ! -d node_modules ]; then
-  echo "pre-push : app/node_modules absent. Lancer « npm ci » dans app/." >&2
+  echo "pre-push: app/node_modules missing. Run « npm ci » in app/." >&2
   exit 1
 fi
 

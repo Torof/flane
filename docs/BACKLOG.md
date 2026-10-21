@@ -1,151 +1,151 @@
 # Backlog
 
-Statuts : **Idée** → **Prête** (fiche validée) → **En cours** → **À tester sur la route** → **Faite**. Une seule tranche « En cours » à la fois. Les budgets sont en sessions et se fixent à l'étape Planifier.
+Statuses: **Idea** → **Ready** (sheet approved) → **In progress** → **To try on the road** → **Done**. Only one slice « In progress » at a time. Budgets are in sessions and are set at the Plan step.
 
-## En cours
+## In progress
 
-Aucune tranche en cours. Prochaines proposées : traduire le reste du dépôt (T0.7), bilan du jalon 0, puis le jalon 1.
+No slice in progress. Next ones proposed: translate the rest of the repository (T0.7), milestone 0 review, then milestone 1.
 
-## Questions ouvertes
+## Open questions
 
-- [ ] **Double authentification du compte Expo** : remise à plus tard le 2026-10-20. À activer avant la première donnée personnelle stockée par la version de test, en même temps que la signature des mises à jour (déclencheur dans `docs/SECURITY.md`).
-- [ ] **Dépôt de marque « Flâne » (INPI)** : quand ? Depuis le passage en public (D-019), le nom est la seule chose que la licence ne protège pas. Prévu en T5.5 ; à avancer si possible.
-- [x] **Région du premier paquet** (jalon 1) : les Hautes-Alpes (05). *Répondu le 2026-10-20.*
-- [x] **Trajet de référence** : Briançon–Embrun (trajet connu par cœur) ; trajet long : Briançon–Marseille. *Répondu le 2026-10-20.*
-- [x] **Nom du dépôt GitHub et identifiant de l'appli** : dépôt `flane`, identifiant de paquet Android `app.flane`, nom affiché « Flâne » (voir D-015). *Répondu le 2026-10-20.*
-
----
-
-## Jalon 0 — L'atelier est prêt
-
-*Critère : une modification passe automatiquement toutes les vérifications, et une appli Flâne vide s'installe sur le téléphone de l'utilisateur.*
-
-| ID | Tranche | Statut |
-| --- | --- | --- |
-| T0.1 | Dépôt et conventions : hooks git locaux dans `.githooks/` (secrets avec gitleaks, format des commits, pré-push), `.editorconfig`, licence AGPL-3.0 et passage en public, modèles d'issues et de PR, réglages GitHub (règle sur `main`, recherche de secrets, alertes), D-017 à D-019. Le garde-fou de Claude livré ici a été retiré ensuite (D-022) | Faite |
-| T0.1b | Kit Claude : mode « accept edits », D-021 (qui décide quoi). La liste `allow` figée et le garde-fou durci ont été retirés (D-022) | Faite, puis simplifiée |
-| T0.2 | Vérifications automatiques (GitHub Actions) : types, lint, tests, audit des dépendances, recherche de secrets, licences ; exigées par la règle sur `main` ; Dependabot ; résumé court des échecs pour Claude | Faite |
-| T0.3 | Squelette de l'appli Expo : TypeScript strict, ESLint et Prettier, fichiers de traduction, notice SPDX en tête des fichiers, `.npmrc` (`ignore-scripts`, `save-exact`), `.nvmrc`, trois onglets vides, variantes `app.flane.dev` / `app.flane`, APK `preview` et client de développement par EAS Build | Faite |
-| T0.5 | Mises à jour instantanées (EAS Update) pour la variante de test `app.flane.dev`, version native visible, une version par tranche (D-023) ; passée avant T0.2 à la demande de l'utilisateur pour accélérer la boucle de test | Faite |
-| T0.4a | Pilotage, voir et arrêter : issue épinglée « État de Flâne », pull request suivie en direct dès le premier commit, veto (signaux lus par `tools/dev/owner-signals.mjs` à chaque point de contrôle), « Remarqué en route » des agents. Fiche `docs/slices/T0.4-pilotage.md` ; veto réel reporté à T0.6 | Faite |
-| T0.6 | Notre méthode, en direct : rituel partagé et réflexes à la place des portes, `METHOD.md` et `CLAUDE.md` en anglais, D-027 (langue), D-028 (rituel), D-029 (versions nommées), commits descriptifs, issue « État » retirée, hooks d'ouverture de session et de veto | Faite |
-| T0.8 | Monthly dependencies, October 2026: `@types/node` 24.19.2 (Dependabot #13 redone, D-025). Sheet `docs/slices/T0.8-deps-2026-10.md` | Faite |
-| T0.7 | Translate the rest of the repository into English (D-027): vision, security, data, conventions, glossary, backlog, journal, agents, scripts' messages | Idée |
-| T0.4b | Full CI: the app assembles in `app-check`, `version-check` (version goes up when the app changes, every tool test on GitHub), required on `main`. Sheet `docs/slices/T0.4b-full-ci.md` | Faite |
-| T0.4c | Type-only packages (`@types/*`, `undici-types`) do not count as an app change in `version-check`. Sheet `docs/slices/T0.4c-types-packages.md` | Faite |
-
-## Jalon 1 — Je vois les bons coins de ma région
-
-*Critère : sur le visualiseur, l'utilisateur reconnaît les lieux qu'il aime, avec peu de faux positifs.*
-
-| ID | Tranche | Statut |
-| --- | --- | --- |
-| T1.1 | Types d'arrêts en configuration : schéma, validation, première liste (voir `docs/VISION.md` et la liste ci-dessous) | Idée |
-| T1.2 | Extraction OSM d'une région : récupération, filtrage selon les types, identifiants stables | Idée |
-| T1.3 | DATAtourisme (Licence Ouverte Etalab 2.0 : citer la source et la date de mise à jour) : intégration et rapprochement avec OSM | Idée |
-| T1.4 | Règles de tri et paliers de sources (paliers 3 et 4 pour l'instant) | Idée |
-| T1.5 | Paquet régional : format de base locale, signature, vérificateur de paquets | Idée |
-| T1.6 | Visualiseur de lieux et « pourquoi ce lieu ? » | Idée |
-
-## Jalon 2 — Je prépare un trajet
-
-*Critère : l'utilisateur prépare son prochain vrai trajet en moins de dix minutes, et les haltes proposées lui donnent envie.*
-
-| ID | Tranche | Statut |
-| --- | --- | --- |
-| T2.0 | Signature des mises à jour instantanées, double authentification des comptes Expo et GitHub, droits du jeton `gh` ; avant T2.3 (première donnée personnelle stockée) | Idée |
-| T2.0b | Direction de l'interface (maquettes, choix visuels), à décider ensemble avant T2.5 | Idée |
-| T2.1 | Stockage local et modèle de données : le trajet comme objet, les modifications comme actions, identifiants stables, hors ligne d'abord | Idée |
-| T2.2 | Chargement et vérification d'un paquet régional dans l'appli | Idée |
-| T2.3 | Préférences, saisies une fois | Idée |
-| T2.4 | Trajet : départ, arrivée, calcul d'itinéraire (choix du moteur et du service) | Idée |
-| T2.5 | Moments et haltes proposées le long du trajet (demande structurée : type, moment, critères) | Idée |
-| T2.6 | Fiche du lieu, mention « © les contributeurs d'OpenStreetMap » visible dans l'appli, et bouton « Voir sur Google Maps » (sans identifiant Google, ce lien est une recherche : vérifier qu'il ouvre le bon lieu) | Idée |
-| T2.7 | Envoi du trajet vers Google Maps (étapes) ou Waze (étape par étape) | Idée |
-| T2.8 | Banc d'essai des suggestions sur le trajet de référence | Idée |
-
-## Jalon 3 — Flâne m'accompagne en route
-
-*Critère : sur un vrai trajet, Flâne parle au bon moment, sans jamais déranger, et sans vider la batterie.*
-
-| ID | Tranche | Statut |
-| --- | --- | --- |
-| T3.1 | Simulateur de trajet : enregistrer un vrai trajet, le rejouer, en accéléré | Idée |
-| T3.2 | Localisation pendant un trajet : autorisations, limitée au trajet actif. Étudier un service de premier plan (notification visible pendant le trajet), qui peut éviter l'autorisation de localisation en arrière-plan et simplifier la validation Google Play | Idée |
-| T3.3 | Moteur en route : niveaux 1, 3 et 4, bascules automatiques, recalcul après détour | Idée |
-| T3.4 | Suggestion en mouvement : phrase courte, deux boutons, moments calmes, espacement | Idée |
-| T3.5 | Voix : synthèse vocale d'Android, écouteur de phrases, coexistence avec la musique | Idée |
-| T3.6 | Mesure de la batterie sur un trajet simulé | Idée |
-
-## Jalon 4 — Flâne apprend de moi
-
-*Critère : après quelques trajets, l'utilisateur sent que les suggestions lui ressemblent davantage.*
-
-| ID | Tranche | Statut |
-| --- | --- | --- |
-| T4.1 | « J'aime » et « pas pour moi », enregistrés pour devenir les futurs avis | Idée |
-| T4.2 | Palier 2 (notes personnelles) et ton qui suit la confiance | Idée |
-| T4.3 | Carnet de route (note rapide pendant un trajet test) | Idée |
-
-## Jalon 5 — Je le confie à un ami
-
-*Critère : un ami installe Flâne et l'utilise sur un de ses trajets, sans aide.*
-
-| ID | Tranche | Statut |
-| --- | --- | --- |
-| T5.1 | Paquets pour d'autres régions et mises à jour partielles | Idée |
-| T5.2 | Politique de confidentialité (à partir de `docs/DATA.md`) | Idée |
-| T5.3 | Bouton « signaler un problème » (export des journaux, sans position) | Idée |
-| T5.4 | Diffusion en test fermé sur Google Play (formulaire des données, justification de la localisation) | Idée |
-| T5.5 | Licence : avis juridique, décision finale, dépôt de marque | Idée |
+- [ ] **Two-factor authentication on the Expo account**: postponed on 2026-10-20. To enable before the first personal data stored by the test variant, together with update signing (trigger in `docs/SECURITY.md`).
+- [ ] **« Flâne » trademark filing (INPI)**: when? Since the repository went public (D-019), the name is the only thing the license does not protect. Planned in T5.5; to bring forward if possible.
+- [x] **Region of the first pack** (milestone 1): the Hautes-Alpes (05). *Answered on 2026-10-20.*
+- [x] **Reference trip**: Briançon–Embrun (a trip known by heart); long trip: Briançon–Marseille. *Answered on 2026-10-20.*
+- [x] **GitHub repository name and app identifier**: repository `flane`, Android package identifier `app.flane`, display name « Flâne » (see D-015). *Answered on 2026-10-20.*
 
 ---
 
-## Première liste de types d'arrêts (pour T1.1)
+## Milestone 0 — The workshop is ready
 
-- **Manger** : boulangerie, marché, épicerie fine et produits locaux, vente à la ferme, traiteur, café avec terrasse, glacier.
-- **Pause** : table de pique-nique, banc avec vue, coin ombragé.
-- **Nature** : point de vue, balade courte, bord de rivière ou de lac, baignade, cascade, forêt.
-- **Chiens** : endroit pour les lâcher, petite balade.
-- **Patrimoine** : joli village, château ou ruine, chapelle, lavoir ou fontaine, lieu insolite.
-- **Moments** : coin pour le coucher de soleil.
-- **Pratique** : toilettes, eau potable, essence, recharge électrique, aire de jeux pour enfants.
+*Criterion: a change automatically goes through all the checks, and an empty Flâne app installs on the owner's phone.*
+
+| ID | Slice | Status |
+| --- | --- | --- |
+| T0.1 | Repository and conventions: local git hooks in `.githooks/` (secrets with gitleaks, commit format, pre-push), `.editorconfig`, AGPL-3.0 license and going public, issue and PR templates, GitHub settings (rule on `main`, secret scanning, alerts), D-017 to D-019. Claude's guardrail delivered here was removed afterwards (D-022) | Done |
+| T0.1b | Claude kit: « accept edits » mode, D-021 (who decides what). The frozen `allow` list and the hardened guardrail were removed (D-022) | Done, then simplified |
+| T0.2 | Automatic checks (GitHub Actions): types, lint, tests, dependency audit, secret scanning, licenses; required by the rule on `main`; Dependabot; short failure summary for Claude | Done |
+| T0.3 | Expo app skeleton: strict TypeScript, ESLint and Prettier, translation files, SPDX notice at the top of files, `.npmrc` (`ignore-scripts`, `save-exact`), `.nvmrc`, three empty tabs, `app.flane.dev` / `app.flane` variants, `preview` APK and development client through EAS Build | Done |
+| T0.5 | Instant updates (EAS Update) for the test variant `app.flane.dev`, visible native version, one version per slice (D-023); done before T0.2 at the owner's request to speed up the test loop | Done |
+| T0.4a | Steering, seeing and stopping: pinned issue « État de Flâne », pull request followed live from the first commit, veto (signals read by `tools/dev/owner-signals.mjs` at each checkpoint), the agents' « Noticed on the way ». Sheet `docs/slices/T0.4-pilotage.md`; real veto postponed to T0.6 | Done |
+| T0.6 | Our method, live: a shared ritual and reflexes instead of gates, `METHOD.md` and `CLAUDE.md` in English, D-027 (language), D-028 (ritual), D-029 (named versions), descriptive commits, « État » issue removed, session-opening and veto hooks | Done |
+| T0.8 | Monthly dependencies, October 2026: `@types/node` 24.19.2 (Dependabot #13 redone, D-025). Sheet `docs/slices/T0.8-deps-2026-10.md` | Done |
+| T0.7 | Translate the rest of the repository into English (D-027): vision, security, data, conventions, glossary, backlog, journal, agents, scripts' messages | Idea |
+| T0.4b | Full CI: the app assembles in `app-check`, `version-check` (version goes up when the app changes, every tool test on GitHub), required on `main`. Sheet `docs/slices/T0.4b-full-ci.md` | Done |
+| T0.4c | Type-only packages (`@types/*`, `undici-types`) do not count as an app change in `version-check`. Sheet `docs/slices/T0.4c-types-packages.md` | Done |
+
+## Milestone 1 — I see the good spots in my region
+
+*Criterion: on the viewer, the owner recognizes the places they love, with few false positives.*
+
+| ID | Slice | Status |
+| --- | --- | --- |
+| T1.1 | Stop types in configuration: schema, validation, first list (see `docs/VISION.md` and the list below) | Idea |
+| T1.2 | OSM extraction for a region: fetching, filtering by type, stable identifiers | Idea |
+| T1.3 | DATAtourisme (Licence Ouverte Etalab 2.0: cite the source and the update date): integration and matching with OSM | Idea |
+| T1.4 | Sorting rules and source tiers (tiers 3 and 4 for now) | Idea |
+| T1.5 | Regional pack: local database format, signature, pack checker | Idea |
+| T1.6 | Place viewer and « why this place? » | Idea |
+
+## Milestone 2 — I prepare a trip
+
+*Criterion: the owner prepares their next real trip in less than ten minutes, and the proposed stops make them want to go.*
+
+| ID | Slice | Status |
+| --- | --- | --- |
+| T2.0 | Signing of instant updates, two-factor authentication on the Expo and GitHub accounts, rights of the `gh` token; before T2.3 (first personal data stored) | Idea |
+| T2.0b | Interface direction (mockups, visual choices), to decide together before T2.5 | Idea |
+| T2.1 | Local storage and data model: the trip as an object, changes as actions, stable identifiers, offline first | Idea |
+| T2.2 | Loading and verifying a regional pack in the app | Idea |
+| T2.3 | Preferences, entered once | Idea |
+| T2.4 | Trip: start, destination, route calculation (choice of engine and service) | Idea |
+| T2.5 | Moments and stops proposed along the trip (structured request: type, moment, criteria) | Idea |
+| T2.6 | Place sheet, « © OpenStreetMap contributors » credit visible in the app, and « See on Google Maps » button (without a Google identifier, this link is a search: check that it opens the right place) | Idea |
+| T2.7 | Sending the trip to Google Maps (waypoints) or Waze (stop by stop) | Idea |
+| T2.8 | Test bench for suggestions on the reference trip | Idea |
+
+## Milestone 3 — Flâne comes along on the road
+
+*Criterion: on a real trip, Flâne speaks at the right moment, never disturbs, and does not drain the battery.*
+
+| ID | Slice | Status |
+| --- | --- | --- |
+| T3.1 | Trip simulator: record a real trip, replay it, sped up | Idea |
+| T3.2 | Location during a trip: permissions, limited to the active trip. Study a foreground service (visible notification during the trip), which can avoid the background location permission and simplify Google Play review | Idea |
+| T3.3 | Engine on the road: levels 1, 3 and 4, automatic switches, recalculation after a detour | Idea |
+| T3.4 | Suggestion while moving: short sentence, two buttons, calm moments, spacing | Idea |
+| T3.5 | Voice: Android text-to-speech, sentence listener, coexistence with music | Idea |
+| T3.6 | Battery measurement on a simulated trip | Idea |
+
+## Milestone 4 — Flâne learns from me
+
+*Criterion: after a few trips, the owner feels that the suggestions are more like them.*
+
+| ID | Slice | Status |
+| --- | --- | --- |
+| T4.1 | « J'aime » and « pas pour moi », recorded to become the future reviews | Idea |
+| T4.2 | Tier 2 (personal notes) and a tone that follows confidence | Idea |
+| T4.3 | Trip notes (quick note during a test trip) | Idea |
+
+## Milestone 5 — I hand it to a friend
+
+*Criterion: a friend installs Flâne and uses it on one of their trips, without help.*
+
+| ID | Slice | Status |
+| --- | --- | --- |
+| T5.1 | Packs for other regions and partial updates | Idea |
+| T5.2 | Privacy policy (based on `docs/DATA.md`) | Idea |
+| T5.3 | « Report a problem » button (log export, without position) | Idea |
+| T5.4 | Closed testing release on Google Play (data form, location justification) | Idea |
+| T5.5 | License: legal advice, final decision, trademark filing | Idea |
+
+---
+
+## First list of stop types (for T1.1)
+
+- **Eat**: bakery, market, delicatessen and local products, farm shop, caterer, café with a terrace, ice cream shop.
+- **Break**: picnic table, bench with a view, shady spot.
+- **Nature**: viewpoint, short walk, riverside or lakeside, swimming spot, waterfall, forest.
+- **Dogs**: place to let them off the leash, short walk.
+- **Heritage**: pretty village, castle or ruin, chapel, wash house or fountain, unusual place.
+- **Moments**: sunset spot.
+- **Practical**: toilets, drinking water, fuel, electric charging, children's playground.
 
 ---
 
 ## Parking
 
-Idées notées, traitées en fin de jalon. Ne pas s'y attaquer avant.
+Ideas written down, handled at the end of a milestone. Do not tackle them before.
 
-**Étape 2 (déjà décidée dans la vision)**
-- Avis des flâneurs : étoiles « ça valait le détour ? », commentaire court, étiquettes factuelles, notation après arrêt vérifié.
-- Flâne partagée : vues conducteur et passager, trajet partagé par actions, éphémère, hors ligne.
-- Supabase pour les avis et le partage.
+**Stage 2 (already decided in the vision)**
+- Flâneurs' reviews: « was it worth the detour? » stars, short comment, factual labels, rating after a verified stop.
+- Shared Flâne: driver and passenger views, trip shared through actions, ephemeral, offline.
+- Supabase for reviews and sharing.
 
-**Plus tard**
-- Import d'un trajet depuis Google Maps (niveau 2).
-- Réponse vocale « oui » / « non », puis demandes en langage naturel avec une IA.
-- Professionnels (commerces, offices de tourisme) avec vérification.
-- CarPlay et Android Auto.
-- Convoi de plusieurs voitures.
-- Vélo, moto, van ; usage domicile-travail ; autres pays ; iOS.
-- Tests de parcours complets (Maestro), galerie d'écrans (Storybook), carnet de route transcrit par Claude.
+**Later**
+- Importing a trip from Google Maps (level 2).
+- Voice answer « oui » / « non », then natural-language requests with an AI.
+- Professionals (shops, tourist offices) with verification.
+- CarPlay and Android Auto.
+- Convoy of several cars.
+- Bike, motorbike, van; home-to-work use; other countries; iOS.
+- Full journey tests (Maestro), screen gallery (Storybook), trip notes transcribed by Claude.
 
-**Outillage**
-- Mode sombre (mode nuit pour la conduite) et orientation paysage : thème clair et portrait seulement depuis T0.3 ; à traiter avec la vue en mouvement (jalon 3), via `app/src/ui/theme.ts`.
-- Anglais et détection de la langue du téléphone : un fichier `en.json` à côté de `fr.json`, pas de code à changer.
-- Icône et écran de démarrage définitifs (icône du modèle Expo conservée en T0.3).
-- Compilation locale de l'appli (SDK Android sur le PC) : EAS Build suffit pour l'instant.
-- Route `+not-found` et lecture des paramètres du schéma `flane` : à la première tranche qui reçoit un lien.
-- Déplacer les tests des outils du dépôt (`app/src/tools/`) hors de l'appli quand `data-pipeline/` aura les siens.
-- Banc d'essai en PR : le banc d'essai tourne sur le trajet de référence à chaque pull request et poste la différence avec `main` (après T2.8).
-- `SECURITY.md` et politique de signalement des failles (jalon 5).
-- Journal de débogage dans la version de test, sans position : à décider dans la fiche de la première tranche du jalon 1 qui touche l'appli.
-- Tableau de bord hors GitHub, notifications par courriel (GitHub prévient déjà d'un run échoué).
-- Claude qui tourne sans session ouverte (tâches planifiées, agents dans le cloud) : à revoir quand le développement aura un rythme.
-- Validation par lot de plusieurs fiches : bilan du jalon 1.
-- Format des messages de commit vérifié dans GitHub Actions.
-- Liste des permissions de Claude Code : `Bash(rm *)` est autorisé et seuls `rm -rf`/`rm -fr` demandent ; `rm -r -f` ou `rm -Rf` passent (audit de T0.6). Tranche `fix/` courte.
-- `version-check` qui compare l'appli assemblée elle-même (empreinte de l'export) entre `main` et la pull request, au lieu de deviner à partir des fichiers (T0.4c).
-- Observer plus en profondeur ce que font les agents (qualité de leurs rapports, ce qu'ils ratent, leur coût) : au bilan d'un jalon, quand on aura du recul.
-- Vérification automatique des renvois morts (`METHODE.md`, vocabulaire des portes) dans `app-check`.
+**Tooling**
+- Dark mode (night mode for driving) and landscape orientation: light theme and portrait only since T0.3; to handle with the moving view (milestone 3), through `app/src/ui/theme.ts`.
+- English and detection of the phone's language: an `en.json` file next to `fr.json`, no code to change.
+- Final icon and splash screen (the Expo template icon kept in T0.3).
+- Local build of the app (Android SDK on the PC): EAS Build is enough for now.
+- `+not-found` route and reading the parameters of the `flane` scheme: at the first slice that receives a link.
+- Move the tests of the repository tools (`app/src/tools/`) out of the app when `data-pipeline/` has its own.
+- Test bench in PRs: the test bench runs on the reference trip on every pull request and posts the difference with `main` (after T2.8).
+- A root-level `SECURITY.md` and vulnerability disclosure policy (milestone 5).
+- Debug log in the test variant, without position: to decide in the sheet of the first slice of milestone 1 that touches the app.
+- Dashboard outside GitHub, email notifications (GitHub already warns about a failed run).
+- Claude running without an open session (scheduled tasks, cloud agents): to revisit when development has a rhythm.
+- Approving several sheets in a batch: milestone 1 review.
+- Commit message format checked in GitHub Actions.
+- Claude Code permission list: `Bash(rm *)` is allowed and only `rm -rf`/`rm -fr` ask; `rm -r -f` or `rm -Rf` pass (T0.6 audit). Short `fix/` slice.
+- `version-check` that compares the built app itself (fingerprint of the export) between `main` and the pull request, instead of guessing from the files (T0.4c).
+- Observe more deeply what the agents do (quality of their reports, what they miss, their cost): at a milestone review, once we have some distance.
+- Automatic check for dead references (`METHODE.md`, vocabulary of the gates) in `app-check`.

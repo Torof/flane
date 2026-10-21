@@ -1,9 +1,9 @@
-## D-0xx — Titre de la décision · AAAA-MM-JJ · Proposée | À confirmer | Acceptée | Remplacée par D-0yy
+## D-0xx — Decision title · YYYY-MM-DD · Proposed | To confirm | Accepted | Replaced by D-0yy
 
-**Contexte** : la situation et la question posée.
+**Context**: the situation and the question asked.
 
-**Décision** : ce qu'on a choisi.
+**Decision**: what we chose.
 
-**Pourquoi** : les raisons, et les options écartées.
+**Why**: the reasons, and the options set aside.
 
-**Conséquences et vigilance** : ce que ça implique, ce qu'il faudra surveiller.
+**Consequences and vigilance**: what it implies, what we will need to watch.
