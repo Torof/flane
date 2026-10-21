@@ -372,3 +372,14 @@ test('main: a repository owned by an organisation is refused', () => {
   assert.equal(code, 2);
   assert.match(out, /not a user account/);
 });
+
+test('main: --dry-run reads without moving the checkpoint', () => {
+  const saved = { 'pr:15': { since: '2026-10-21T10:00:00Z', expected: 'draft' } };
+  const stateFile = tempState(saved);
+  const fetcher = fakeFetcher({
+    issueComments: [comment(OWNER, 'renommer ceci', '2026-10-21T11:00:00Z')],
+  });
+  assert.equal(run(['--pr', '15', '--dry-run'], fetcher, { stateFile }).code, 3);
+  assert.deepEqual(readStateFile(stateFile), saved);
+  assert.equal(run(['--pr', '15'], fetcher, { stateFile }).code, 3);
+});

@@ -32,7 +32,7 @@ import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const USAGE =
-  'usage: owner-signals.mjs --pr <n>... [--expect draft|ready|closed|merged] [--ack] [--state <file>]';
+  'usage: owner-signals.mjs --pr <n>... [--expect draft|ready|closed|merged] [--ack] [--dry-run] [--state <file>]';
 export const CLAUDE_SIGNATURE = '<!-- flane:claude -->';
 // « veto » or « stop » first, after any quote, emphasis or punctuation; « véto » too.
 const STOP_WORD = /^[\s>*_~`«»"'“”‘’(\[-]*(v[eé]to|stop)(?![\p{L}\p{N}])/iu;
@@ -43,11 +43,15 @@ const EXCERPT_LENGTH = 500;
 const CLOCK_MARGIN_MS = 2 * 60 * 1000;
 
 export function parseArgs(argv) {
-  const args = { items: [], expect: null, ack: false, state: null };
+  const args = { items: [], expect: null, ack: false, dryRun: false, state: null };
   for (let i = 0; i < argv.length; i++) {
     const flag = argv[i];
     if (flag === '--ack') {
       args.ack = true;
+      continue;
+    }
+    if (flag === '--dry-run') {
+      args.dryRun = true; // read without moving the checkpoint (hooks)
       continue;
     }
     const value = argv[++i];
@@ -265,7 +269,7 @@ export function main(
       state[key].expected = args.expect ?? actual;
       if (stopped) state[key].stopped = true;
     }
-    writeFileSync(file, JSON.stringify(state, null, 2) + '\n');
+    if (!args.dryRun) writeFileSync(file, JSON.stringify(state, null, 2) + '\n');
     io.stdout(render(results));
     return exitCode(results);
   } catch (e) {
