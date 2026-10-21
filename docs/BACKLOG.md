@@ -31,6 +31,7 @@ Aucune tranche en cours. Prochaines proposées : la pull request Dependabot 13 (
 | T0.6 | Notre méthode, en direct : rituel partagé et réflexes à la place des portes, `METHOD.md` et `CLAUDE.md` en anglais, D-027 (langue), D-028 (rituel), D-029 (versions nommées), commits descriptifs, issue « État » retirée, hooks d'ouverture de session et de veto | Faite |
 | T0.7 | Translate the rest of the repository into English (D-027): vision, security, data, conventions, glossary, backlog, journal, agents, scripts' messages | Idée |
 | T0.4b | Full CI: the app assembles in `app-check`, `version-check` (version goes up when the app changes, every tool test on GitHub), required on `main`. Sheet `docs/tranches/T0.4b-full-ci.md` | Faite |
+| T0.4c | Type-only packages (`@types/*`, `undici-types`) do not count as an app change in `version-check`. Sheet `docs/tranches/T0.4c-types-packages.md` | En cours |
 
 ## Jalon 1 — Je vois les bons coins de ma région
 
@@ -144,4 +145,5 @@ Idées notées, traitées en fin de jalon. Ne pas s'y attaquer avant.
 - Validation par lot de plusieurs fiches : bilan du jalon 1.
 - Format des messages de commit vérifié dans GitHub Actions.
 - Liste des permissions de Claude Code : `Bash(rm *)` est autorisé et seuls `rm -rf`/`rm -fr` demandent ; `rm -r -f` ou `rm -Rf` passent (audit de T0.6). Tranche `fix/` courte.
+- `version-check` qui compare l'appli assemblée elle-même (empreinte de l'export) entre `main` et la pull request, au lieu de deviner à partir des fichiers (T0.4c).
 - Vérification automatique des renvois morts (`METHODE.md`, vocabulaire des portes) dans `app-check`.
