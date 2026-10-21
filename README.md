@@ -7,7 +7,7 @@ Le compagnon de route qui te souffle où t'arrêter, pour faire du trajet une pa
 Flâne est une appli mobile (Android d'abord) qui suggère les bons arrêts sur un trajet : points de vue, pique-nique, boulangeries de village, balades pour les chiens, baignades. Elle s'appuie sur des données ouvertes (OpenStreetMap, DATAtourisme), calcule tout sur le téléphone, et laisse la navigation à Google Maps ou Waze.
 
 - Vision et cadre : [`docs/VISION.md`](docs/VISION.md)
-- Méthode de construction : [`docs/METHODE.md`](docs/METHODE.md)
+- Méthode de construction : [`docs/METHOD.md`](docs/METHOD.md) ; versions : [`CHANGELOG.md`](CHANGELOG.md)
 - Où en est le projet : [`docs/JOURNAL.md`](docs/JOURNAL.md) et [`docs/BACKLOG.md`](docs/BACKLOG.md)
 
 ## L'appli
@@ -38,9 +38,7 @@ EXPO_NO_TELEMETRY=1 eas build -p android -e development    # client de développ
 
 ## Contribuer au dépôt
 
-Où en est le projet : l'issue épinglée [« État de Flâne »](https://github.com/Torof/flane/issues/16).
-
-Après avoir cloné : `tools/dev/setup.sh` active les hooks git du projet (format des commits, recherche de secrets, vérifications avant envoi), installe gitleaks dans `~/.local/bin` et la version de Node attendue. Chaque pull request passe les vérifications automatiques (`.github/workflows/checks.yml` : types, lint, formatage, notices SPDX, tests, licences, secrets, audit des dépendances) ; `main` refuse la fusion tant qu'elles ne sont pas vertes (l'audit des dépendances ne bloque que si la pull request touche les fichiers de paquets). Méthode et conventions : [`docs/METHODE.md`](docs/METHODE.md), [`docs/CONVENTIONS.md`](docs/CONVENTIONS.md).
+Après avoir cloné : `tools/dev/setup.sh` active les hooks git du projet (format des commits, recherche de secrets, vérifications avant envoi), installe gitleaks dans `~/.local/bin` et la version de Node attendue. Chaque pull request passe les vérifications automatiques (`.github/workflows/checks.yml` : types, lint, formatage, notices SPDX, tests, licences, secrets, audit des dépendances) ; `main` refuse la fusion tant qu'elles ne sont pas vertes (l'audit des dépendances ne bloque que si la pull request touche les fichiers de paquets). Méthode et conventions : [`docs/METHOD.md`](docs/METHOD.md), [`docs/CONVENTIONS.md`](docs/CONVENTIONS.md).
 
 ## Licence
 

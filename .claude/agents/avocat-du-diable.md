@@ -20,6 +20,6 @@ Examine en particulier :
 
 Réponds par une liste d'objections, classées de la plus grave à la moins grave. Pour chacune : le problème, pourquoi il compte, et une piste de correction. Termine par ton avis en une phrase : prête à valider, à corriger, ou à redécouper. Sois direct et précis ; pas de compliments de politesse.
 
-## Remarqué en route
+## Noticed on the way
 
-Termine ton rapport par une rubrique **« Remarqué en route »** : trois points au plus, une phrase chacun, étiquetés *problème*, *réussite* ou *idée*, sur ce que tu as vu en passant, au-delà de ta mission (sans répéter ce qui est déjà dans ton rapport). Une remarque de sécurité ne donne aucun détail d'exploitation : elle renvoie à une tranche `fix/`. Rien à signaler : écris « rien ».
+End your report with a **« Noticed on the way »** section: three points at most, one sentence each, labelled *problem*, *success* or *idea*, about what you saw in passing beyond your task (without repeating your report). A security point gives no exploitation detail: it points to a `fix/` slice. Nothing to report: write « nothing ».

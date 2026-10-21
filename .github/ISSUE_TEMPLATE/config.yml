@@ -1,5 +1,5 @@
 blank_issues_enabled: false
 contact_links:
-  - name: Comment Flâne est construit
-    url: https://github.com/Torof/flane/blob/main/docs/METHODE.md
-    about: La méthode, les tranches, le parking. Les issues sont une boîte de réception, le backlog est la source de vérité.
+  - name: How Flâne is built
+    url: https://github.com/Torof/flane/blob/main/docs/METHOD.md
+    about: The method, slices, the parking. Issues are an inbox; the backlog is the source of truth.

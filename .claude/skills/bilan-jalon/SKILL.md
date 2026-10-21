@@ -1,15 +1,14 @@
 ---
 name: bilan-jalon
-description: Conduit le bilan de fin de jalon de Flâne (produit et méthode). À lancer quand toutes les tranches d'un jalon sont faites et que le trajet test a eu lieu.
-disable-model-invocation: true
+description: Runs the end-of-milestone review of Flâne (product and method). Claude proposes it when every slice of a milestone is done and the test trip has taken place.
 ---
 
-# Bilan de jalon
+# Milestone review
 
-1. Vérifier que toutes les tranches du jalon sont « Faites » ou « À tester sur la route » dans `docs/BACKLOG.md`, et que le trajet test de fin de jalon a eu lieu. Sinon, le signaler.
-2. **Le produit** : le critère d'usage du jalon est-il atteint ? Reprendre avec l'utilisateur les notes du carnet de route (`docs/carnet-de-route/`) et proposer pour chacune : tranche, parking ou abandon. Les tranches « À tester sur la route » passent en « Faite » si le trajet test les a validées.
-3. **La méthode** : ce qui a bien marché, ce qui a frotté, ce qu'on ajuste. Suggérer à l'utilisateur de lancer `/insights` pour nourrir cette partie.
-4. **Le parking** : passer en revue les idées, une par une. Pour chacune : tranche d'un prochain jalon, garder au parking, ou abandonner.
-5. Proposer les tranches du jalon suivant, avec leur ordre, et la version à étiqueter (voir `docs/CONVENTIONS.md`).
-6. Rédiger le bilan à partir de `docs/modeles/BILAN_JALON.md` et le **montrer dans la conversation**.
-7. Avec l'accord de l'utilisateur seulement : enregistrer `docs/bilans/Jx-bilan.md`, et mettre à jour le backlog, la méthode et le journal, sur une branche `docs/meta-AAAA-MM-JJ`.
+1. Check that every slice of the milestone is « Faite » or « À tester sur la route » in `docs/BACKLOG.md`, and that the end-of-milestone test trip happened. Otherwise, say so.
+2. **The product**: is the milestone's criterion met? Go through the trip notes (`docs/carnet-de-route/`) with the owner and propose for each: slice, parking or drop. Slices « À tester sur la route » become « Faite » if the trip validated them.
+3. **The method** (on trial, D-028): what worked, what got stuck, what we change, from the journal's « Method » lines. Suggest `/insights` to the owner.
+4. **Full security pass** of the milestone (`auditeur-securite` on everything merged since the last review).
+5. **The parking**: one idea at a time: slice of a next milestone, keep parked, or drop.
+6. Propose the slices of the next milestone and their order.
+7. Write the review from `docs/modeles/BILAN_JALON.md`, show it in the conversation, then record `docs/bilans/Mx-review.md` and update the backlog, the method and the journal on a `docs/meta-YYYY-MM-DD` branch.

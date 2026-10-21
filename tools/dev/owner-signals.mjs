@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-// Reads the owner's signals on pull requests and issues, at each checkpoint
-// (before a commit, push, agent, `eas update`, EAS build, merge, and at /debut).
+// Reads the owner's signals on pull requests, at each checkpoint
+// (before a commit, push, agent, `eas update`, EAS build, merge, and at the opening of a session).
 // Claude acts with the owner's GitHub account, so the two are told apart by a
 // signature: every comment Claude posts starts with CLAUDE_SIGNATURE.
 //
@@ -16,7 +16,7 @@
 // (`.git/flane-signals.json` by default, never committed). A stop is sticky:
 // the checkpoint does not move until Claude acknowledges it with `--ack`,
 // after the owner said to resume. `--ack` still reads and shows the comments
-// since the stop (as requests marked « acquitté »), so nothing written before
+// since the stop (as requests marked « acknowledged »), so nothing written before
 // the resume is lost. No dependency.
 //
 // Limits: the owner is the repository owner and must be a user account (an
@@ -32,7 +32,7 @@ import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const USAGE =
-  'usage: owner-signals.mjs (--pr <n> | --issue <n>)... [--expect draft|ready|closed|merged] [--ack] [--state <file>]';
+  'usage: owner-signals.mjs --pr <n>... [--expect draft|ready|closed|merged] [--ack] [--dry-run] [--state <file>]';
 export const CLAUDE_SIGNATURE = '<!-- flane:claude -->';
 // « veto » or « stop » first, after any quote, emphasis or punctuation; « véto » too.
 const STOP_WORD = /^[\s>*_~`«»"'“”‘’(\[-]*(v[eé]to|stop)(?![\p{L}\p{N}])/iu;
@@ -43,18 +43,22 @@ const EXCERPT_LENGTH = 500;
 const CLOCK_MARGIN_MS = 2 * 60 * 1000;
 
 export function parseArgs(argv) {
-  const args = { items: [], expect: null, ack: false, state: null };
+  const args = { items: [], expect: null, ack: false, dryRun: false, state: null };
   for (let i = 0; i < argv.length; i++) {
     const flag = argv[i];
     if (flag === '--ack') {
       args.ack = true;
       continue;
     }
+    if (flag === '--dry-run') {
+      args.dryRun = true; // read without moving the checkpoint (hooks)
+      continue;
+    }
     const value = argv[++i];
     if (value === undefined) throw new Error(`missing value after ${flag}\n${USAGE}`);
-    if (flag === '--pr' || flag === '--issue') {
-      if (!/^[1-9]\d*$/.test(value)) throw new Error(`${flag} expects a number, got "${value}"`);
-      args.items.push({ kind: flag.slice(2), number: Number(value) });
+    if (flag === '--pr') {
+      if (!/^[1-9]\d*$/.test(value)) throw new Error(`--pr expects a number, got "${value}"`);
+      args.items.push({ number: Number(value) });
     } else if (flag === '--expect') {
       if (!EXPECTED_STATES.has(value))
         throw new Error(`--expect must be one of ${[...EXPECTED_STATES].join(', ')}`);
@@ -66,7 +70,7 @@ export function parseArgs(argv) {
     }
   }
   if (!args.items.length) throw new Error(USAGE);
-  if (args.expect && (args.items.length !== 1 || args.items[0].kind !== 'pr')) {
+  if (args.expect && args.items.length !== 1) {
     throw new Error('--expect applies to a single --pr');
   }
   if (args.ack && args.items.length !== 1) throw new Error('--ack applies to a single item');
@@ -88,16 +92,16 @@ export function stateSignal(actual, expected) {
   if (!expected) {
     // First reading of this item: nothing to compare with, but a closed pull request is still said.
     return actual === 'closed'
-      ? { kind: 'request', text: 'pull request fermée (premier passage)' }
+      ? { kind: 'request', text: 'pull request closed (first reading)' }
       : null;
   }
   if (actual === expected) return null;
-  if (actual === 'closed') return { kind: 'stop', text: 'pull request fermée' };
-  if (actual === 'draft') return { kind: 'stop', text: 'pull request repassée en brouillon' };
-  if (actual === 'merged') return { kind: 'request', text: 'pull request fusionnée sans Claude' };
+  if (actual === 'closed') return { kind: 'stop', text: 'pull request closed' };
+  if (actual === 'draft') return { kind: 'stop', text: 'pull request moved back to draft' };
+  if (actual === 'merged') return { kind: 'request', text: 'pull request merged without Claude' };
   return {
     kind: 'request',
-    text: `pull request passée de « ${expected} » à « ${actual} »`,
+    text: `pull request went from ${expected} to ${actual}`,
   };
 }
 
@@ -122,7 +126,7 @@ export function classifyComments(comments, { owner, since }) {
     if (c.user.login !== owner) {
       signals.push({
         kind: 'external',
-        text: `commentaire de @${c.user.login}, contenu externe (non suivi)`,
+        text: `comment by @${c.user.login}, external content (not followed)`,
         url,
       });
     } else if (body.trimStart().startsWith(CLAUDE_SIGNATURE)) {
@@ -141,21 +145,21 @@ export function classifyComments(comments, { owner, since }) {
 }
 
 const RANK = { stop: 0, request: 1, external: 2 };
-const LABEL = { stop: 'ARRÊT', request: 'DEMANDE', external: 'EXTERNE' };
+const LABEL = { stop: 'STOP', request: 'REQUEST', external: 'EXTERNAL' };
 
 export function render(results) {
   const lines = [];
   for (const { item, signals, sticky } of results) {
-    const name = `${item.kind === 'pr' ? 'pr' : 'issue'} #${item.number}`;
+    const name = `pr #${item.number}`;
     if (sticky)
-      lines.push(`ARRÊT ${name} : arrêt non levé depuis le point précédent (lever par --ack)`);
+      lines.push(`STOP ${name}: stop not lifted since the previous checkpoint (lift with --ack)`);
     for (const s of [...signals].sort((a, b) => RANK[a.kind] - RANK[b.kind])) {
       lines.push(
-        `${LABEL[s.kind]} ${name} : ${s.text.replace(/\s+/g, ' ')}${s.url ? ` <${s.url}>` : ''}`,
+        `${LABEL[s.kind]} ${name}: ${s.text.replace(/\s+/g, ' ')}${s.url ? ` <${s.url}>` : ''}`,
       );
     }
   }
-  return (lines.length ? lines : ['RIEN']).join('\n') + '\n';
+  return (lines.length ? lines : ['NOTHING']).join('\n') + '\n';
 }
 
 export function exitCode(results) {
@@ -236,26 +240,24 @@ export function main(
     const owner = ownerAccount.login;
     const results = [];
     for (const item of args.items) {
-      const key = `${item.kind}:${item.number}`;
+      const key = `pr:${item.number}`;
       const saved = state[key] ?? {};
       const base = `repos/${repo}`;
-      const actual =
-        item.kind === 'pr' ? prState(fetcher.object(`${base}/pulls/${item.number}`)) : null;
+      const actual = prState(fetcher.object(`${base}/pulls/${item.number}`));
       const signals = [];
       // A stop being lifted is not a signal; a state Claude has just set itself
       // (--expect) is compared with what GitHub reports, in case the owner acted too.
-      const s =
-        item.kind === 'pr' && !args.ack ? stateSignal(actual, args.expect ?? saved.expected) : null;
+      const s = !args.ack ? stateSignal(actual, args.expect ?? saved.expected) : null;
       if (s) signals.push(s);
       const comments = [
         ...fetcher.list(`${base}/issues/${item.number}/comments`),
-        ...(item.kind === 'pr' ? fetcher.list(`${base}/pulls/${item.number}/reviews`) : []),
-        ...(item.kind === 'pr' ? fetcher.list(`${base}/pulls/${item.number}/comments`) : []),
+        ...fetcher.list(`${base}/pulls/${item.number}/reviews`),
+        ...fetcher.list(`${base}/pulls/${item.number}/comments`),
       ];
       for (const c of classifyComments(comments, { owner, since: saved.since ?? null })) {
         signals.push(
           args.ack && c.kind === 'stop'
-            ? { ...c, kind: 'request', text: `(acquitté) ${c.text}` }
+            ? { ...c, kind: 'request', text: `(acknowledged) ${c.text}` }
             : c,
         );
       }
@@ -264,14 +266,14 @@ export function main(
       const stopped = sticky || signals.some((s) => s.kind === 'stop');
       // A stop keeps the checkpoint where it was, so it is read again until --ack.
       state[key] = { since: stopped ? (saved.since ?? null) : checkpoint };
-      if (actual) state[key].expected = args.expect ?? actual;
+      state[key].expected = args.expect ?? actual;
       if (stopped) state[key].stopped = true;
     }
-    writeFileSync(file, JSON.stringify(state, null, 2) + '\n');
+    if (!args.dryRun) writeFileSync(file, JSON.stringify(state, null, 2) + '\n');
     io.stdout(render(results));
     return exitCode(results);
   } catch (e) {
-    io.stdout(`INDÉTERMINÉ : ${e.message}\nÀ traiter comme un arrêt.\n`);
+    io.stdout(`UNREADABLE: ${e.message}\nTreat as a stop.\n`);
     return 2;
   }
 }
