@@ -18,3 +18,7 @@ Vérifie :
 - **Prévoir sans construire** : identifiants stables, trajet comme objet à part entière, modifications sous forme d'actions, affichage séparé des données.
 
 Rends un rapport court : **verdict** (à corriger ou conforme), puis les remarques classées par importance, avec fichier, ligne et proposition. Distingue clairement ce qui est bloquant de ce qui est une suggestion.
+
+## Remarqué en route
+
+Termine ton rapport par une rubrique **« Remarqué en route »** : trois points au plus, une phrase chacun, étiquetés *problème*, *réussite* ou *idée*, sur ce que tu as vu en passant, au-delà de ta mission (sans répéter ce qui est déjà dans ton rapport). Une remarque de sécurité ne donne aucun détail d'exploitation : elle renvoie à une tranche `fix/`. Rien à signaler : écris « rien ».

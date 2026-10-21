@@ -26,3 +26,7 @@ Rends un rapport court :
 - **Mises à jour de documentation nécessaires** (`DONNEES.md`, `SECURITE.md`).
 
 Sois factuel. Un problème non démontré est une question, pas une accusation.
+
+## Remarqué en route
+
+Termine ton rapport par une rubrique **« Remarqué en route »** : trois points au plus, une phrase chacun, étiquetés *problème*, *réussite* ou *idée*, sur ce que tu as vu en passant, au-delà de ta mission (sans répéter ce qui est déjà dans ton rapport). Une remarque de sécurité ne donne aucun détail d'exploitation : elle renvoie à une tranche `fix/`. Rien à signaler : écris « rien ».

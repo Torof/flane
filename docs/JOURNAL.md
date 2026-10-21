@@ -4,6 +4,38 @@ Lu au début de chaque session (`/debut`), complété à la fin (`/fin`). Les en
 
 ---
 
+## 2026-10-21 — T0.2 intégrée, T0.4a construite jusqu'à la porte Observer
+
+**Tranche** : T0.2 (fusionnée), puis T0.4a.
+**Étape** : T0.4a Observer.
+
+**Fait**
+- T0.2 : porte Observer passée, pull request 11 fusionnée par Claude, pull request 12 fermée.
+- Règle `ask` sur `gh pr merge` : le mode auto refuse que Claude commite une modification de ses propres permissions ; l'utilisateur l'a commitée lui-même (pull request 14).
+- T0.4 : oui de l'utilisateur sur la fiche (issue épinglée, signaux de veto, découpage en T0.4a et T0.4b).
+- T0.4a construite : `tools/dev/owner-signals.mjs` (18 tests), issue épinglée « État de Flâne » (#16), modèle `docs/modeles/ETAT.md`, pull request 15 en brouillon dès le premier commit, « Remarqué en route » dans les agents et le modèle de pull request, `/debut`, `/fin`, `/tranche`, méthode, conventions, sécurité, données, glossaire, README.
+- Audit et relecture : 2 points bloquants de relecture (veto pouvant être sauté sans bruit) et 7 points d'audit corrigés ; détail dans la fiche.
+
+**Décisions** : aucune nouvelle.
+
+**Exceptions à la méthode**
+- Les tests de `owner-signals.mjs` ne tournent pas encore dans les vérifications automatiques : ajoutés en T0.4b, qui touche le workflow.
+
+**Questions ouvertes**
+- Hook Claude Code `PreToolUse` qui lancerait `owner-signals.mjs` avant `gh pr merge`, `eas update` et `eas build`, et bloquerait sur un arrêt : il rendrait le veto par commentaire technique. À commiter par l'utilisateur s'il le veut (réglages de Claude Code).
+- Veto réel à constater par l'utilisateur sur la pull request 15.
+- Pull request Dependabot 13 : à reprendre dans une tranche de dépendances (D-025).
+
+**Ensuite, dans la même session**
+- L'utilisateur revoit le processus : portes, `/debut` et `/fin` à taper, autonomie silencieuse de Claude : « on est trop déconnectés ». Il veut un rituel partagé (Claude annonce l'étape, on regarde, on décide, Claude construit en tenant au courant) et des réflexes portés par Claude (parking, couper, versions nommées, passes de sécurité, découvertes, pas de côté). Méthode à l'essai, plugin plus tard s'il le décide.
+- Langue : tout le dépôt en anglais, conversation en français, appli d'abord en français. Commits descriptifs.
+- T0.4a intégrée sans l'essai du veto, reporté à T0.6 (prévu par la fiche) ; fiche T0.6 rédigée, attaquée par l'avocat du diable (redécouper : T0.4a seule d'abord), validée.
+
+**Prochaine étape**
+- Construire T0.6 sur une branche neuve ; veto réel pendant la construction.
+
+---
+
 ## 2026-10-21 — État des lieux du jalon 0, et la fiche du pilotage
 
 **Tranche** : T0.2 (toujours à la porte Observer) ; fiche de T0.4 en discussion.

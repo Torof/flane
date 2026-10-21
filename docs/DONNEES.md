@@ -22,6 +22,10 @@ Aucun compte utilisateur, aucun identifiant publicitaire, aucun outil de statist
 
 **Retours des utilisateurs par GitHub Issues** (dépôt public depuis T0.1) : ce qu'un utilisateur y écrit est public et hors de notre contrôle. Les modèles d'issues demandent un tronçon approximatif (« entre Briançon et Embrun ») et interdisent coordonnées, adresses et captures d'écran montrant la position. Le bouton « signaler un problème » de l'appli (T5.3) suivra la même règle : export des journaux sans position, jamais de position dans une issue.
 
+## Pilotage du projet (T0.4a)
+
+Aucune donnée d'usage de l'appli. Le corps de l'issue « État de Flâne », celui des pull requests et les commentaires de Claude sont **publics**, comme le dépôt : contenu borné par `docs/CONVENTIONS.md` (ni position, ni trajet, ni préférence, ni adresse, ni détail d'une faille ouverte). `tools/dev/owner-signals.mjs` lit ces commentaires publics par `gh`, sur le PC, et ne les envoie nulle part ; il n'affiche pas le texte des commentaires d'autres comptes. Son état local, `.git/flane-signals.json`, ne contient que des dates et des états de pull request, hors du dépôt.
+
 ## Données publiques utilisées
 
 | Source | Usage | Licence | Obligations |

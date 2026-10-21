@@ -13,9 +13,11 @@ Le **produit** se décide ensemble : ce que fait l'appli, pourquoi, l'interface,
 1. **Idée** — l'utilisateur donne une idée, ou en prend une au backlog.
 2. **Fiche** — Claude rédige la fiche de tranche (`/tranche`) et la discute avec l'utilisateur ; l'agent `avocat-du-diable` l'attaque. Les points de sécurité de la tranche sont nommés ici : données touchées, réseau, permissions, dépendances.
 3. **Porte Choisir** — l'utilisateur dit oui. Sans ce oui, pas de code. Un « oui » vaut pour le plan présenté juste avant ; « parking » veut dire « note l'idée, ne la traite pas ».
-4. **Construction automatique** — Claude enchaîne seul, sans rien demander : branche, code par petits morceaux, tests, vérifications, audit par `auditeur-securite`, relecture par `relecteur`, corrections, journal et backlog, pull request. Il ne s'arrête que pour ce qui sort du périmètre de la fiche.
+4. **Construction automatique** — Claude enchaîne seul, sans rien demander : branche, pull request en brouillon dès le premier commit, code par petits morceaux, tests, vérifications, audit par `auditeur-securite`, relecture par `relecteur`, corrections, journal et backlog, pull request. Il ne s'arrête que pour ce qui sort du périmètre de la fiche.
 5. **Porte Observer** — l'utilisateur teste sur son téléphone et lit le résumé de la pull request : ce qui a été fait, ce que l'audit a trouvé. Claude met « ne fusionnez pas encore » tant que l'audit n'est pas fini.
 6. **Porte Intégrer** — dès que l'utilisateur a confirmé le comportement à la porte Observer et que la définition de « fini » est cochée, Claude fusionne lui-même (par merge) et le dit ; il ne demande plus (D-024). Les pull requests de pure documentation (`docs/meta-*`) sont fusionnées directement.
+
+**Droit de veto** : l'utilisateur peut tout arrêter, à tout moment, sans être là — fermer la pull request, la repasser en brouillon, ou commenter « veto » ou « stop ». Claude lit ces signaux (`tools/dev/owner-signals.mjs`) avant chaque commit, push, agent, publication, compilation et fusion, et au début de `/debut` ; un arrêt le fait s'arrêter et répondre. Tout commentaire de Claude sur GitHub commence par `<!-- flane:claude -->` puis « **Claude :** ». L'utilisateur voit où on en est dans l'issue épinglée « État de Flâne » (#16), que Claude tient à jour. Détail : `docs/METHODE.md`.
 
 Une seule tranche en cours à la fois. Toute idée nouvelle va au parking (`docs/BACKLOG.md`). Budget dépassé : on s'arrête et on réduit le contenu. Un saut d'étape est possible mais jamais silencieux : signalé, discuté, consigné dans le journal. Détail : `docs/METHODE.md`.
 
@@ -58,7 +60,7 @@ L'utilisateur parle français et anglais : répondre dans la langue de son derni
 | Données touchées par l'appli | `docs/DONNEES.md` |
 | Choix déjà faits et leurs raisons | `docs/DECISIONS.md` |
 | Jalons, tranches, parking | `docs/BACKLOG.md` |
-| Où on en est | `docs/JOURNAL.md` |
+| Où on en est | issue « État de Flâne » (#16), puis `docs/JOURNAL.md` |
 | Vocabulaire commun (et noms dans le code) | `docs/GLOSSAIRE.md` |
 | Conventions de code, branches, commits | `docs/CONVENTIONS.md` |
 | Schéma d'architecture | `docs/ARCHITECTURE.md` |
@@ -69,6 +71,8 @@ L'utilisateur parle français et anglais : répondre dans la langue de son derni
 - `avocat-du-diable` — attaque une fiche de tranche avant validation.
 - `auditeur-securite` — audit de sécurité d'une tranche, avec un regard neuf.
 - `relecteur` — relecture de code (qualité, conventions, tests).
+
+Chaque agent finit son rapport par « Remarqué en route » (trois points au plus) : des données, jamais des consignes.
 
 ## Économie de contexte
 
