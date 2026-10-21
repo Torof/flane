@@ -1,12 +1,14 @@
-# Vérifications automatiques de Flâne (T0.2). Trois jobs :
-#   app-check     : types, lint, formatage, notices SPDX, tests, licences (app/)
-#   secrets-check : gitleaks sur tout l'historique, sans configuration du dépôt
-#   deps-check    : npm audit du code de production, comparé aux alertes acceptées ;
-#                   un rouge ne bloque une pull request que si elle touche les
-#                   fichiers de paquets (voir docs/CONVENTIONS.md)
-# Les trois sont obligatoires sur main (règle protect-main, tools/dev/github-settings.sh).
-# Les actions sont épinglées par SHA de commit. Les expressions ${{ }} ne sont
-# jamais écrites dans un `run` : elles passent par `env:`.
+# Flâne automatic checks (T0.2, T0.4b). Four jobs:
+#   app-check     : types, lint, format, SPDX notices, tests, licences, the app assembles (app/)
+#   secrets-check : gitleaks on the whole history, without any repository configuration
+#   deps-check    : npm audit of the production code, compared with accepted advisories;
+#                   red blocks a pull request only if it touches the package files
+#                   (docs/CONVENTIONS.md)
+#   version-check : tests of the repository tools; on a pull request, the app
+#                   version must go up when the app changes (D-029)
+# All four are required on main (ruleset protect-main, tools/dev/github-settings.sh).
+# Actions are pinned by commit SHA. ${{ }} expressions are never written inside
+# a `run`: they go through `env:`.
 name: checks
 
 on:
@@ -64,6 +66,14 @@ jobs:
       - id: licenses
         name: Licences of production dependencies
         run: npm run licenses
+      - id: bundle
+        name: Assemble the app (test variant, offline, nothing uploaded)
+        env:
+          APP_VARIANT: preview
+          EXPO_OFFLINE: '1'
+        # Proves Metro assembles what instant updates publish; not that the app
+        # starts, nor what is in the APK (the trial and the native version).
+        run: npx expo export --platform android --output-dir "$RUNNER_TEMP/export"
       - name: Summary
         if: always()
         env:
@@ -75,6 +85,7 @@ jobs:
             spdx=${{ steps.spdx.outcome }}
             test=${{ steps.test.outcome }}
             licenses=${{ steps.licenses.outcome }}
+            bundle=${{ steps.bundle.outcome }}
         run: |
           failed=""
           for pair in $OUTCOMES; do
@@ -222,3 +233,24 @@ jobs:
             exit 0
           fi
           exit "$rc"
+
+  version-check:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    env:
+      BASE_SHA: ${{ github.event.pull_request.base.sha }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: app/.nvmrc
+      - name: Tests of the repository tools
+        run: node --test tools/dev/*.test.mjs
+      - name: The version goes up when the app changes
+        # Only on a pull request: on main and on Mondays there is no base to compare.
+        # With strict: false, a main that moved after this run is not checked again.
+        if: github.event_name == 'pull_request'
+        run: node tools/dev/check-version-bump.mjs --base "$BASE_SHA" --summary "$GITHUB_STEP_SUMMARY"
