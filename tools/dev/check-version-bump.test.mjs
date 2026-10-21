@@ -222,3 +222,21 @@ test('end to end: a test-only change stays green', () => {
   );
   assert.equal(code, 0, out);
 });
+
+test('type-only packages counted as production by npm do not count; a real one next to them does', () => {
+  const withTypes = (types, undici, expo = '58.0.0') =>
+    lock('0.0.2', {
+      'node_modules/expo': { version: expo },
+      'node_modules/jest-util': { version: '30.0.0', dependencies: { '@types/node': '*' } },
+      'node_modules/@types/node': { version: types, dependencies: { 'undici-types': '*' } },
+      'node_modules/undici-types': { version: undici },
+      'node_modules/jest-util/node_modules/@types/node': { version: types },
+    });
+  const base = { ...baseFiles, 'app/package-lock.json': withTypes('24.10.1', '7.16.0') };
+  const types = { ...baseFiles, 'app/package-lock.json': withTypes('24.19.2', '7.24.6') };
+  assert.deepEqual(appChanges(['app/package-lock.json'], reader(base, types)), []);
+  const real = { ...baseFiles, 'app/package-lock.json': withTypes('24.19.2', '7.24.6', '58.0.1') };
+  assert.deepEqual(appChanges(['app/package-lock.json'], reader(base, real)), [
+    'app/package-lock.json (production entries)',
+  ]);
+});

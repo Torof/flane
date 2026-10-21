@@ -54,12 +54,16 @@ const buildScripts = (pkg) =>
   Object.fromEntries(Object.entries(pkg?.scripts ?? {}).filter(([k]) => BUILD_SCRIPT.test(k)));
 const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 
-/** The part of a lockfile that ships: non-dev entries, without the project's own version. */
+// Packages made only of type declarations: never in the assembled app, even when
+// npm counts them as production because a production tool (Jest, Metro) requires them.
+const TYPES_ONLY = /(^|\/)node_modules\/(@types\/[^/]+|undici-types)$/;
+
+/** The part of a lockfile that ships: non-dev, non-type entries, without the project's own version. */
 export function productionLock(lock) {
   const packages = {};
   for (const [path, entry] of Object.entries(lock?.packages ?? {})) {
     if (path === '') packages[path] = { dependencies: entry.dependencies ?? {} };
-    else if (!entry.dev) packages[path] = entry;
+    else if (!entry.dev && !TYPES_ONLY.test(path)) packages[path] = entry;
   }
   return packages;
 }
