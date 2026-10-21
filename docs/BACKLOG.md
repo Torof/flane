@@ -4,7 +4,7 @@ Statuts : **Idée** → **Prête** (fiche validée) → **En cours** → **À te
 
 ## En cours
 
-**T0.4a** — Voir et arrêter, fiche `docs/tranches/T0.4-pilotage.md`, validée le 2026-10-21, branche `chore/T0.4a-see-and-stop`, étape Construire. Ensuite T0.4b (vérifications, fiche courte).
+**T0.4a** — Voir et arrêter, fiche `docs/tranches/T0.4-pilotage.md`, validée le 2026-10-21, branche `chore/T0.4a-see-and-stop`, pull request 15 à la porte Observer. Ensuite T0.4b (vérifications, fiche courte).
 
 ## Questions ouvertes
 
