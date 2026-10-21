@@ -41,6 +41,7 @@ Talk with the owner in French (in English if they write in English). Everything 
 ## Tools
 
 - New clone: `tools/dev/setup.sh` (git hooks and gitleaks). Node 24 is required for `app/`.
+- Never bypass a git hook (`--no-verify`) nor a Claude Code hook; a hook that blocks is a signal to read, not an obstacle.
 - Claude Code runs in « accept edits » mode with the usual commands allowed; a force push and a recursive delete ask first. Never `bypassPermissions` nor `--dangerously-skip-permissions`.
 - Commit and pull request titles describe what changes, in plain English (`docs/METHOD.md`). Several `-m` for commits; pull request bodies through `--body-file`.
 - Every comment Claude posts on GitHub starts with `<!-- flane:claude -->` then « **Claude:** ».

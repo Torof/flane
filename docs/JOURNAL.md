@@ -4,6 +4,38 @@ Lu au début de chaque session (`/debut`), complété à la fin (`/fin`). Les en
 
 ---
 
+## 2026-10-21 — T0.6: our shared ritual, first full run
+
+**Slice**: T0.6 — Our method, live
+**Moment of the ritual**: closing
+
+**Done**
+- `docs/METHOD.md` (the ritual, the reflexes, stop signals, hooks, named versions) and `CLAUDE.md` in English; D-027 (language), D-028 (ritual, with the table of former rules), D-029 (named versions).
+- `debut` and `fin` run by Claude; short sheets; three objections from the devil's advocate.
+- Commit titles in plain English (`commit-msg` hook, 6 tests); « État » issue closed; `CHANGELOG.md`.
+- Hooks: `session-state.sh` (session opening) and `stop-gate.mjs` (veto before merge and publish), enabled by the owner.
+- Security pass: the stop gate failed open on common command shapes, fixed before activation; review: two documentation leftovers, fixed.
+
+**Version**: none (no app change). Past versions named: 0.0.1 — An empty Flâne on the phone; 0.0.2 — Updates without reinstalling.
+
+**Decisions**: D-027, D-028, D-029.
+
+**What worked / what got stuck**
+- Worked: the short sheet and the three best objections (the devil's advocate rightly split T0.4a off); the security pass found a real hole in the stop gate before it was enabled; the new `commit-msg` hook refused one of Claude's own titles.
+- Stuck: Claude's own settings cannot be changed by Claude (auto mode), so the owner had to run commands twice; the real veto was never tried.
+
+**Method**: the « building, kept posted » updates worked as one line per piece; to watch: owner actions (hooks, veto) should be grouped into one moment, not scattered.
+
+**Skipped moments**: real veto trial (T0.4a, then T0.6): the owner did not comment « stop »; to do at the next pull request.
+
+**Open questions**
+- Next slice: translate the rest of the repository (T0.7), then T0.4b or milestone 1.
+
+**Next step**
+- Next session: Claude opens by itself (T0.6 criterion), proposes T0.7.
+
+---
+
 ## 2026-10-21 — T0.2 intégrée, T0.4a construite jusqu'à la porte Observer
 
 **Tranche** : T0.2 (fusionnée), puis T0.4a.
