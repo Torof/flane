@@ -3,8 +3,13 @@
 // version (app/package.json) above the one of its base (D-029,
 // docs/CONVENTIONS.md). Closed by default: every file under app/ counts,
 // except the ones listed in DOES_NOT_COUNT; in app/package.json only the
-// sections that change nothing in the app are ignored, and in
-// app/package-lock.json only the development entries. No dependency.
+// sections that change nothing in the app are ignored (install and build
+// hooks in `scripts` do count), and in app/package-lock.json only the
+// development entries. Renames count as a deletion plus an addition, and file
+// names are read raw (-z), accents included. No dependency.
+//
+// Not a security boundary: a pull request can edit this script to pass itself;
+// the security pass reads changes to the checks line by line.
 //
 // Exit code: 0 nothing to bump or bumped, 1 the app changed without a higher
 // version, 2 unusable inputs (unreadable package.json, bad arguments).
@@ -15,20 +20,21 @@ import { fileURLToPath } from 'node:url';
 const USAGE = 'usage: check-version-bump.mjs --base <sha> [--summary <file>]';
 const VERSION = /^(\d+)\.(\d+)\.(\d+)$/;
 const DOES_NOT_COUNT = [
-  /\.test\.[^/]+$/,
+  /\.test\.(ts|tsx|js|jsx|mjs|cjs)$/,
   /(^|\/)__mocks__\//,
-  /(^|\/)jest\.setup\.[^/]+$/,
+  /(^|\/)jest\.setup\.(ts|js|mjs|cjs)$/,
   /^app\/src\/tools\//,
-  /\.md$/,
-  /^app\/eslint\.config\.[^/]+$/,
+  /^app\/(.*\/)?[^/]+\.md$/,
+  /^app\/eslint\.config\.(js|mjs|cjs|ts)$/,
   /^app\/\.eslintrc[^/]*$/,
   /^app\/\.prettierrc[^/]*$/,
   /^app\/\.prettierignore$/,
   /^app\/\.nvmrc$/,
-  /^app\/\.npmrc$/,
 ];
 // package.json sections that change nothing in the app (version is compared apart).
 const PACKAGE_IGNORED = ['devDependencies', 'scripts', 'jest', 'version'];
+// Scripts that run when the app is installed or built (npm lifecycle, EAS Build hooks).
+const BUILD_SCRIPT = /^(preinstall|install|postinstall|prepare|prepack|postpack|eas-build-.+)$/;
 
 export function parseVersion(text) {
   const m = VERSION.exec(String(text ?? ''));
@@ -44,6 +50,8 @@ export function isHigher(head, base) {
 
 const without = (obj, keys) =>
   Object.fromEntries(Object.entries(obj ?? {}).filter(([k]) => !keys.includes(k)));
+const buildScripts = (pkg) =>
+  Object.fromEntries(Object.entries(pkg?.scripts ?? {}).filter(([k]) => BUILD_SCRIPT.test(k)));
 const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 
 /** The part of a lockfile that ships: non-dev entries, without the project's own version. */
@@ -56,6 +64,15 @@ export function productionLock(lock) {
   return packages;
 }
 
+/** Splits the output of `git diff -z --name-only`; every name must be under app/. */
+export function parseChangedFiles(output) {
+  const files = output.split('\0').filter(Boolean);
+  const outside = files.find((f) => !f.startsWith('app/'));
+  if (outside !== undefined)
+    throw new Error(`unexpected path in the diff: ${JSON.stringify(outside)}`);
+  return files;
+}
+
 /**
  * Why the app counts as changed: a list of reasons (empty = nothing that ships).
  * `read(path, side)` returns the file text on 'base' or 'head', or null if absent.
@@ -63,11 +80,14 @@ export function productionLock(lock) {
 export function appChanges(changedFiles, read) {
   const reasons = [];
   for (const file of changedFiles) {
-    if (!file.startsWith('app/') || DOES_NOT_COUNT.some((re) => re.test(file))) continue;
+    if (DOES_NOT_COUNT.some((re) => re.test(file))) continue;
     if (file === 'app/package.json') {
       const [base, head] = ['base', 'head'].map((side) => JSON.parse(read(file, side) ?? '{}'));
-      if (!same(without(base, PACKAGE_IGNORED), without(head, PACKAGE_IGNORED))) {
-        reasons.push('app/package.json (outside devDependencies, scripts, jest)');
+      if (
+        !same(without(base, PACKAGE_IGNORED), without(head, PACKAGE_IGNORED)) ||
+        !same(buildScripts(base), buildScripts(head))
+      ) {
+        reasons.push('app/package.json (outside devDependencies, jest and non-build scripts)');
       }
     } else if (file === 'app/package-lock.json') {
       const [base, head] = ['base', 'head'].map((side) => JSON.parse(read(file, side) ?? '{}'));
@@ -83,7 +103,9 @@ export function appChanges(changedFiles, read) {
 
 export function evaluate({ changedFiles, read }) {
   const reasons = appChanges(changedFiles, read);
-  const base = JSON.parse(read('app/package.json', 'base') ?? 'null')?.version;
+  const baseText = read('app/package.json', 'base');
+  const base = baseText == null ? null : JSON.parse(baseText).version;
+  if (baseText != null) parseVersion(base); // a base package.json must carry a version
   const head = JSON.parse(read('app/package.json', 'head') ?? 'null')?.version;
   parseVersion(head); // a malformed head version is refused even when nothing counts
   if (!reasons.length) return { ok: true, reasons, base, head };
@@ -136,19 +158,19 @@ export function main(
   }
   const emit = (text) => {
     io.stdout(text);
-    if (summary) appendFileSync(summary, text);
+    try {
+      if (summary) appendFileSync(summary, text);
+    } catch {
+      // the summary is a convenience; the exit code is the verdict
+    }
   };
   try {
-    const changedFiles = execFileSync(
+    const output = execFileSync(
       'git',
-      ['diff', '--name-only', `${base}...HEAD`, '--', 'app'],
-      {
-        encoding: 'utf8',
-      },
-    )
-      .split('\n')
-      .filter(Boolean);
-    const result = evaluate({ changedFiles, read: gitReader(base) });
+      ['diff', '-z', '--name-only', '--no-renames', `${base}...HEAD`, '--', 'app'],
+      { encoding: 'utf8' },
+    );
+    const result = evaluate({ changedFiles: parseChangedFiles(output), read: gitReader(base) });
     emit(render(result));
     return result.ok ? 0 : 1;
   } catch (e) {

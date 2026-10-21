@@ -2,7 +2,19 @@
 // Tests of check-version-bump.mjs, run with `node --test tools/dev/check-version-bump.test.mjs` (Node 24).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { appChanges, evaluate, isHigher, parseVersion, render } from './check-version-bump.mjs';
+import { execFileSync } from 'node:child_process';
+import { mkdirSync, mkdtempSync, renameSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { dirname, join } from 'node:path';
+import {
+  appChanges,
+  evaluate,
+  isHigher,
+  main,
+  parseChangedFiles,
+  parseVersion,
+  render,
+} from './check-version-bump.mjs';
 
 const pkg = (version, extra = {}) =>
   JSON.stringify({
@@ -88,10 +100,8 @@ test('only tests, tools tests, docs, lint and format config, dev dependencies or
     'app/eslint.config.js',
     'app/.prettierrc',
     'app/.nvmrc',
-    'app/.npmrc',
     'app/package.json',
     'app/package-lock.json',
-    'docs/METHOD.md',
   ];
   const result = evaluate({ changedFiles: changed, read: reader(baseFiles, head) });
   assert.deepEqual(result.reasons, []);
@@ -104,7 +114,21 @@ test('production dependencies, production lock entries or eas.json: a bump is re
     'app/package.json': pkg('0.0.2', { dependencies: { expo: '58.0.1' } }),
   };
   assert.deepEqual(appChanges(['app/package.json'], reader(baseFiles, deps)), [
-    'app/package.json (outside devDependencies, scripts, jest)',
+    'app/package.json (outside devDependencies, jest and non-build scripts)',
+  ]);
+  const hook = {
+    ...baseFiles,
+    'app/package.json': pkg('0.0.2', { scripts: { test: 'jest', postinstall: 'node x.js' } }),
+  };
+  assert.equal(appChanges(['app/package.json'], reader(baseFiles, hook)).length, 1);
+  const easHook = {
+    ...baseFiles,
+    'app/package.json': pkg('0.0.2', { scripts: { test: 'jest', 'eas-build-pre-install': 'x' } }),
+  };
+  assert.equal(appChanges(['app/package.json'], reader(baseFiles, easHook)).length, 1);
+  assert.deepEqual(appChanges(['app/.npmrc'], reader(baseFiles, baseFiles)), ['app/.npmrc']);
+  assert.deepEqual(appChanges(['app/assets/icon.test.png'], reader(baseFiles, baseFiles)), [
+    'app/assets/icon.test.png',
   ]);
   const lockHead = {
     ...baseFiles,
@@ -125,4 +149,76 @@ test('the version bump alone does not count as a change', () => {
     appChanges(['app/package.json', 'app/package-lock.json'], reader(baseFiles, head)),
     [],
   );
+});
+
+test('a base package.json without a version is unusable; no base package.json is a first version', () => {
+  const noVersion = { ...baseFiles, 'app/package.json': JSON.stringify({ name: 'flane' }) };
+  const head = { ...baseFiles, 'app/package.json': pkg('0.0.3') };
+  assert.throws(() => evaluate({ changedFiles: ['app/src/x.ts'], read: reader(noVersion, head) }));
+  assert.equal(evaluate({ changedFiles: ['app/src/x.ts'], read: reader({}, head) }).ok, true);
+});
+
+test('parseChangedFiles: NUL-separated raw names, accents kept, anything outside app/ refused', () => {
+  assert.deepEqual(parseChangedFiles('app/src/carré.ts\0app/a b.ts\0'), [
+    'app/src/carré.ts',
+    'app/a b.ts',
+  ]);
+  assert.throws(() => parseChangedFiles('"app/src/carr\\303\\251.ts"\0'), /unexpected path/);
+});
+
+/** Runs main() in a temporary git repository: base commit, then `change(dir)` committed on top. */
+function onRepo(change) {
+  const dir = join(mkdtempSync(join(tmpdir(), 'version-check-')), 'Flâne repo');
+  mkdirSync(join(dir, 'app/src'), { recursive: true });
+  const git = (...args) => execFileSync('git', args, { cwd: dir, encoding: 'utf8' });
+  git('init', '-q');
+  git('config', 'user.email', 'test@example.invalid');
+  git('config', 'user.name', 'test');
+  git('config', 'commit.gpgsign', 'false');
+  writeFileSync(join(dir, 'app/package.json'), pkg('0.0.2'));
+  writeFileSync(join(dir, 'app/src/feature.ts'), 'export const a = 1;\n');
+  git('add', '-A');
+  git('commit', '-q', '-m', 'base');
+  const base = git('rev-parse', 'HEAD').trim();
+  change(dir);
+  git('add', '-A');
+  git('commit', '-q', '-m', 'change');
+  const previous = process.cwd();
+  let out = '';
+  try {
+    process.chdir(dir);
+    const code = main(['--base', base], { stdout: (t) => (out += t), stderr: (t) => (out += t) });
+    return { code, out };
+  } finally {
+    process.chdir(previous);
+    rmSync(dirname(dir), { recursive: true, force: true });
+  }
+}
+
+test('end to end: an accented file name counts', () => {
+  const { code, out } = onRepo((dir) =>
+    writeFileSync(join(dir, 'app/src/carré.ts'), 'export {};\n'),
+  );
+  assert.equal(code, 1, out);
+  assert.match(out, /app\/src\/carré\.ts/);
+});
+
+test('end to end: moving a shipped file into an ignored place still counts', () => {
+  const toTools = onRepo((dir) => {
+    mkdirSync(join(dir, 'app/src/tools'));
+    renameSync(join(dir, 'app/src/feature.ts'), join(dir, 'app/src/tools/feature.ts'));
+  });
+  assert.equal(toTools.code, 1, toTools.out);
+  assert.match(toTools.out, /app\/src\/feature\.ts/);
+  const toTest = onRepo((dir) =>
+    renameSync(join(dir, 'app/src/feature.ts'), join(dir, 'app/src/feature.test.ts')),
+  );
+  assert.equal(toTest.code, 1, toTest.out);
+});
+
+test('end to end: a test-only change stays green', () => {
+  const { code, out } = onRepo((dir) =>
+    writeFileSync(join(dir, 'app/src/feature.test.ts'), 'test("x", () => {});\n'),
+  );
+  assert.equal(code, 0, out);
 });

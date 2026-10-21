@@ -71,9 +71,10 @@ jobs:
         env:
           APP_VARIANT: preview
           EXPO_OFFLINE: '1'
+        # EXPO_NO_TELEMETRY is set for the whole workflow; --no-install: never downloads.
         # Proves Metro assembles what instant updates publish; not that the app
         # starts, nor what is in the APK (the trial and the native version).
-        run: npx expo export --platform android --output-dir "$RUNNER_TEMP/export"
+        run: npx --no-install expo export --platform android --output-dir "$RUNNER_TEMP/export"
       - name: Summary
         if: always()
         env:
@@ -237,8 +238,6 @@ jobs:
   version-check:
     runs-on: ubuntu-24.04
     timeout-minutes: 5
-    env:
-      BASE_SHA: ${{ github.event.pull_request.base.sha }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -253,4 +252,6 @@ jobs:
         # Only on a pull request: on main and on Mondays there is no base to compare.
         # With strict: false, a main that moved after this run is not checked again.
         if: github.event_name == 'pull_request'
-        run: node tools/dev/check-version-bump.mjs --base "$BASE_SHA" --summary "$GITHUB_STEP_SUMMARY"
+        # HEAD is the merge commit GitHub builds on the current main: its first
+        # parent is that main, so a main that moved since the event is compared too.
+        run: node tools/dev/check-version-bump.mjs --base "$(git rev-parse HEAD^1)" --summary "$GITHUB_STEP_SUMMARY"

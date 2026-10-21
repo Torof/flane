@@ -64,6 +64,11 @@ test('merge targets: number anywhere among flags, #n, URL, current branch, sever
     ['gh pr merge 17 --merge --delete-branch 2>&1 | tail -1', [17]],
     ['gh pr merge 17 > /tmp/out.txt', [17]],
     ['gh pr merge 17 2>/dev/null', [17]],
+    ['x=$(gh pr merge 5)', [5]],
+    ["cat <<'A' && gh pr merge 7\nbody\nA", [7]],
+    ['cat <<EOF\nEOF\ngh pr merge 5', [5]],
+    ['bash -c "gh pr merge 5"', [5]],
+    ["bash <<'EOF'\ngh pr merge 5\nEOF", [5]],
   ];
   for (const [command, prs] of cases)
     assert.deepEqual(targets(command), { prs, blocked: null }, command);
@@ -80,6 +85,14 @@ test('publish, build and submit: eas and eas-cli in every shape', () => {
     'eas submit -p android',
     'eas workflow:run deploy.yml',
     '(cd app && eas update --channel preview)',
+    'URL=$(eas update --branch preview --json)',
+    'echo `eas update`',
+    'echo "$(eas build)"',
+    'cat <<EOF && eas update\nbody\nEOF',
+    'bash -c "cd app && eas update"',
+    "sh -c 'eas build'",
+    "eval 'eas submit'",
+    "bash <<'EOF'\ncd app\neas update\nEOF",
     'cd app; npx -y eas-cli@16.3.0 build -p android',
   ]) {
     assert.deepEqual(targets(command).prs, ['current'], command);
@@ -91,6 +104,9 @@ test('what cannot be resolved is blocked', () => {
   assert.match(targets('gh -R x/y pr merge 5').blocked, /--repo/);
   assert.match(targets('gh --repo x/y pr merge 5').blocked, /--repo/);
   assert.match(targets('gh pr merge -R Torof/flane 5').blocked, /--repo/);
+  assert.match(targets('echo 5 | xargs gh pr merge').blocked, /input/);
+  assert.match(targets('gh pr merge <<< 5').blocked, /input/);
+  assert.match(targets('gh pr merge < numbers.txt').blocked, /input/);
   assert.equal(decide('gh pr merge some-branch', deps()).allow, false);
 });
 
