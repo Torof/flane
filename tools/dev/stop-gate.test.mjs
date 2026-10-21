@@ -58,6 +58,9 @@ test('merge targets: number anywhere among flags, #n, URL, current branch, sever
     ['gh pr merge --merge', ['current']],
     ['gh pr merge 17 && gh pr merge 5', [17, 5]],
     ['gh api -X PUT repos/Torof/flane/pulls/5/merge', [5]],
+    ['gh pr merge 17 --merge --delete-branch 2>&1 | tail -1', [17]],
+    ['gh pr merge 17 > /tmp/out.txt', [17]],
+    ['gh pr merge 17 2>/dev/null', [17]],
   ];
   for (const [command, prs] of cases)
     assert.deepEqual(targets(command), { prs, blocked: null }, command);

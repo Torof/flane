@@ -95,6 +95,10 @@ export function targets(command) {
         const positional = [];
         for (let i = 0; i < args.length; i++) {
           if (VALUE_FLAGS.has(args[i])) i++;
+          else if (/^\d*[<>]+$/.test(args[i]))
+            i++; // a redirection and its target
+          else if (/^\d*[<>]/.test(args[i]))
+            continue; // a redirection with its target attached
           else if (!args[i].startsWith('-')) positional.push(args[i]);
         }
         if (!positional.length) prs.push('current');
