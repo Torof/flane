@@ -29,7 +29,7 @@ case "${1:-}" in
     ;;
 esac
 
-need() { command -v "$1" >/dev/null 2>&1 || { echo "$1 manquant" >&2; exit 1; }; }
+need() { command -v "$1" >/dev/null 2>&1 || { echo "$1 missing" >&2; exit 1; }; }
 need gh
 need jq
 
@@ -37,8 +37,8 @@ die() { echo "$*" >&2; exit 1; }
 
 api() {
   local out
-  out="$(gh api "$@")" || die "gh api $1 a échoué"
-  [ -n "$out" ] || die "gh api $1 : réponse vide"
+  out="$(gh api "$@")" || die "gh api $1 failed"
+  [ -n "$out" ] || die "gh api $1: empty response"
   printf '%s' "$out"
 }
 
@@ -50,7 +50,7 @@ ruleset_id() {
 snapshot() {
   local id ruleset
   echo "actions.permissions      : $(api "repos/$REPO/actions/permissions" | jq -c '{enabled,allowed_actions,sha_pinning_required}')"
-  echo "actions.selected         : $(gh api "repos/$REPO/actions/permissions/selected-actions" 2>/dev/null | jq -c '{github_owned_allowed,verified_allowed,patterns_allowed}' || echo '(non applicable)')"
+  echo "actions.selected         : $(gh api "repos/$REPO/actions/permissions/selected-actions" 2>/dev/null | jq -c '{github_owned_allowed,verified_allowed,patterns_allowed}' || echo '(not applicable)')"
   echo "actions.workflow token   : $(api "repos/$REPO/actions/permissions/workflow" | jq -c .)"
   echo "actions.fork approval    : $(api "repos/$REPO/actions/permissions/fork-pr-contributor-approval" | jq -c .)"
   echo "dependabot auto-fixes    : $(api "repos/$REPO/automated-security-fixes" | jq -c .)"
@@ -88,16 +88,16 @@ EOF
 
 compare_with_expected() {
   if diff <(expected) <(snapshot) >/dev/null; then
-    echo "--- conforme à l'état attendu"
+    echo "--- matches the expected state"
     return 0
   fi
-  echo "--- ÉCART avec l'état attendu (< attendu, > constaté)"
+  echo "--- DIFFERS from the expected state (< expected, > found)"
   diff <(expected) <(snapshot) || true
   return 1
 }
 
 before="$(snapshot)"
-echo "--- avant"
+echo "--- before"
 echo "$before"
 if [ "$mode" = "check" ]; then
   compare_with_expected
@@ -128,7 +128,7 @@ gh api -X DELETE "repos/$REPO/automated-security-fixes" >/dev/null
 # 5. Ruleset: enforcement and bypass imposed, required_status_checks replaced,
 #    the other rules kept (and checked against the expected state below).
 id="$(ruleset_id)"
-[ -n "$id" ] || die "ruleset $RULESET_NAME introuvable : le créer d'abord dans GitHub (pull request obligatoire, merge seulement)."
+[ -n "$id" ] || die "ruleset $RULESET_NAME not found: create it in GitHub first (pull request required, merge only)."
 checks_json="$(printf '%s\n' "${REQUIRED_CHECKS[@]}" | jq -R --argjson app "$GITHUB_ACTIONS_APP_ID" '{context: ., integration_id: $app}' | jq -s .)"
 current="$(api "repos/$REPO/rulesets/$id")"
 updated="$(printf '%s' "$current" | jq --argjson checks "$checks_json" '
@@ -146,8 +146,8 @@ updated="$(printf '%s' "$current" | jq --argjson checks "$checks_json" '
 printf '%s' "$updated" | gh api -X PUT "repos/$REPO/rulesets/$id" --input - >/dev/null
 
 after="$(snapshot)"
-echo "--- après"
+echo "--- after"
 echo "$after"
-echo "--- diff avant/après"
+echo "--- diff before/after"
 diff <(echo "$before") <(echo "$after") || true
 compare_with_expected

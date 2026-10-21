@@ -2,50 +2,50 @@
 
 [![checks](https://github.com/Torof/flane/actions/workflows/checks.yml/badge.svg)](https://github.com/Torof/flane/actions/workflows/checks.yml)
 
-Le compagnon de route qui te souffle où t'arrêter, pour faire du trajet une partie du voyage.
+The travel companion that whispers where to stop, to make the trip part of the journey.
 
-Flâne est une appli mobile (Android d'abord) qui suggère les bons arrêts sur un trajet : points de vue, pique-nique, boulangeries de village, balades pour les chiens, baignades. Elle s'appuie sur des données ouvertes (OpenStreetMap, DATAtourisme), calcule tout sur le téléphone, et laisse la navigation à Google Maps ou Waze.
+Flâne is a mobile app (Android first) that suggests the right stops on a trip: viewpoints, picnic spots, village bakeries, dog walks, swimming spots. It relies on open data (OpenStreetMap, DATAtourisme), computes everything on the phone, and leaves navigation to Google Maps or Waze.
 
-- Vision et cadre : [`docs/VISION.md`](docs/VISION.md)
-- Méthode de construction : [`docs/METHOD.md`](docs/METHOD.md) ; versions : [`CHANGELOG.md`](CHANGELOG.md)
-- Où en est le projet : [`docs/JOURNAL.md`](docs/JOURNAL.md) et [`docs/BACKLOG.md`](docs/BACKLOG.md)
+- Vision and framework: [`docs/VISION.md`](docs/VISION.md)
+- How it is built: [`docs/METHOD.md`](docs/METHOD.md); versions: [`CHANGELOG.md`](CHANGELOG.md)
+- Where the project stands: [`docs/JOURNAL.md`](docs/JOURNAL.md) and [`docs/BACKLOG.md`](docs/BACKLOG.md)
 
-## L'appli
+## The app
 
-L'appli Expo (React Native, TypeScript) vit dans [`app/`](app/).
+The Expo app (React Native, TypeScript) lives in [`app/`](app/).
 
 ```sh
-tools/dev/setup.sh        # hooks git, gitleaks, Node (version de app/.nvmrc, par nvm)
+tools/dev/setup.sh        # git hooks, gitleaks, Node (version from app/.nvmrc, via nvm)
 cd app
 nvm use                   # Node 24
-npm ci                    # dépendances, sans script d'installation (.npmrc)
-npm run check             # types, lint, formatage, notices SPDX, tests
-npm start                 # serveur de développement (Metro)
+npm ci                    # dependencies, without install scripts (.npmrc)
+npm run check             # types, lint, formatting, SPDX notices, tests
+npm start                 # development server (Metro)
 ```
 
-Tests seuls : `npm test`. Inventaire des licences de production : `npm run licenses`.
+Tests only: `npm test`. Production licence inventory: `npm run licenses`.
 
-Compilation par EAS Build (compte Expo nécessaire, `eas login` ; eas-cli 16.27.0 utilisé ici) :
+Builds with EAS Build (Expo account needed, `eas login`; eas-cli 16.27.0 used here):
 
 ```sh
-tools/dev/make-dev-keystore.sh                 # une fois, avant la première compilation : keystore de développement
+tools/dev/make-dev-keystore.sh                 # once, before the first build: development keystore
 cd app
-EXPO_NO_TELEMETRY=1 eas build -p android -e preview        # APK autonome « Flâne (dev) », pour tester sans PC
-EXPO_NO_TELEMETRY=1 eas build -p android -e development    # client de développement, pour coder avec Metro
+EXPO_NO_TELEMETRY=1 eas build -p android -e preview        # standalone APK « Flâne (dev) », to test without a PC
+EXPO_NO_TELEMETRY=1 eas build -p android -e development    # development client, to code with Metro
 ```
 
-À chaque tranche, la version de test reçoit le nouveau code par mise à jour instantanée (`eas update --channel preview`, voir `docs/CONVENTIONS.md`) ; un nouvel APK n'est nécessaire que quand la version native change. Les deux profils produisent la variante `app.flane.dev` ; `app.flane` est réservé à la version publiée (profil `production`, sans clé pour l'instant : T5.4). Le keystore et `app/credentials.json` restent sur ce PC, ignorés par git : ne les copier nulle part. Pour couper la télémétrie des outils Expo dans votre shell : `export EXPO_NO_TELEMETRY=1`. Pour lire les permissions d'un APK produit : `python3 -I tools/dev/read-manifest.py fichier.apk`.
+With each slice, the test variant receives the new code by instant update (`eas update --channel preview`, see `docs/CONVENTIONS.md`); a new APK is only needed when the native version changes. Both profiles produce the `app.flane.dev` variant; `app.flane` is reserved for the published version (`production` profile, no key for now: T5.4). The keystore and `app/credentials.json` stay on this PC, ignored by git: do not copy them anywhere. To turn off Expo tools telemetry in your shell: `export EXPO_NO_TELEMETRY=1`. To read the permissions of a built APK: `python3 -I tools/dev/read-manifest.py file.apk`.
 
-## Contribuer au dépôt
+## Contributing to the repository
 
-Après avoir cloné : `tools/dev/setup.sh` active les hooks git du projet (format des commits, recherche de secrets, vérifications avant envoi), installe gitleaks dans `~/.local/bin` et la version de Node attendue. Chaque pull request passe les vérifications automatiques (`.github/workflows/checks.yml` : types, lint, formatage, notices SPDX, tests, licences, assemblage de l'appli, secrets, audit des dépendances, montée de version, tests des scripts du dépôt) ; `main` refuse la fusion tant qu'elles ne sont pas vertes (l'audit des dépendances ne bloque que si la pull request touche les fichiers de paquets). Méthode et conventions : [`docs/METHOD.md`](docs/METHOD.md), [`docs/CONVENTIONS.md`](docs/CONVENTIONS.md).
+After cloning: `tools/dev/setup.sh` enables the project's git hooks (commit format, secret scanning, checks before push), installs gitleaks in `~/.local/bin` and the expected Node version. Every pull request goes through the automatic checks (`.github/workflows/checks.yml`: types, lint, formatting, SPDX notices, tests, licences, app bundling, secrets, dependency audit, version bump, tests of the repository scripts); `main` refuses the merge until they are green (the dependency audit only blocks if the pull request touches the package files). Method and conventions: [`docs/METHOD.md`](docs/METHOD.md), [`docs/CONVENTIONS.md`](docs/CONVENTIONS.md).
 
 ## Licence
 
 Copyright (C) 2026 Torof.
 
-Flâne est un logiciel libre, distribué sous la licence GNU Affero General Public License, version 3 ou ultérieure (AGPL-3.0-or-later). Voir [`LICENSE`](LICENSE). Le nom « Flâne » n'est pas couvert par cette licence.
+Flâne is free software, distributed under the GNU Affero General Public License, version 3 or later (AGPL-3.0-or-later). See [`LICENSE`](LICENSE). The name « Flâne » is not covered by this licence.
 
-Données cartographiques © les contributeurs d'OpenStreetMap, sous licence ODbL.
+Map data © OpenStreetMap contributors, under the ODbL licence.
 
-Projet en construction.
+Project under construction.

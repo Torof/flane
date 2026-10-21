@@ -16,7 +16,7 @@ on:
   push:
     branches: [main]
   schedule:
-    - cron: '17 6 * * 1' # chaque lundi : deps-check sur main entre deux pull requests
+    - cron: '17 6 * * 1' # every Monday: deps-check on main between two pull requests
 
 permissions:
   contents: read
@@ -93,14 +93,14 @@ jobs:
             case "$pair" in *=failure) failed="${pair%=*}" ;; esac
           done
           if [ -z "$failed" ]; then
-            echo "## app-check : vert" >> "$GITHUB_STEP_SUMMARY"
+            echo "## app-check: green" >> "$GITHUB_STEP_SUMMARY"
             exit 0
           fi
           {
-            echo "## app-check : ROUGE, étape « $failed »"
+            echo "## app-check: RED, step « $failed »"
             echo
-            echo "Lire : \`gh run view $GITHUB_RUN_ID --log-failed | grep -vE '^\s*$' | head -n 30\`"
-            echo "Rejouer en local : \`cd app && npm run check && npm run licenses\`."
+            echo "Read: \`gh run view $GITHUB_RUN_ID --log-failed | grep -vE '^\s*$' | head -n 30\`"
+            echo "Replay locally: \`cd app && npm run check && npm run licenses\`."
           } >> "$GITHUB_STEP_SUMMARY"
 
   secrets-check:
@@ -118,18 +118,18 @@ jobs:
         run: |
           set -euo pipefail
           if [ -e .gitleaks.toml ] || [ -e .gitleaksignore ]; then
-            echo "## secrets-check : ROUGE, configuration gitleaks fournie par le dépôt (.gitleaks.toml ou .gitleaksignore)" >> "$GITHUB_STEP_SUMMARY"
+            echo "## secrets-check: RED, gitleaks configuration provided by the repository (.gitleaks.toml or .gitleaksignore)" >> "$GITHUB_STEP_SUMMARY"
             exit 1
           fi
-          # Lignes ajoutées par la pull request, comme le hook pre-commit. Le diff va
-          # dans un fichier avant le grep : un grep -q sur un tube sous pipefail
-          # ferait échouer l'amont (SIGPIPE) et masquerait la correspondance.
-          # Le motif est coupé en deux pour que ce fichier ne se détecte pas lui-même.
+          # Lines added by the pull request, as in the pre-commit hook. The diff goes
+          # to a file before the grep: a grep -q on a pipe under pipefail would make
+          # the upstream command fail (SIGPIPE) and hide the match.
+          # The pattern is split in two so that this file does not detect itself.
           if [ "$GITHUB_EVENT_NAME" = "pull_request" ]; then
             added="$(mktemp)"
             git diff -U0 "$BASE_SHA...HEAD" | grep '^+' | grep -v '^+++' > "$added" || true
             if grep -q 'gitleaks:''allow' "$added"; then
-              echo "## secrets-check : ROUGE, annotation d'exception gitleaks ajoutée (une exception se consigne dans le journal)" >> "$GITHUB_STEP_SUMMARY"
+              echo "## secrets-check: RED, gitleaks exception annotation added (an exception is recorded in the journal)" >> "$GITHUB_STEP_SUMMARY"
               exit 1
             fi
           fi
@@ -152,14 +152,14 @@ jobs:
             --exit-code 1 --report-format json --report-path "$report" >"$log" 2>&1
           rc=$?
           if [ "$rc" -eq 0 ]; then
-            echo "## secrets-check : vert" >> "$GITHUB_STEP_SUMMARY"
+            echo "## secrets-check: green" >> "$GITHUB_STEP_SUMMARY"
             rm -f "$report" "$log"
             exit 0
           fi
           {
-            echo "## secrets-check : ROUGE, secret détecté ou gitleaks en erreur (code $rc)"
+            echo "## secrets-check: RED, secret detected or gitleaks error (code $rc)"
             echo
-            # Règle, fichier, ligne et commit : jamais la valeur.
+            # Rule, file, line and commit: never the value.
             python3 -I - "$report" <<'PY'
           import json, sys
           try:
@@ -168,9 +168,9 @@ jobs:
           except Exception:
               results = []
           for r in results[:30]:
-              print(f"- règle {r.get('RuleID', '?')}, fichier {r.get('File', '?')}, ligne {r.get('StartLine', '?')}, commit {str(r.get('Commit', '?'))[:8]}")
+              print(f"- rule {r.get('RuleID', '?')}, file {r.get('File', '?')}, line {r.get('StartLine', '?')}, commit {str(r.get('Commit', '?'))[:8]}")
           if not results:
-              print("Aucun résultat exploitable : gitleaks a échoué. Dernières lignes de sa sortie (expurgée) :")
+              print("No usable result: gitleaks failed. Last lines of its output (redacted):")
           PY
             if [ ! -s "$report" ] || [ "$(tr -d '[:space:]' < "$report")" = "[]" ]; then
               echo '```'
@@ -178,7 +178,7 @@ jobs:
               echo '```'
             fi
             echo
-            echo "Retirer le secret et le révoquer s'il est réel. Aucune exception gitleaks : une exception se consigne dans le journal."
+            echo "Remove the secret and revoke it if it is real. No gitleaks exception: an exception is recorded in the journal."
           } >> "$GITHUB_STEP_SUMMARY"
           rm -f "$report" "$log"
           exit 1
@@ -202,8 +202,8 @@ jobs:
         name: Decide whether a red audit blocks this run
         run: |
           set -euo pipefail
-          # Sur main et le lundi : toujours. Sur une pull request : seulement si
-          # elle touche les fichiers de paquets (docs/CONVENTIONS.md).
+          # On main and on Mondays: always. On a pull request: only if it
+          # touches the package files (docs/CONVENTIONS.md).
           if [ "$GITHUB_EVENT_NAME" != "pull_request" ]; then
             blocking=true
           elif [ -n "$(git diff --name-only "$BASE_SHA...HEAD" -- app/package.json app/package-lock.json)" ]; then
@@ -215,8 +215,8 @@ jobs:
           echo "blocking=$blocking"
       - name: npm audit of production dependencies (reads the lockfile, no install)
         working-directory: app
-        # npm audit sort en 1 dès qu'il y a une alerte : c'est audit.mjs qui juge,
-        # et il sort en 2 si le JSON est une erreur du registre ou vide.
+        # npm audit exits with 1 as soon as there is an advisory: audit.mjs is the judge,
+        # and it exits with 2 if the JSON is a registry error or empty.
         run: npm audit --omit=dev --json > "$RUNNER_TEMP/audit.json" || true
       - name: Compare with accepted advisories
         env:
@@ -229,7 +229,7 @@ jobs:
           if [ "$rc" -ne 0 ] && [ "$BLOCKING" != "true" ]; then
             {
               echo
-              echo "_Informatif : cette pull request ne touche ni \`app/package.json\` ni \`app/package-lock.json\` ; ce rouge ne la bloque pas (\`docs/CONVENTIONS.md\`). À corriger dans une tranche de dépendances._"
+              echo "_For information: this pull request touches neither \`app/package.json\` nor \`app/package-lock.json\`; this red does not block it (\`docs/CONVENTIONS.md\`). To fix in a dependencies slice._"
             } >> "$GITHUB_STEP_SUMMARY"
             exit 0
           fi

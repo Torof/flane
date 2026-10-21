@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: AGPL-3.0-or-later
-# Hook pre-commit Flâne : recherche de secrets dans les fichiers indexés avec
-# gitleaks (version épinglée dans tools/dev/gitleaks.env). En cas de doute, on
-# refuse : gitleaks absent ou en erreur = commit refusé. Le secret lui-même
-# n'est jamais affiché.
+# Flâne pre-commit hook: searches the staged files for secrets with gitleaks
+# (version pinned in tools/dev/gitleaks.env). When in doubt, it refuses:
+# gitleaks missing or in error = commit refused. The secret itself is never
+# displayed.
 set -u
 
 root="$(git rev-parse --show-toplevel 2>/dev/null)" || {
-  echo "pre-commit : pas dans un dépôt git. Commit refusé." >&2
+  echo "pre-commit: not in a git repository. Commit refused." >&2
   exit 1
 }
 cd "$root" || exit 1
@@ -17,7 +17,7 @@ GITLEAKS_VERSION=""
 . tools/dev/gitleaks.env 2>/dev/null
 EXPECTED_VERSION="$GITLEAKS_VERSION"
 if [ -z "$EXPECTED_VERSION" ]; then
-  echo "pre-commit : tools/dev/gitleaks.env illisible ou sans GITLEAKS_VERSION. Commit refusé." >&2
+  echo "pre-commit: tools/dev/gitleaks.env unreadable or without GITLEAKS_VERSION. Commit refused." >&2
   exit 1
 fi
 
@@ -32,29 +32,29 @@ find_gitleaks() {
 gitleaks_bin="$(find_gitleaks)"
 if [ -z "$gitleaks_bin" ]; then
   cat >&2 <<EOF
-pre-commit : gitleaks introuvable (ni dans le PATH, ni dans ~/.local/bin).
-  Lancer tools/dev/setup.sh pour l'installer (version $EXPECTED_VERSION, somme de contrôle vérifiée).
-  Commit refusé : la recherche de secrets est obligatoire.
+pre-commit: gitleaks not found (neither in the PATH nor in ~/.local/bin).
+  Run tools/dev/setup.sh to install it (version $EXPECTED_VERSION, checksum verified).
+  Commit refused: the secret search is mandatory.
 EOF
   exit 1
 fi
 
 version="$("$gitleaks_bin" version 2>/dev/null | tr -d '[:space:]' | sed 's/^v//')"
 if [ "$version" != "$EXPECTED_VERSION" ]; then
-  echo "pre-commit : gitleaks $version détecté, $EXPECTED_VERSION attendue (avertissement, voir tools/dev/setup.sh)." >&2
+  echo "pre-commit: gitleaks $version found, $EXPECTED_VERSION expected (warning, see tools/dev/setup.sh)." >&2
 fi
 
-# Une configuration gitleaks fournie par le dépôt neutraliserait la recherche :
-# refusée, qu'elle soit indexée ou déjà présente. Une exception se discute et se
-# consigne dans le journal ; elle ne se glisse pas dans un commit.
+# A gitleaks configuration provided by the repository would neutralise the search:
+# refused, whether staged or already present. An exception is discussed and
+# recorded in the journal; it does not slip into a commit.
 staged="$(git diff --cached --name-only --diff-filter=ACMR)"
 if printf '%s\n' "$staged" | grep -Eq '(^|/)\.gitleaks(\.toml|ignore)$' \
   || [ -e .gitleaks.toml ] || [ -e .gitleaksignore ]; then
-  echo "pre-commit : configuration gitleaks fournie par le dépôt (.gitleaks.toml ou .gitleaksignore). Commit refusé." >&2
+  echo "pre-commit: gitleaks configuration provided by the repository (.gitleaks.toml or .gitleaksignore). Commit refused." >&2
   exit 1
 fi
 if git diff --cached -U0 | grep '^+' | grep -v '^+++' | grep -q 'gitleaks:''allow'; then
-  echo "pre-commit : annotation d'exception gitleaks dans le code. Commit refusé : une exception se consigne dans le journal, pas dans le code." >&2
+  echo "pre-commit: gitleaks exception annotation in the code. Commit refused: an exception is recorded in the journal, not in the code." >&2
   exit 1
 fi
 
@@ -70,8 +70,8 @@ if [ "$rc" -eq 0 ]; then
   exit 0
 fi
 
-# Rapport non vide : des secrets ont été trouvés. Afficher la règle, le fichier
-# et la ligne, jamais la valeur.
+# Non-empty report: secrets were found. Show the rule, the file and the line,
+# never the value.
 if [ -s "$report" ] && command -v python3 >/dev/null 2>&1; then
   findings="$(python3 -I - "$report" <<'PY'
 import json, sys
@@ -81,20 +81,20 @@ try:
 except Exception:
     results = []
 for r in results:
-    print(f"  règle {r.get('RuleID', '?')}, fichier {r.get('File', '?')}, ligne {r.get('StartLine', '?')}")
+    print(f"  rule {r.get('RuleID', '?')}, file {r.get('File', '?')}, line {r.get('StartLine', '?')}")
 PY
 )"
   if [ -n "$findings" ]; then
     cat >&2 <<EOF
-pre-commit : secret détecté, commit refusé.
+pre-commit: secret detected, commit refused.
 $findings
-  Retirer le secret du fichier (et le révoquer s'il est réel). Aucune exception
-  gitleaks : une exception se discute et se consigne dans le journal.
+  Remove the secret from the file (and revoke it if it is real). No gitleaks
+  exception: an exception is discussed and recorded in the journal.
 EOF
     exit 1
   fi
 fi
 
-echo "pre-commit : gitleaks a échoué (code $rc) sans résultat exploitable : doute, commit refusé." >&2
+echo "pre-commit: gitleaks failed (code $rc) without a usable result: in doubt, commit refused." >&2
 tail -n 5 "$log" >&2 || true
 exit 1

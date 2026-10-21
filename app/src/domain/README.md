@@ -1,1 +1,1 @@
-Modèle de données (Trip, Stop, Place, StopRequest…), sans dépendance à l'interface ni à la plateforme. Naît en T2.1.
+Data model (Trip, Stop, Place, StopRequest…), with no dependency on the interface or the platform. Born in T2.1.

@@ -1,105 +1,105 @@
 # Flâne — Vision
 
-**Le compagnon de route qui te souffle où t'arrêter, pour faire du trajet une partie du voyage.**
+**The travel companion that whispers where to stop, to make the trip part of the journey.**
 
-## Le constat
+## The observation
 
-On vit nos trajets comme un tunnel : un point A, un point B, et rien entre les deux. On avale un sandwich d'aire d'autoroute au volant, pendant que défilent des villages, des rivières et des points de vue qu'on ne verra jamais. Ce n'est pas l'information qui manque. Ce qui manque, c'est la *permission* de s'arrêter, et quelqu'un qui sache où ça vaut le coup.
+We live our trips like a tunnel: a point A, a point B, and nothing in between. We wolf down a motorway service-area sandwich at the wheel, while villages, rivers and viewpoints we will never see roll past. Information is not what is missing. What is missing is the *permission* to stop, and someone who knows where it is worth it.
 
-## Ce que fait Flâne
+## What Flâne does
 
-Flâne propose les bons arrêts sur ton trajet, selon tes envies réelles : manger ton pique-nique sur une table face à la vue, trouver une vraie boulangerie de village à 3 km de ta route, promener tes chiens au bord d'une rivière, te rafraîchir quand il fait chaud. Elle ne remplace pas ton GPS : elle trouve l'arrêt, puis ouvre Google Maps ou Waze pour t'y guider.
+Flâne suggests the right stops on your trip, based on what you really feel like: eating your picnic at a table facing the view, finding a real village bakery 3 km from your route, walking your dogs by a river, cooling off when it is hot. It does not replace your GPS: it finds the stop, then opens Google Maps or Waze to guide you there.
 
-## Comment ça marche
+## How it works
 
-Deux façons d'utiliser Flâne, **séparément ou ensemble** :
+Two ways to use Flâne, **separately or together**:
 
-- **Avant de partir** : tu traces ton trajet, ou tu l'importes depuis Google Maps. Tu indiques en quelques secondes quand tu veux manger ou faire une pause, et Flâne construit un trajet jalonné de belles haltes. Tes préférences (chiens, pique-nique, pas d'aires d'autoroute, détour maximum) sont enregistrées une fois pour toutes.
-- **En route** : Flâne te glisse des suggestions au bon moment, comme un ami passager qui connaît la région : « Dans 25 km, un petit village avec une superbe boulangerie. » Elle s'adapte toute seule à ce qu'elle sait. Si elle connaît ta route, elle regarde loin devant ; si tu fais un détour ou flânes sans but, elle regarde autour de toi.
+- **Before leaving**: you draw your trip, or import it from Google Maps. In a few seconds you say when you want to eat or take a break, and Flâne builds a trip dotted with lovely stops. Your preferences (dogs, picnic, no motorway service areas, maximum detour) are saved once and for all.
+- **On the road**: Flâne slips you suggestions at the right moment, like a passenger friend who knows the area: « Dans 25 km, un petit village avec une superbe boulangerie. » It adapts on its own to what it knows. If it knows your route, it looks far ahead; if you take a detour or wander aimlessly, it looks around you.
 
-Les deux se complètent : un trajet préparé à l'avance reste vivant une fois sur la route. Et si tu n'as rien préparé, tu peux partir à l'improviste, Flâne t'accompagne quand même.
+The two complement each other: a trip prepared in advance stays alive once on the road. And if you prepared nothing, you can set off on a whim, Flâne still comes along.
 
-## Pourquoi c'est différent
+## Why it is different
 
-- **Elle optimise pour le plus riche, pas pour le plus rapide.** Dix minutes de détour pour un vrai souvenir.
-- **Elle répond à des envies que personne ne sait formuler ailleurs**, liées à l'instant, à la météo, à qui est dans la voiture.
-- **Elle apaise au lieu de solliciter** : peu de suggestions, mais justes.
+- **It optimises for the richest, not the fastest.** Ten minutes of detour for a real memory.
+- **It answers wishes nobody knows how to express elsewhere**, tied to the moment, the weather, who is in the car.
+- **It soothes instead of nagging**: few suggestions, but the right ones.
 
-## Utile, jamais envahissante
+## Useful, never intrusive
 
-- **Peu, mais juste.** Une bonne suggestion plutôt que dix moyennes ; Flâne apprend de tes réponses.
-- **Elle ne te déconcentre pas.** Ses suggestions se lisent d'un coup d'œil ou s'écoutent, et arrivent au bon moment.
-- **Ta vie privée reste au centre.** Ta position sert à te suggérer des arrêts, rien d'autre. Les suggestions sont calculées sur ton téléphone ; seuls le départ et l'arrivée servent à calculer l'itinéraire. Rien n'est revendu ni exploité à d'autres fins.
-- **C'est toi qui règles** : suggestions spontanées ou non, fréquence, ce que tu acceptes de partager.
+- **Few, but right.** One good suggestion rather than ten average ones; Flâne learns from your answers.
+- **It does not distract you.** Its suggestions can be read at a glance or listened to, and arrive at the right moment.
+- **Your privacy stays at the centre.** Your position is used to suggest stops, nothing else. Suggestions are computed on your phone; only the start and the destination are used to compute the route. Nothing is sold or exploited for other purposes.
+- **You are in control**: spontaneous suggestions or not, frequency, what you agree to share.
 
-## D'où viennent les lieux
+## Where the places come from
 
-- **Un socle ouvert et gratuit** : OpenStreetMap et DATAtourisme (la base nationale des données touristiques).
-- **Les flâneurs**, qui jugent ce qui vaut vraiment le détour (étape 2).
-- **Les professionnels** (commerces, offices de tourisme), qui renseignent eux-mêmes leurs lieux, avec une mention claire (plus tard).
+- **An open and free foundation**: OpenStreetMap and DATAtourisme (the national database of tourism data).
+- **The flâneurs**, who judge what is truly worth the detour (stage 2).
+- **Professionals** (shops, tourist offices), who fill in their own places, with a clear label (later).
 
-Google n'est utilisé qu'en renvoi, pour consulter la fiche d'un lieu.
+Google is only used as a referral, to look at a place's page.
 
-## Le cadre
+## The framework
 
-**Ce qu'on veut**
-- Faire du trajet une partie du voyage.
-- Des suggestions justes plutôt que nombreuses.
-- Une appli simple, qui se fait oublier quand on n'en a pas besoin.
+**What we want**
+- Make the trip part of the journey.
+- Right suggestions rather than many.
+- A simple app, which makes itself forgotten when you don't need it.
 
-**Ce qu'on ne fait pas**
-- Pas de GPS : la navigation est confiée à Google Maps et Waze.
-- Pas de réseau social : ni fil d'actualité, ni abonnés, ni likes.
-- Pas de réservation ni de vente dans l'appli.
-- Pas de mécaniques addictives : ni séries, ni badges, ni pression à revenir.
+**What we don't do**
+- No GPS: navigation is left to Google Maps and Waze.
+- No social network: no feed, no followers, no likes.
+- No booking or selling in the app.
+- No addictive mechanics: no streaks, no badges, no pressure to come back.
 
-**Les limites éthiques**
-- **Vie privée** : collecter le minimum, traiter sur le téléphone, ne jamais revendre.
-- **Sécurité routière** : aucune interaction exigée en conduisant, pas de suggestion en pleine manœuvre.
-- **Honnêteté** : le sponsorisé et les infos fournies par les pros sont toujours clairement identifiés.
-- **Respect des lieux** : ne pas mettre en avant les lieux fragiles, et répartir les suggestions plutôt que d'envoyer tout le monde au même endroit.
+**The ethical limits**
+- **Privacy**: collect the minimum, process on the phone, never sell.
+- **Road safety**: no interaction required while driving, no suggestion in the middle of a manoeuvre.
+- **Honesty**: sponsored content and information provided by professionals are always clearly identified.
+- **Respect for places**: do not promote fragile places, and spread suggestions rather than sending everyone to the same spot.
 
-## En route et à l'arrêt
+## On the move and stopped
 
-La règle : **en route, Flâne parle peu ; à l'arrêt, elle montre tout.**
+The rule: **on the move, Flâne speaks little; when stopped, it shows everything.**
 
-- **À l'arrêt** (ou avant de partir) : étoiles, étiquettes, commentaires, photos, liste complète.
-- **En mouvement** : une phrase courte et une distance, une ou deux étiquettes au maximum (celles qui correspondent à tes critères), deux gros boutons (« On y va », « Pas maintenant »), et la voix.
-- **Le bon moment** : annoncer tôt, se taire en ville, sur un échangeur ou avant une sortie, espacer les suggestions.
+- **When stopped** (or before leaving): stars, tags, comments, photos, full list.
+- **On the move**: one short sentence and a distance, one or two tags at most (those matching your criteria), two big buttons (« On y va », « Pas maintenant »), and the voice.
+- **The right moment**: announce early, stay quiet in town, on an interchange or before an exit, space out suggestions.
 
-**Ce que Flâne sait de ta route.** Elle utilise le meilleur niveau disponible et bascule toute seule :
-1. Trajet planifié dans Flâne : suggestions précises, loin devant.
-2. Trajet importé depuis Google Maps : pareil, après recalcul.
-3. Destination seule : Flâne calcule une route probable.
-4. Rien : mode découverte « autour de moi », plus court et plus prudent.
+**What Flâne knows about your route.** It uses the best level available and switches on its own:
+1. Trip planned in Flâne: precise suggestions, far ahead.
+2. Trip imported from Google Maps: same, after recalculation.
+3. Destination only: Flâne computes a likely route.
+4. Nothing: « autour de moi » discovery mode, shorter and more cautious.
 
-Les bascules restent invisibles ; seule la formulation change (« Sur ta route, dans 25 km… » ou « Tout près d'ici… »), avec un indicateur discret. Flâne ne pose une question que si elle l'aide vraiment : « On reprend vers Montpellier ? »
+The switches stay invisible; only the wording changes (« Sur ta route, dans 25 km… » or « Tout près d'ici… »), with a discreet indicator. Flâne only asks a question if it really helps: « On reprend vers Montpellier ? »
 
-## Juger un lieu : des paliers de sources
+## Judging a place: source tiers
 
-Flâne utilise, lieu par lieu, la meilleure source disponible :
-1. Les avis des flâneurs.
-2. Tes propres notes.
-3. Des règles simples : présent dans DATAtourisme, village labellisé, lieu nommé.
-4. OSM brut.
+Flâne uses, place by place, the best source available:
+1. The flâneurs' reviews.
+2. Your own ratings.
+3. Simple rules: present in DATAtourisme, labelled village, named place.
+4. Raw OSM.
 
-**Le ton suit la confiance** : « Il y a un point de vue à 10 minutes » tant que rien n'est validé ; « un point de vue que les gens adorent » une fois qu'il l'est.
+**The tone follows confidence**: « Il y a un point de vue à 10 minutes » as long as nothing is validated; « un point de vue que les gens adorent » once it is.
 
-## Les avis des flâneurs (étape 2)
+## The flâneurs' reviews (stage 2)
 
-- Des étoiles qui répondent à une question claire : « Est-ce que ça valait le détour ? »
-- Un commentaire court, facultatif.
-- Des étiquettes factuelles, d'une touche : ombragé, table de pique-nique, chiens bienvenus, baignade possible, calme, parking facile, lieu fragile.
-- Garde-fous : on ne note que si on s'y est arrêté (vérifié sur le téléphone), avis datés, pas de profils à suivre ni de classement.
+- Stars that answer a clear question: « Est-ce que ça valait le détour ? »
+- A short, optional comment.
+- Factual tags, one tap each: shaded, picnic table, dogs welcome, swimming possible, quiet, easy parking, fragile place.
+- Guardrails: you can only rate if you stopped there (checked on the phone), dated reviews, no profiles to follow and no ranking.
 
-## Flâne partagée (étape 2)
+## Shared Flâne (stage 2)
 
-Une seule appli, deux vues : chacun choisit s'il est **conducteur** (vue minimale) ou **passager** (appli complète). Le trajet est partagé entre les téléphones de la voiture ; une modification est envoyée à l'autre, sans synchronisation continue. Confiance par défaut, mais le conducteur est toujours prévenu et peut annuler. Sans réseau, la modification attend. Le partage est éphémère.
+One single app, two views: everyone chooses whether they are **driver** (minimal view) or **passenger** (full app). The trip is shared between the phones in the car; a change is sent to the other, without continuous sync. Trust by default, but the driver is always notified and can cancel. Without network, the change waits. Sharing is ephemeral.
 
-## Les étapes
+## The stages
 
-1. **Flâne seule** : une version simple et solide, sur les données ouvertes. Mode planifié et mode en route.
-2. **Flâne communautaire et partagée** : avis, étiquettes, mode conducteur et passager.
-3. **Plus loin** : les professionnels, la réponse vocale puis une IA conversationnelle, CarPlay et Android Auto, le convoi, d'autres façons de voyager (vélo, moto, van), l'usage quotidien, d'autres pays.
+1. **Flâne alone**: a simple and solid version, on open data. Planned mode and on-the-road mode.
+2. **Community and shared Flâne**: reviews, tags, driver and passenger mode.
+3. **Further on**: professionals, voice reply then a conversational AI, CarPlay and Android Auto, convoys, other ways of travelling (bike, motorbike, van), everyday use, other countries.
 
-**Prévoir sans construire** : dès la première étape, le trajet est un objet à part entière, les modifications sont enregistrées comme de petites actions, l'affichage est séparé des données, tout marche sans réseau, et chaque lieu a un identifiant stable.
+**Plan ahead without building**: from the first stage, the trip is a full-fledged object, changes are recorded as small actions, display is separate from data, everything works without network, and every place has a stable identifier.

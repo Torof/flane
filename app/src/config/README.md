@@ -1,1 +1,1 @@
-Types d'arrêts et réglages. Naît en T1.1.
+Stop types and settings. Born in T1.1.

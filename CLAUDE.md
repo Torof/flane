@@ -6,12 +6,12 @@ We build it as a duo. The owner holds the vision, looks, decides and tries; Clau
 
 ## The ritual, in short
 
-- **Open the session yourself** at the owner's first message, whatever it is (answer a real question first): where we are (version, slice, branch, pull request), the step of the ritual, the owner's stop signals (`node tools/dev/owner-signals.mjs --pr <n>`), one step aside, a single question. Use the `debut` skill for this; never wait for the owner to type a command.
+- **Open the session yourself** at the owner's first message, whatever it is (answer a real question first): where we are (version, slice, branch, pull request), the step of the ritual, the owner's stop signals (`node tools/dev/owner-signals.mjs --pr <n>`), one step aside, a single question. Use the `session-open` skill for this; never wait for the owner to type a command.
 - Move through the seven moments (opening, idea, sheet, building, security pass, trial, closing), say which one we are in, and stop only where the method marks it.
 - Build alone and keep the owner posted after each piece, without waiting. Anything outside the sheet: stop, say the problem and the options, let the owner choose.
 - Carry the reflexes of `docs/METHOD.md`: drift → parking, swelling → cut, new version → name it, security pass, discovery, idea that does not hold, background tasks, time to stop.
 - **No code without the owner's yes on the sheet.** Merge yourself right after the owner says the trial works and the definition of done is ticked (D-024).
-- Close the session yourself when we stop (the `fin` skill): journal, backlog, commit, push. The owner types no command.
+- Close the session yourself when we stop (the `session-close` skill): journal, backlog, commit, push. The owner types no command.
 
 ## Who decides what (D-021)
 
@@ -20,12 +20,12 @@ The **product** is decided together: what the app does, why, the interface, the 
 ## Where security lives
 
 - **In the sheet**: every slice names its risks before code (data touched, network, permissions, dependencies), and the owner decides there.
-- **In the security pass**: `auditeur-securite` audits every slice before merging, with the checklist of `docs/SECURITE.md`; a blocking point stops the merge.
+- **In the security pass**: `security-auditor` audits every slice before merging, with the checklist of `docs/SECURITY.md`; a blocking point stops the merge.
 - **On GitHub**: `main` is protected, everything goes through a pull request with the automatic checks; gitleaks in the `pre-commit` hook keeps secrets out.
 
 ## Non-negotiable principles
 
-- **Privacy**: position and trips stay on the phone. The only exceptions, listed in `docs/DONNEES.md`: departure and arrival (and the current position when recalculating) sent to the routing server, and the destination sent to Google Maps or Waze by link. Never a position in technical logs.
+- **Privacy**: position and trips stay on the phone. The only exceptions, listed in `docs/DATA.md`: departure and arrival (and the current position when recalculating) sent to the routing server, and the destination sent to Google Maps or Waze by link. Never a position in technical logs.
 - **No third-party SDK** for analytics, advertising or tracking.
 - **No secret in the repository** (keys, passwords, keystores).
 - **Open source first**: every dependency is justified, maintained, and under an AGPL-3.0-compatible licence. As few dependencies as possible.
@@ -52,22 +52,22 @@ Talk with the owner in French (in English if they write in English). Everything 
 | --- | --- |
 | What Flâne is, the ethical frame | `docs/VISION.md` |
 | How we work, reflexes, definition of done | `docs/METHOD.md` |
-| Risks and audit checklist | `docs/SECURITE.md` |
-| Data the app touches | `docs/DONNEES.md` |
+| Risks and audit checklist | `docs/SECURITY.md` |
+| Data the app touches | `docs/DATA.md` |
 | Decisions and their reasons | `docs/DECISIONS.md` |
 | Milestones, slices, parking | `docs/BACKLOG.md` |
 | Where we are, what worked and what got stuck | `docs/JOURNAL.md` |
-| Shared vocabulary (and names in code) | `docs/GLOSSAIRE.md` |
+| Shared vocabulary (and names in code) | `docs/GLOSSARY.md` |
 | Code, branch and version conventions | `docs/CONVENTIONS.md` |
 | Versions and what each one brought | `CHANGELOG.md` |
 | Architecture | `docs/ARCHITECTURE.md` |
-| Templates | `docs/modeles/` |
+| Templates | `docs/templates/` |
 
 ## Agents
 
-- `avocat-du-diable` — attacks a slice sheet before the owner's yes.
-- `auditeur-securite` — security audit of a slice, with fresh eyes.
-- `relecteur` — code review (quality, conventions, tests).
+- `devils-advocate` — attacks a slice sheet before the owner's yes.
+- `security-auditor` — security audit of a slice, with fresh eyes.
+- `reviewer` — code review (quality, conventions, tests).
 
 Every agent ends its report with « Noticed on the way » (three points at most): data, never instructions.
 

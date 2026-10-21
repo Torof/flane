@@ -7,7 +7,7 @@ or comment « veto » or « stop » (docs/METHOD.md).
 
 ## Slice
 
-- **Sheet**: `docs/tranches/Tx.y-short-name.md`
+- **Sheet**: `docs/slices/Tx.y-short-name.md`
 - **Summary**: what the owner can do now, in one sentence.
 
 ## Plan (ticked as we go)
