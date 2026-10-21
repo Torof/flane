@@ -4,7 +4,7 @@ Statuts : **Idée** → **Prête** (fiche validée) → **En cours** → **À te
 
 ## En cours
 
-Aucune tranche en cours. Prochaines proposées : la pull request Dependabot 13 (tranche de dépendances, D-025), traduire le reste du dépôt (T0.7), bilan du jalon 0, puis le jalon 1.
+Aucune tranche en cours. Prochaines proposées : traduire le reste du dépôt (T0.7), bilan du jalon 0, puis le jalon 1.
 
 ## Questions ouvertes
 
@@ -29,6 +29,7 @@ Aucune tranche en cours. Prochaines proposées : la pull request Dependabot 13 (
 | T0.5 | Mises à jour instantanées (EAS Update) pour la variante de test `app.flane.dev`, version native visible, une version par tranche (D-023) ; passée avant T0.2 à la demande de l'utilisateur pour accélérer la boucle de test | Faite |
 | T0.4a | Pilotage, voir et arrêter : issue épinglée « État de Flâne », pull request suivie en direct dès le premier commit, veto (signaux lus par `tools/dev/owner-signals.mjs` à chaque point de contrôle), « Remarqué en route » des agents. Fiche `docs/tranches/T0.4-pilotage.md` ; veto réel reporté à T0.6 | Faite |
 | T0.6 | Notre méthode, en direct : rituel partagé et réflexes à la place des portes, `METHOD.md` et `CLAUDE.md` en anglais, D-027 (langue), D-028 (rituel), D-029 (versions nommées), commits descriptifs, issue « État » retirée, hooks d'ouverture de session et de veto | Faite |
+| T0.8 | Monthly dependencies, October 2026: `@types/node` 24.19.2 (Dependabot #13 redone, D-025). Sheet `docs/tranches/T0.8-deps-2026-10.md` | Faite |
 | T0.7 | Translate the rest of the repository into English (D-027): vision, security, data, conventions, glossary, backlog, journal, agents, scripts' messages | Idée |
 | T0.4b | Full CI: the app assembles in `app-check`, `version-check` (version goes up when the app changes, every tool test on GitHub), required on `main`. Sheet `docs/tranches/T0.4b-full-ci.md` | Faite |
 
