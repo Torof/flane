@@ -16,6 +16,8 @@ Lu au début de chaque session (`/debut`), complété à la fin (`/fin`). Les en
 - Fiche `docs/tranches/T0.4-pilotage.md` rédigée, attaquée par l'avocat du diable (14 objections, 3 bloquantes sur le veto : Claude poste avec le compte de l'utilisateur, lecture des commentaires incomplète, rien relu avant la fusion). Toutes retenues ; proposé : issue épinglée « État de Flâne », signaux de veto (fermer la pull request, la repasser en brouillon, commentaire « veto »/« stop »), points de contrôle avant commit, push, agent, publication, compilation et fusion, découpage en T0.4a (voir et arrêter) et T0.4b (vérifications, fiche courte).
 - Indiqué à l'utilisateur comment retirer la règle `ask` sur `gh pr merge` de `.claude/settings.json` ; il le fera lui-même.
 
+- Porte Observer de T0.2 passée : l'utilisateur a constaté la pull request 12 rouge et sa fusion bloquée. Fiche et backlog passés à « Faite », pull request 11 fusionnée par Claude (D-024), pull request 12 fermée.
+
 **Décisions** : D-026 (versions sans étiquettes ni historique des versions).
 
 **Exceptions à la méthode**
