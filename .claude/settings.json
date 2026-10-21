@@ -34,7 +34,6 @@
       "Bash(chmod *)"
     ],
     "ask": [
-      "Bash(gh pr merge *)",
       "Bash(git push --force*)",
       "Bash(git push -f*)",
       "Bash(rm -rf *)",
