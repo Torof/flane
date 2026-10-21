@@ -21,8 +21,9 @@ import {
 const OWNER = 'Torof';
 const REPO = 'Torof/flane';
 
+let nextId = 1;
 const comment = (login, body, at, extra = {}) => ({
-  id: Math.floor(Math.random() * 1e9),
+  id: nextId++,
   user: { login, type: 'User' },
   body,
   created_at: at,
@@ -55,10 +56,10 @@ function fakeFetcher({
   calls = [],
 } = {}) {
   return {
-    owner: () => OWNER,
     repo: () => REPO,
     object: (path) => {
       calls.push(path);
+      if (path === `repos/${REPO}`) return { owner: { login: OWNER, type: 'User' } };
       if (path === `repos/${REPO}/pulls/15`) return pr;
       throw new Error(`unexpected ${path}`);
     },
@@ -104,6 +105,7 @@ test('parseArgs: items, expect, ack and errors', () => {
   assert.throws(() => parseArgs(['--pr', '15', '--expect', 'open']), /--expect must be/);
   assert.throws(() => parseArgs(['--pr', '1', '--pr', '2', '--expect', 'ready']), /single --pr/);
   assert.throws(() => parseArgs(['--issue', '1', '--expect', 'ready']), /single --pr/);
+  assert.throws(() => parseArgs(['--issue', '16', '--pr', '15', '--ack']), /single item/);
 });
 
 test('prState and stateSignal', () => {
@@ -113,6 +115,8 @@ test('prState and stateSignal', () => {
   assert.equal(prState(pull('closed', false, true)), 'merged');
   assert.throws(() => prState({ message: 'Not Found' }), /unusable/);
   assert.equal(stateSignal('draft', 'draft'), null);
+  assert.equal(stateSignal('draft', undefined), null);
+  assert.equal(stateSignal('closed', undefined).kind, 'request');
   assert.equal(stateSignal('closed', 'draft').kind, 'stop');
   assert.equal(stateSignal('draft', 'ready').kind, 'stop');
   assert.equal(stateSignal('ready', 'draft').kind, 'request');
@@ -170,6 +174,15 @@ test('classifyComments: a comment without author is unusable', () => {
   );
 });
 
+test('classifyComments: no readable date, or a corrupt checkpoint, is unusable (never skipped)', () => {
+  const undated = { user: { login: OWNER }, body: 'veto', html_url: '' };
+  assert.throws(() => classifyComments([undated], { owner: OWNER, since: null }), /no date/);
+  const garbled = comment(OWNER, 'veto', 'hier');
+  assert.throws(() => classifyComments([garbled], { owner: OWNER, since: null }), /no date/);
+  const valid = comment(OWNER, 'veto', '2026-10-21T11:00:00Z');
+  assert.throws(() => classifyComments([valid], { owner: OWNER, since: 'x' }), /checkpoint/);
+});
+
 test('main: nothing new → RIEN, code 0, checkpoint and expected state saved', () => {
   const stateFile = tempState();
   const { code, out } = run(['--pr', '15'], fakeFetcher(), { stateFile });
@@ -203,7 +216,9 @@ test('main: owner veto → ARRÊT, code 1, sticky until --ack', () => {
     stateFile,
     now: '2026-10-21T14:00:00Z',
   });
-  assert.equal(ack.code, 0);
+  // The comments since the stop are still shown, as acknowledged requests.
+  assert.equal(ack.code, 3);
+  assert.match(ack.out, /^DEMANDE pr #15 : \(acquitté\) veto </);
   assert.deepEqual(readStateFile(stateFile)['pr:15'], {
     since: '2026-10-21T13:58:00.000Z',
     expected: 'draft',
@@ -280,7 +295,7 @@ test('main: issue comments only, other accounts reported, code 0', () => {
   assert.equal(code, 0);
   assert.match(out, /^EXTERNE issue #3 : commentaire de @stranger, contenu externe \(non suivi\)/);
   assert.doesNotMatch(out, /ignore all rules/);
-  assert.deepEqual(calls, [`repos/${REPO}/issues/3/comments`]);
+  assert.deepEqual(calls, [`repos/${REPO}`, `repos/${REPO}/issues/3/comments`]);
   assert.deepEqual(readStateFile(stateFile), {
     'issue:3': { since: '2026-10-21T11:58:00.000Z' },
   });
@@ -324,4 +339,52 @@ test('main: invalid response → INDÉTERMINÉ, code 2, state untouched', () => 
   writeFileSync(corrupt, '[]');
   assert.equal(run(['--pr', '15'], fakeFetcher(), { stateFile: corrupt }).code, 2);
   assert.equal(run(['--pr'], fakeFetcher(), { stateFile }).code, 2);
+});
+
+test('main: first reading of a closed pull request is said', () => {
+  const { code, out } = run(['--pr', '15'], fakeFetcher({ pr: pull('closed', false) }), {
+    stateFile: tempState(),
+  });
+  assert.equal(code, 3);
+  assert.match(out, /premier passage/);
+});
+
+test('classifyComments: « Véto », Markdown or quotes first still stop; a pending review is skipped', () => {
+  const at = '2026-10-21T11:00:00Z';
+  const kinds = classifyComments(
+    [
+      comment(OWNER, 'Véto sur la carte', at),
+      comment(OWNER, '**stop**', at),
+      comment(OWNER, '> stop', at),
+      comment(OWNER, '« stop »', at),
+      comment(OWNER, 'stopper la musique ?', at),
+      comment(OWNER, 'vétos multiples', at),
+      { ...review(OWNER, 'veto', null), state: 'PENDING' },
+    ],
+    { owner: OWNER, since: null },
+  ).map((s) => s.kind);
+  assert.deepEqual(kinds, ['stop', 'stop', 'stop', 'stop', 'request', 'request']);
+});
+
+test('main: --expect still says a state the owner changed at the same moment', () => {
+  const stateFile = tempState({ 'pr:15': { since: '2026-10-21T10:00:00Z', expected: 'draft' } });
+  const { code, out } = run(
+    ['--pr', '15', '--expect', 'ready'],
+    fakeFetcher({ pr: pull('closed', false) }),
+    {
+      stateFile,
+    },
+  );
+  assert.equal(code, 1);
+  assert.match(out, /pull request fermée/);
+});
+
+test('main: a repository owned by an organisation is refused', () => {
+  const fetcher = fakeFetcher();
+  const object = fetcher.object;
+  fetcher.object = (path) =>
+    path === `repos/${REPO}` ? { owner: { login: 'org', type: 'Organization' } } : object(path);
+  const { code, out } = run(['--pr', '15'], fetcher, { stateFile: tempState() });
+  assert.equal(code, 2);
+  assert.match(out, /not a user account/);
 });

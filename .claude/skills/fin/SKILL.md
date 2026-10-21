@@ -6,7 +6,7 @@ disable-model-invocation: true
 
 # Clore une session Flâne
 
-1. **Collecte** (sans la rédiger à la main) : `node tools/dev/owner-signals.mjs` sur la pull request en cours et l'issue « État de Flâne » (#16), `gh run list --limit 3`, `gh pr list`, alertes Dependabot comme dans `/debut`. Si le jeton `gh` ne lit pas les alertes, le dire dans l'issue.
+1. **Collecte** (sans la rédiger à la main) : `node tools/dev/owner-signals.mjs --pr <n> --issue 16` (pull request en cours et issue « État de Flâne »), `gh run list --limit 3`, `gh pr list`, alertes Dependabot comme dans `/debut`. Si le jeton `gh` ne lit pas les alertes, le dire dans l'issue.
 2. **Tri des remarques** de la rubrique « Remarqué en route » de la pull request : *idée* et *problème* vont au parking ou en question ouverte ; *réussite* reste dans la pull request. Un *problème* que Claude propose d'écarter reste dans « Remarques ouvertes » de l'issue « État » jusqu'à l'accord ou au veto de l'utilisateur.
 3. Faire le point avec l'utilisateur : ce qui a été fait, l'étape du cycle atteinte, ce qui reste.
 4. Si une tranche arrive à l'étape Valider, dérouler la **définition de « fini »** de `docs/METHODE.md`, case par case. Une case non cochée bloque l'intégration : le dire clairement.

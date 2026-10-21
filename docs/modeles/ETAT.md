@@ -10,7 +10,7 @@ Tout ce qui précède la ligne « --- » ci-dessous est retiré avant publicatio
 ---
 *Mis à jour le AAAA-MM-JJ à HH:MM, étape « … ». Claude travaille en ce moment / Claude ne travaille pas en ce moment : rien ne fusionne sans lui.*
 
-Pour arrêter quoi que ce soit : ferme la pull request en cours, repasse-la en brouillon, ou commente « veto » ou « stop » ici ou dessus.
+Pour arrêter quoi que ce soit : ferme la pull request en cours (ou repasse-la en brouillon si elle est prête) ; GitHub empêche alors toute fusion. Ou commente « veto » ou « stop », ici ou dessus : Claude s'arrête au point de contrôle suivant.
 
 ## Où on en est
 
