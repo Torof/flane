@@ -4,7 +4,7 @@ Statuts : **Idée** → **Prête** (fiche validée) → **En cours** → **À te
 
 ## En cours
 
-**T0.4** — Pilotage, fiche `docs/tranches/T0.4-pilotage.md` à la porte Choisir : issue épinglée ou fichier pour l'état, découpage en T0.4a et T0.4b, puis le oui de l'utilisateur.
+**T0.4a** — Voir et arrêter, fiche `docs/tranches/T0.4-pilotage.md`, validée le 2026-10-21, branche `chore/T0.4a-see-and-stop`, étape Construire. Ensuite T0.4b (vérifications, fiche courte).
 
 ## Questions ouvertes
 
@@ -27,7 +27,8 @@ Statuts : **Idée** → **Prête** (fiche validée) → **En cours** → **À te
 | T0.2 | Vérifications automatiques (GitHub Actions) : types, lint, tests, audit des dépendances, recherche de secrets, licences ; exigées par la règle sur `main` ; Dependabot ; résumé court des échecs pour Claude | Faite |
 | T0.3 | Squelette de l'appli Expo : TypeScript strict, ESLint et Prettier, fichiers de traduction, notice SPDX en tête des fichiers, `.npmrc` (`ignore-scripts`, `save-exact`), `.nvmrc`, trois onglets vides, variantes `app.flane.dev` / `app.flane`, APK `preview` et client de développement par EAS Build | Faite |
 | T0.5 | Mises à jour instantanées (EAS Update) pour la variante de test `app.flane.dev`, version native visible, une version par tranche (D-023) ; passée avant T0.2 à la demande de l'utilisateur pour accélérer la boucle de test | Faite |
-| T0.4 | Pilotage : issue « État », pull request suivie en direct, veto, remarques des agents (T0.4a) ; assemblage de l'appli, contrôle de version, fiche courte (T0.4b). Fiche en discussion : `docs/tranches/T0.4-pilotage.md`. L'historique des versions et les étiquettes sont abandonnés (D-026) | Idée |
+| T0.4a | Pilotage, voir et arrêter : issue épinglée « État de Flâne », pull request suivie en direct dès le premier commit, veto (signaux lus par `tools/dev/owner-signals.mjs` à chaque point de contrôle), « Remarqué en route » des agents. Fiche `docs/tranches/T0.4-pilotage.md` ; l'historique des versions et les étiquettes sont abandonnés (D-026) | En cours |
+| T0.4b | Pilotage, vérifications : l'appli s'assemble (`expo export` dans `app-check`), `version-check`, fiche courte, budget signalé, tests des outils dans le workflow. Même fiche | Prête |
 
 ## Jalon 1 — Je vois les bons coins de ma région
 
@@ -48,6 +49,8 @@ Statuts : **Idée** → **Prête** (fiche validée) → **En cours** → **À te
 
 | ID | Tranche | Statut |
 | --- | --- | --- |
+| T2.0 | Signature des mises à jour instantanées, double authentification des comptes Expo et GitHub, droits du jeton `gh` ; avant T2.3 (première donnée personnelle stockée) | Idée |
+| T2.0b | Direction de l'interface (maquettes, choix visuels), à décider ensemble avant T2.5 | Idée |
 | T2.1 | Stockage local et modèle de données : le trajet comme objet, les modifications comme actions, identifiants stables, hors ligne d'abord | Idée |
 | T2.2 | Chargement et vérification d'un paquet régional dans l'appli | Idée |
 | T2.3 | Préférences, saisies une fois | Idée |
@@ -133,4 +136,9 @@ Idées notées, traitées en fin de jalon. Ne pas s'y attaquer avant.
 - Déplacer les tests des outils du dépôt (`app/src/tools/`) hors de l'appli quand `data-pipeline/` aura les siens.
 - Banc d'essai en PR : le banc d'essai tourne sur le trajet de référence à chaque pull request et poste la différence avec `main` (après T2.8).
 - `SECURITY.md` et politique de signalement des failles (jalon 5).
+- Journal de débogage dans la version de test, sans position : à décider dans la fiche de la première tranche du jalon 1 qui touche l'appli.
+- Tableau de bord hors GitHub, notifications par courriel (GitHub prévient déjà d'un run échoué).
+- Claude qui tourne sans session ouverte (tâches planifiées, agents dans le cloud) : à revoir quand le développement aura un rythme.
+- Validation par lot de plusieurs fiches : bilan du jalon 1.
+- Format des messages de commit vérifié dans GitHub Actions.
 - Démarrage automatique de session (hook `SessionStart` qui charge journal, backlog et issues), si `/debut` devient lourd.
