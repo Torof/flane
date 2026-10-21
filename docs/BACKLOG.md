@@ -4,7 +4,7 @@ Statuts : **Idée** → **Prête** (fiche validée) → **En cours** → **À te
 
 ## En cours
 
-**T0.4a** — Voir et arrêter, fiche `docs/tranches/T0.4-pilotage.md`, validée le 2026-10-21, branche `chore/T0.4a-see-and-stop`, pull request 15 à la porte Observer. Ensuite T0.4b (vérifications, fiche courte).
+**T0.6** — Notre méthode, en direct : rituel partagé, réflexes, dépôt en anglais, versions nommées. Fiche `docs/tranches/T0.6-method-live.md`, validée le 2026-10-21.
 
 ## Questions ouvertes
 
@@ -27,7 +27,8 @@ Statuts : **Idée** → **Prête** (fiche validée) → **En cours** → **À te
 | T0.2 | Vérifications automatiques (GitHub Actions) : types, lint, tests, audit des dépendances, recherche de secrets, licences ; exigées par la règle sur `main` ; Dependabot ; résumé court des échecs pour Claude | Faite |
 | T0.3 | Squelette de l'appli Expo : TypeScript strict, ESLint et Prettier, fichiers de traduction, notice SPDX en tête des fichiers, `.npmrc` (`ignore-scripts`, `save-exact`), `.nvmrc`, trois onglets vides, variantes `app.flane.dev` / `app.flane`, APK `preview` et client de développement par EAS Build | Faite |
 | T0.5 | Mises à jour instantanées (EAS Update) pour la variante de test `app.flane.dev`, version native visible, une version par tranche (D-023) ; passée avant T0.2 à la demande de l'utilisateur pour accélérer la boucle de test | Faite |
-| T0.4a | Pilotage, voir et arrêter : issue épinglée « État de Flâne », pull request suivie en direct dès le premier commit, veto (signaux lus par `tools/dev/owner-signals.mjs` à chaque point de contrôle), « Remarqué en route » des agents. Fiche `docs/tranches/T0.4-pilotage.md` ; l'historique des versions et les étiquettes sont abandonnés (D-026) | En cours |
+| T0.4a | Pilotage, voir et arrêter : issue épinglée « État de Flâne », pull request suivie en direct dès le premier commit, veto (signaux lus par `tools/dev/owner-signals.mjs` à chaque point de contrôle), « Remarqué en route » des agents. Fiche `docs/tranches/T0.4-pilotage.md` ; veto réel reporté à T0.6 | Faite |
+| T0.6 | Notre méthode, en direct : rituel partagé et réflexes à la place des portes, `METHOD.md` et `CLAUDE.md` en anglais, D-027 (langue), D-028 (rituel), D-029 (versions nommées), commits descriptifs, issue « État » retirée | En cours |
 | T0.4b | Pilotage, vérifications : l'appli s'assemble (`expo export` dans `app-check`), `version-check`, fiche courte, budget signalé, tests des outils dans le workflow. Même fiche | Prête |
 
 ## Jalon 1 — Je vois les bons coins de ma région

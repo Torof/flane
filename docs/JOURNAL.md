@@ -26,8 +26,13 @@ Lu au début de chaque session (`/debut`), complété à la fin (`/fin`). Les en
 - Veto réel à constater par l'utilisateur sur la pull request 15.
 - Pull request Dependabot 13 : à reprendre dans une tranche de dépendances (D-025).
 
+**Ensuite, dans la même session**
+- L'utilisateur revoit le processus : portes, `/debut` et `/fin` à taper, autonomie silencieuse de Claude : « on est trop déconnectés ». Il veut un rituel partagé (Claude annonce l'étape, on regarde, on décide, Claude construit en tenant au courant) et des réflexes portés par Claude (parking, couper, versions nommées, passes de sécurité, découvertes, pas de côté). Méthode à l'essai, plugin plus tard s'il le décide.
+- Langue : tout le dépôt en anglais, conversation en français, appli d'abord en français. Commits descriptifs.
+- T0.4a intégrée sans l'essai du veto, reporté à T0.6 (prévu par la fiche) ; fiche T0.6 rédigée, attaquée par l'avocat du diable (redécouper : T0.4a seule d'abord), validée.
+
 **Prochaine étape**
-- Porte Observer de T0.4a : l'issue #16 lue sur le téléphone, un « stop » réel sur la pull request 15 ; puis fusion et T0.4b.
+- Construire T0.6 sur une branche neuve ; veto réel pendant la construction.
 
 ---
 
