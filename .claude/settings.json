@@ -53,5 +53,30 @@
       "Read(./android/app/build/**)",
       "Read(./data-pipeline/out/**)"
     ]
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/tools/dev/session-state.sh\"",
+            "timeout": 90
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/tools/dev/stop-gate.mjs\"",
+            "timeout": 60
+          }
+        ]
+      }
+    ]
   }
 }
