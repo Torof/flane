@@ -54,7 +54,7 @@ Chaque version reçoit un nom qui dit ce qu'elle apporte, quelques lignes dans `
 
 **Le `versionName` Android** est la version de l'appli au moment où l'APK a été compilé. Après des mises à jour instantanées, Android affiche donc une version plus ancienne que « À propos » : c'est normal, « À propos » dit la vérité.
 
-**Publier une mise à jour instantanée** (porte Observer seulement, après l'audit) :
+**Publier une mise à jour instantanée** (à l'essai seulement, après la passe de sécurité, D-023) :
 
 ```sh
 cd app

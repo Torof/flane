@@ -22,6 +22,9 @@ Les choix structurants, avec leurs raisons. Une décision n'est jamais effacée 
 | A skipped step is never silent | D-014 | Kept |
 | « État de Flâne » issue for the absent owner | T0.4a | Removed: the owner is in the conversation |
 | Conventional Commits with the slice in the title | D-018, `docs/CONVENTIONS.md` | Removed: descriptive titles in plain English |
+| The veto is a rule Claude must remember | T0.4a | Changed: also a hook (`tools/dev/stop-gate.mjs`) once the owner enables it |
+
+The skills `debut`, `fin`, `tranche` and `bilan-jalon` carry no `disable-model-invocation`: Claude runs them itself (checked one by one).
 
 **Why**: the owner holds the vision and must stay in the loop; Claude knows more and goes faster, and must be the one who says « now is the time for… ».
 
@@ -65,7 +68,7 @@ La validation explicite de l'utilisateur est obligatoire à trois portes : **Cho
 Identifiant de paquet Android `app.flane` ; nom affiché « Flâne » ; dépôt GitHub `flane`. **Pourquoi** : l'identifiant est définitif une fois publié sur Google Play ; il doit donc être court, sans accent et sans référence à un pays, pour une appli qui commence en France mais vise l'international. `fr.flane` écarté pour cette raison ; `com.flane.app` et `io.flane` écartés car plus longs sans avantage. Correspond au domaine `flane.app`, non acheté à ce jour. **Vigilance** : vérifier à la première publication (T5.4) qu'aucune appli ne porte déjà cet identifiant ; envisager l'achat du domaine `flane.app`.
 
 ## D-014 — Méthode de construction · 2026-10-20 · Acceptée, amended by D-028 (now `docs/METHOD.md`)
-Cycle en sept temps par tranche, jalons d'usage plutôt que sprints, une seule tranche en cours, budget par tranche, parking, journal de session, définition de « fini ». Claude fait respecter la méthode ; les exceptions sont consignées. **Pourquoi** : construire à deux (humain et IA) demande de la continuité entre sessions et un contradicteur, pas des rituels d'équipe. Détail : `docs/METHODE.md`.
+Cycle en sept temps par tranche, jalons d'usage plutôt que sprints, une seule tranche en cours, budget par tranche, parking, journal de session, définition de « fini ». Claude fait respecter la méthode ; les exceptions sont consignées. **Pourquoi** : construire à deux (humain et IA) demande de la continuité entre sessions et un contradicteur, pas des rituels d'équipe. Détail : `docs/METHOD.md`.
 
 ## D-013 — Licence : direction AGPL-3.0, dépôt privé au départ · 2026-10-20 · Acceptée pour la licence ; remplacée par D-019 pour le dépôt privé
 Le dépôt reste privé au début. La direction est l'AGPL-3.0, avec un dépôt de marque « Flâne » à l'INPI. Avis juridique avant de rendre le dépôt public. **Pourquoi** : rester open source sans qu'on puisse refermer le code ; la valeur de Flâne est dans les données, les partenariats et le nom. **Vigilance** : compatibilité GPL/AGPL avec l'App Store ; accord de contribution si d'autres contribuent.

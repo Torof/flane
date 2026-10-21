@@ -1,17 +1,24 @@
-## AAAA-MM-JJ — Titre court
+## YYYY-MM-DD — Short title
 
-**Tranche** : Tx.y — …
-**Étape** : Planifier | Discuter | Choisir | Construire | Observer | Sécuriser | Valider
+**Slice**: Tx.y — …
+**Moment of the ritual**: opening | idea | sheet | building | security pass | trial | closing
 
-**Fait**
+**Done**
 - …
 
-**Décisions** : D-… (ou aucune)
+**Version**: 0.x.y — name (or none)
 
-**Exceptions à la méthode** : aucune / étape sautée, raison, accord de l'utilisateur
+**Decisions**: D-… (or none)
 
-**Questions ouvertes**
+**What worked / what got stuck**
 - …
 
-**Prochaine étape**
+**Method** (on trial, D-028): one line on the method itself: a reflex that came too late, a moment that was useless, something to change.
+
+**Skipped moments**: none / which one, why, the owner's agreement
+
+**Open questions**
+- …
+
+**Next step**
 - …

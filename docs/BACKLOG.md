@@ -142,4 +142,5 @@ Idées notées, traitées en fin de jalon. Ne pas s'y attaquer avant.
 - Claude qui tourne sans session ouverte (tâches planifiées, agents dans le cloud) : à revoir quand le développement aura un rythme.
 - Validation par lot de plusieurs fiches : bilan du jalon 1.
 - Format des messages de commit vérifié dans GitHub Actions.
-- Démarrage automatique de session (hook `SessionStart` qui charge journal, backlog et issues), si `/debut` devient lourd.
+- Liste des permissions de Claude Code : `Bash(rm *)` est autorisé et seuls `rm -rf`/`rm -fr` demandent ; `rm -r -f` ou `rm -Rf` passent (audit de T0.6). Tranche `fix/` courte.
+- Vérification automatique des renvois morts (`METHODE.md`, vocabulaire des portes) dans `app-check`.

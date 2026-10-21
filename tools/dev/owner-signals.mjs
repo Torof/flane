@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Reads the owner's signals on pull requests, at each checkpoint
-// (before a commit, push, agent, `eas update`, EAS build, merge, and at /debut).
+// (before a commit, push, agent, `eas update`, EAS build, merge, and at the opening of a session).
 // Claude acts with the owner's GitHub account, so the two are told apart by a
 // signature: every comment Claude posts starts with CLAUDE_SIGNATURE.
 //

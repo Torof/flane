@@ -2,7 +2,7 @@
 // Tests of stop-gate.mjs, run with `node --test tools/dev/stop-gate.test.mjs` (Node 24).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { decide, main } from './stop-gate.mjs';
+import { decide, main, targets, words } from './stop-gate.mjs';
 
 const deps = ({ pr = 17, code = 0, out = 'NOTHING\n', calls = [] } = {}) => ({
   currentPr: () => {
@@ -15,35 +15,86 @@ const deps = ({ pr = 17, code = 0, out = 'NOTHING\n', calls = [] } = {}) => ({
   },
 });
 
+test('words: quotes kept together, separators split', () => {
+  assert.deepEqual(words(`gh pr merge 5 --body "a b; c" && echo 'x y'`), [
+    'gh',
+    'pr',
+    'merge',
+    '5',
+    '--body',
+    'a b; c',
+    ';',
+    ';',
+    'echo',
+    'x y',
+  ]);
+});
+
 test('ordinary commands pass without reading anything', () => {
   const calls = [];
   for (const command of [
     'git status',
     'gh pr view 17',
+    'gh pr create --title "how to gh pr merge 5" --body x',
     'npm test',
     'echo "eas updated"',
+    'gh api repos/Torof/flane/pulls/5/comments',
     undefined,
   ]) {
-    assert.equal(decide(command, deps({ calls })).allow, true);
+    assert.equal(decide(command, deps({ calls })).allow, true, command);
   }
   assert.deepEqual(calls, []);
 });
 
-test('merge, publish and build are read against the right pull request', () => {
-  const calls = [];
-  assert.equal(decide('gh pr merge 15 --merge --delete-branch', deps({ calls })).allow, true);
-  assert.equal(decide('gh pr merge --merge', deps({ calls })).allow, true);
-  assert.equal(decide('cd app && eas update --channel preview', deps({ calls })).allow, true);
-  assert.equal(decide('node $(which eas) build --profile preview', deps({ calls })).allow, true);
-  assert.equal(decide('eas update:republish --group x', deps({ calls })).allow, true);
-  assert.deepEqual(calls, [15, 17, 17, 17, 17]);
+test('merge targets: number anywhere among flags, #n, URL, current branch, several merges', () => {
+  const cases = [
+    ['gh pr merge 15 --merge --delete-branch', [15]],
+    ['gh pr merge --merge 5', [5]],
+    ['gh pr merge --merge --body "fixes 9" 5', [5]],
+    ['gh pr merge #5', [5]],
+    ['gh pr merge https://github.com/Torof/flane/pull/5', [5]],
+    ['"gh" pr merge 5', [5]],
+    ['/usr/bin/gh pr merge 5', [5]],
+    ['gh pr merge --merge', ['current']],
+    ['gh pr merge 17 && gh pr merge 5', [17, 5]],
+    ['gh api -X PUT repos/Torof/flane/pulls/5/merge', [5]],
+  ];
+  for (const [command, prs] of cases)
+    assert.deepEqual(targets(command), { prs, blocked: null }, command);
 });
 
-test('a stop or unreadable signals block, a request does not', () => {
+test('publish, build and submit: eas and eas-cli in every shape', () => {
+  for (const command of [
+    'cd app && eas update --channel preview',
+    'node $(which eas) build --profile preview',
+    'node "$(which eas)" update',
+    'npx eas-cli update',
+    'npx eas-cli@latest build',
+    'eas update:republish --group x',
+    'eas submit -p android',
+    'eas workflow:run deploy.yml',
+  ]) {
+    assert.deepEqual(targets(command).prs, ['current'], command);
+  }
+});
+
+test('what cannot be resolved is blocked', () => {
+  assert.match(targets('gh pr merge some-branch').blocked, /not a pull request number/);
+  assert.match(targets('gh -R x/y pr merge 5').blocked, /--repo/);
+  assert.match(targets('gh --repo x/y pr merge 5').blocked, /--repo/);
+  assert.match(targets('gh pr merge -R Torof/flane 5').blocked, /--repo/);
+  assert.equal(decide('gh pr merge some-branch', deps()).allow, false);
+});
+
+test('every target is read; a stop or unreadable signals block, a request does not', () => {
+  const calls = [];
+  assert.equal(decide('gh pr merge 17 && gh pr merge 5', deps({ calls })).allow, true);
+  assert.deepEqual(calls, [17, 5]);
   const stop = decide('gh pr merge 17', deps({ code: 1, out: 'STOP pr #17: stop\n' }));
   assert.equal(stop.allow, false);
   assert.match(stop.message, /STOP pr #17: stop/);
   assert.equal(decide('eas build', deps({ code: 2, out: 'UNREADABLE\n' })).allow, false);
+  assert.equal(decide('eas build', deps({ code: null, out: '' })).allow, false);
   assert.equal(decide('gh pr merge 17', deps({ code: 3, out: 'REQUEST\n' })).allow, true);
 });
 
@@ -52,7 +103,7 @@ test('no pull request found: blocked (fails closed)', () => {
   assert.equal(decide('gh pr merge', deps({ pr: 0 })).allow, false);
 });
 
-test('main: reads the hook JSON, exit 2 with a message on a block', () => {
+test('main: reads the hook JSON, exit 2 with a message on a block or any failure', () => {
   let err = '';
   const io = { stderr: (t) => (err += t) };
   const input = (command) => JSON.stringify({ tool_name: 'Bash', tool_input: { command } });
@@ -60,4 +111,11 @@ test('main: reads the hook JSON, exit 2 with a message on a block', () => {
   assert.equal(main(input('gh pr merge 17'), deps({ code: 1, out: 'STOP\n' }), io), 2);
   assert.match(err, /block this command/);
   assert.equal(main('not json', deps(), io), 2);
+  const broken = {
+    currentPr: () => 17,
+    signals: () => {
+      throw new Error('boom');
+    },
+  };
+  assert.equal(main(input('gh pr merge 17'), broken, io), 2);
 });

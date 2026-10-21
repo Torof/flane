@@ -23,7 +23,7 @@ Claude moves from one moment to the next by itself, says which one we are in, an
 3. ● **The sheet, sized to the stakes** — half a page for a small slice, more when data, network, permissions or security are touched. `avocat-du-diable` attacks it; Claude presents its three best objections with an answer for each. **No code without the owner's yes** on the sheet; a yes covers the plan shown just before.
 4. **Building, kept posted** — Claude builds alone and does not wait. After each piece, three lines: what was done, what was seen, what comes next. The owner can answer, redirect or say nothing. Anything outside the sheet (dependency, data, scope) stops Claude: it says the problem and the options, the owner chooses.
 5. ● **Security pass** — before merging every slice (`auditeur-securite` and `relecteur`), plus a full pass at the end of each milestone. Claude summarises in plain words: « nothing serious », or « a real hole, here is what I fix ». The owner decides only what changes the plan.
-6. ● **Trial** — on the phone, or in the repository for a slice without app. Claude says what to look at and what to try to break. If it does not hold: rework, cut or drop, and the lesson is noted. **Claude merges right after the owner says it works** and the definition of done is ticked (D-024).
+6. ● **Trial** — on the phone, or in the repository for a slice without app. The pull request is marked ready only now, after the security pass; an instant update is published only now, from the pull request's last commit (D-023). Claude says what to look at and what to try to break. If it does not hold: rework, cut or drop, and the lesson is noted. **Claude merges right after the owner says it works** and the definition of done is ticked (D-024).
 7. ● **Closing** — when we stop: the new version if there is one (named together, D-029), what worked and what got stuck, one line on the method itself, the next step proposed, one step aside. Claude writes the journal and the backlog, commits and pushes; the owner types nothing.
 
 ## The reflexes
@@ -49,7 +49,20 @@ The owner can stop, change or cancel anything, at any time, even after a merge (
 - close the pull request (or move it back to draft once it is ready): GitHub then refuses the merge;
 - write a **new** comment starting with « veto » or « stop » on the pull request.
 
-Claude reads these with `node tools/dev/owner-signals.mjs --pr <n>` before every commit, push, agent run, `eas update`, EAS build and merge. Code 1 (stop) or 2 (unreadable): Claude stops, answers on the pull request and waits; it resumes only with the owner's agreement, then `--ack`. After changing the pull request state itself: `--expect ready|closed|merged`. Every comment Claude posts starts with `<!-- flane:claude -->` then « **Claude:** », never with « veto » or « stop », and never copies external content.
+Claude reads these with `node tools/dev/owner-signals.mjs --pr <n>` before every commit, push, agent run, `eas update`, EAS build and merge. Code 1 (stop) or 2 (unreadable): Claude stops, answers on the pull request and waits; it resumes only with the owner's agreement, then `--ack`. After changing the pull request state itself: `--expect ready|closed|merged`. Once the owner has enabled the hooks below, `tools/dev/stop-gate.mjs` reads the signals again right before a merge, publish or build and blocks on a stop: a seatbelt against forgetting, not a sandbox (`docs/SECURITE.md`). Every comment Claude posts starts with `<!-- flane:claude -->` then « **Claude:** », never with « veto » or « stop », and never copies external content.
+
+## Hooks
+
+Two Claude Code hooks make the ritual and the veto mechanical. They live in `.claude/settings.json`, which only the owner changes (Claude may not change its own settings):
+
+```json
+"hooks": {
+  "SessionStart": [{ "hooks": [{ "type": "command", "command": "bash \"$CLAUDE_PROJECT_DIR/tools/dev/session-state.sh\"", "timeout": 90 }] }],
+  "PreToolUse": [{ "matcher": "Bash", "hooks": [{ "type": "command", "command": "node \"$CLAUDE_PROJECT_DIR/tools/dev/stop-gate.mjs\"", "timeout": 60 }] }]
+}
+```
+
+`session-state.sh` hands Claude the project state when a session starts; `stop-gate.mjs` blocks `gh pr merge`, `eas update`, `eas build` and similar commands on a stop. Both run the code of the branch that is checked out: never check out an untrusted branch in this clone.
 
 ## Pull requests and commits
 

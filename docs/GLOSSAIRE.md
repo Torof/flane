@@ -63,12 +63,12 @@ Attention au mot **« étape »**, qui a trois sens. Pour lever l'ambiguïté :
 | Trajet de référence | Le scénario fixe utilisé pour tester et comparer toutes les versions. |
 | Banc d'essai | L'outil qui sort la liste des suggestions sur le trajet de référence. |
 | Simulateur de trajet | L'outil qui rejoue un trajet enregistré. |
-| Porte | L'un des trois moments où la validation de l'utilisateur est obligatoire : Choisir, Observer, Intégrer (D-016). Entre les portes, Claude enchaîne seul. |
+| Porte | Ancien nom (D-016) des moments où l'utilisateur valide ; remplacé par les moments du rituel (D-028) : son oui sur la fiche, l'essai. |
 | Garde-fou | Un contrôle automatique qui bloque une action interdite : hook git (`.githooks/`), règle GitHub sur `main`. Le hook de Claude Code qui analysait chaque commande a été retiré (D-022). |
 | Variante | Une version de l'appli construite avec son propre identifiant Android : `app.flane.dev` pour le développement et les essais, `app.flane` pour la publication (D-015). Les deux cohabitent sur un téléphone. Choisie par `APP_VARIANT` dans `app/app.config.ts`. |
 | Client de développement | L'appli compilée avec `expo-dev-client` : elle charge le code depuis le PC (Metro) et accepte les modules natifs. Ne marche pas sans le PC. Profil EAS `development`. |
-| APK d'essai | L'appli compilée avec le code embarqué, installable et utilisable sans PC. C'est elle qu'on teste à la porte Observer. Profil EAS `preview`. |
-| Mise à jour instantanée | Le code JavaScript d'une tranche livré à l'APK d'essai sans réinstallation (EAS Update, `expo-updates`), publié par Claude à la porte Observer sur le canal `preview`. Réservé à `app.flane.dev` (D-023). |
+| APK d'essai | L'appli compilée avec le code embarqué, installable et utilisable sans PC. C'est elle qu'on teste à l'essai. Profil EAS `preview`. |
+| Mise à jour instantanée | Le code JavaScript d'une tranche livré à l'APK d'essai sans réinstallation (EAS Update, `expo-updates`), publié par Claude à l'essai sur le canal `preview`. Réservé à `app.flane.dev` (D-023). |
 | Version native | L'empreinte des modules natifs de l'APK (`runtimeVersion`). Une mise à jour instantanée ne s'applique qu'à la même version native ; quand elle change, il faut un nouvel APK. Visible dans « À propos ». |
 | Canal | Le nom sous lequel un APK reçoit ses mises à jour instantanées (`preview`). Un futur canal `beta` servira aux testeurs amis. |
 | Vérifications automatiques | Le workflow GitHub Actions `checks` (`app-check`, `secrets-check`, `deps-check`) qui contrôle chaque pull request. Les trois sont **obligatoires** : la règle `protect-main` refuse la fusion tant qu'ils ne sont pas verts ; `deps-check` ne passe au rouge sur une pull request que si elle touche les fichiers de paquets. |
