@@ -222,3 +222,40 @@ test('end to end: a test-only change stays green', () => {
   );
   assert.equal(code, 0, out);
 });
+
+test('type-only packages counted as production by npm do not count; a real one next to them does', () => {
+  const withTypes = (types, undici, expo = '58.0.0') =>
+    lock('0.0.2', {
+      'node_modules/expo': { version: expo },
+      'node_modules/jest-util': { version: '30.0.0', dependencies: { '@types/node': '*' } },
+      'node_modules/@types/node': { version: types, dependencies: { 'undici-types': '*' } },
+      'node_modules/undici-types': { version: undici },
+      'node_modules/jest-util/node_modules/@types/node': { version: types },
+    });
+  const base = { ...baseFiles, 'app/package-lock.json': withTypes('24.10.1', '7.16.0') };
+  const types = { ...baseFiles, 'app/package-lock.json': withTypes('24.19.2', '7.24.6') };
+  assert.deepEqual(appChanges(['app/package-lock.json'], reader(base, types)), []);
+  const real = { ...baseFiles, 'app/package-lock.json': withTypes('24.19.2', '7.24.6', '58.0.1') };
+  assert.deepEqual(appChanges(['app/package-lock.json'], reader(base, real)), [
+    'app/package-lock.json (production entries)',
+  ]);
+});
+
+test('look-alikes, code under a types package, aliases and links still count', () => {
+  const base = { ...baseFiles, 'app/package-lock.json': lock('0.0.2', {}) };
+  const counts = (entries) =>
+    appChanges(
+      ['app/package-lock.json'],
+      reader(base, { ...baseFiles, 'app/package-lock.json': lock('0.0.2', entries) }),
+    ).length === 1;
+  assert.equal(counts({ 'node_modules/undici': { version: '7.0.0' } }), true);
+  assert.equal(counts({ 'node_modules/undici-types-x': { version: '1.0.0' } }), true);
+  assert.equal(counts({ 'node_modules/@types/node/node_modules/x': { version: '1.0.0' } }), true);
+  assert.equal(counts({ 'node_modules/@types/x': { name: 'left-pad', version: '1.0.0' } }), true);
+  assert.equal(counts({ 'node_modules/@types/x': { version: '1.0.0', link: true } }), true);
+  assert.equal(
+    counts({ 'node_modules/undici-types': { version: '1.0.0', hasInstallScript: true } }),
+    true,
+  );
+  assert.equal(counts({ 'node_modules/@types/x': { name: '@types/x', version: '1.0.0' } }), false);
+});
