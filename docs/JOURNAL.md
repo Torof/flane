@@ -4,6 +4,36 @@ Lu au début de chaque session (`/debut`), complété à la fin (`/fin`). Les en
 
 ---
 
+## 2026-10-21 — T0.4b: full CI
+
+**Slice**: T0.4b — Full CI
+**Moment of the ritual**: closing
+
+**Done**
+- `app-check` assembles the test variant offline; new `version-check` job: every tool test on GitHub, and the app version must go up when the app changes; both required on `main`.
+- Red proven on the throwaway pull request 19 (missing image: assembly red; app changed without a version: version red), seen by the owner; closed without merging.
+- Stop gate: reads only real commands (it had blocked Claude's own commands on sheet text), then nested commands again after the audit.
+
+**Version**: none (no app change).
+
+**Decisions**: none. CD waits for milestone 1 (owner, 2026-10-21).
+
+**What worked / what got stuck**
+- Worked: the security pass found two real holes in the new version check (renamed files, accented file names) and regressions in the stop gate; end-to-end tests on a temporary git repository now guard them.
+- Stuck: the stop gate, freshly enabled, blocked Claude three times on false positives; each time it failed closed and nothing ran.
+
+**Method**: the owner's trial was quick and concrete (two red crosses, one green PR); keep trials to « look at this, expect that ».
+
+**Skipped moments**: devil's advocate not run again (T0.4b part of the T0.4 sheet already attacked); real veto still not tried.
+
+**Open questions**
+- Dependabot pull request 13: dependency slice (D-025).
+
+**Next step**
+- Dependency slice for #13, then T0.7 (translation), milestone 0 review, milestone 1.
+
+---
+
 ## 2026-10-21 — T0.6: our shared ritual, first full run
 
 **Slice**: T0.6 — Our method, live
