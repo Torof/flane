@@ -1,0 +1,46 @@
+# Dependabot (T0.2) : un rendez-vous mensuel, une pull request groupée par
+# écosystème. Une pull request Dependabot n'est jamais fusionnée telle quelle :
+# elle est reprise dans une tranche de dépendances (D-025, docs/CONVENTIONS.md).
+# La famille Expo et React est exclue : ces paquets suivent le SDK par
+# `npx expo install --check` ; pour un 0.x comme react-native, Dependabot
+# classerait une rupture en « mineure ».
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+    open-pull-requests-limit: 2
+    commit-message:
+      prefix: 'chore(deps)'
+    groups:
+      actions:
+        patterns: ['*']
+
+  - package-ecosystem: npm
+    directory: /app
+    schedule:
+      interval: monthly
+    open-pull-requests-limit: 2
+    versioning-strategy: increase
+    commit-message:
+      prefix: 'chore(deps)'
+    groups:
+      npm:
+        patterns: ['*']
+        update-types: ['minor', 'patch']
+    ignore:
+      - dependency-name: '*'
+        update-types: ['version-update:semver-major']
+      - dependency-name: 'expo'
+      - dependency-name: 'expo-*'
+      - dependency-name: '@expo/*'
+      - dependency-name: 'react'
+      - dependency-name: 'react-dom'
+      - dependency-name: 'react-native'
+      - dependency-name: 'react-native-*'
+      - dependency-name: 'jest-expo'
+      - dependency-name: 'babel-preset-expo'
+      - dependency-name: 'eslint-config-expo'
+      - dependency-name: 'typescript'
+      - dependency-name: '@types/react'

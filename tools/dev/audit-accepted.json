@@ -1,0 +1,44 @@
+[
+  {
+    "ghsa": "GHSA-vfj7-8cjw-p6xm",
+    "package": "braces",
+    "range": "<=3.0.3",
+    "requiredBy": [
+      "micromatch"
+    ],
+    "reachableFrom": [
+      "expo",
+      "expo-constants",
+      "expo-dev-client",
+      "expo-linking",
+      "expo-router",
+      "expo-status-bar",
+      "expo-updates",
+      "react-native",
+      "react-native-safe-area-context",
+      "react-native-screens"
+    ],
+    "reason": "Filtrage de motifs de fichiers (micromatch) utilisé par Metro, la CLI Expo et les outils de configuration, sur le PC ; rien n'en est chargé par l'appli. Pas de correctif amont dans Expo SDK 58 (T0.3).",
+    "reviewed": "2026-10-20"
+  },
+  {
+    "ghsa": "GHSA-86w9-cpqp-85rv",
+    "package": "node-forge",
+    "range": "<=1.4.0",
+    "requiredBy": [
+      "@expo/cli",
+      "@expo/code-signing-certificates"
+    ],
+    "reachableFrom": [
+      "expo",
+      "expo-constants",
+      "expo-dev-client",
+      "expo-linking",
+      "expo-router",
+      "expo-status-bar",
+      "expo-updates"
+    ],
+    "reason": "Certificats du serveur de développement et de la signature de code EAS, générés sur le PC par @expo/cli et @expo/code-signing-certificates. expo-updates requiert ce dernier, mais seulement dans son dossier cli/ (commandes `expo-updates codesigning:*` sur le PC) : vérifié dans l'archive npm expo-updates@58.0.17, aucune référence dans build/ (code exécuté) ni dans le natif, qui vérifie les signatures lui-même. Pas de correctif amont dans Expo SDK 58 (T0.3).",
+    "reviewed": "2026-10-20"
+  }
+]

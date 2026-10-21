@@ -46,7 +46,7 @@ Une tranche est finie quand **toutes** ces cases sont cochées :
 
 - [ ] Le critère de réussite de la fiche est atteint et l'utilisateur l'a constaté.
 - [ ] Les tests sont écrits et passent, y compris les cas limites de la fiche.
-- [ ] Les vérifications automatiques sont vertes (tests, types, dépendances, secrets, licences).
+- [ ] Les vérifications automatiques sont vertes (`app-check`, `secrets-check`, `deps-check`).
 - [ ] L'audit de sécurité n'a laissé aucun point bloquant ouvert.
 - [ ] La relecture de code n'a laissé aucun point bloquant ouvert.
 - [ ] `docs/DONNEES.md` est à jour si la tranche touche des données.
@@ -99,4 +99,4 @@ L'utilisateur reste le décideur. Une étape peut être sautée, mais **jamais e
 
 ## Les outils de développement
 
-La méthode est vérifiée par la machine autant que possible, mais l'outillage reste minimal : hooks git locaux (format des commits, gitleaks, tests avant push), règle GitHub sur `main`, vérifications automatiques (T0.2), agents. Le garde-fou qui analysait chaque commande de Claude a été retiré (D-022) : il coûtait plus d'attention qu'il n'apportait de sécurité. Les outils du produit (simulateur, visualiseur, banc d'essai, écouteur de phrases…) arrivent avec les tranches qui en ont besoin.
+La méthode est vérifiée par la machine autant que possible, mais l'outillage reste minimal : hooks git locaux (format des commits, gitleaks, tests avant push), règle GitHub sur `main`, vérifications automatiques (`.github/workflows/checks.yml`, `docs/CONVENTIONS.md`), agents. Le garde-fou qui analysait chaque commande de Claude a été retiré (D-022) : il coûtait plus d'attention qu'il n'apportait de sécurité. Les outils du produit (simulateur, visualiseur, banc d'essai, écouteur de phrases…) arrivent avec les tranches qui en ont besoin.

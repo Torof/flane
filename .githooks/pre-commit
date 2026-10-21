@@ -1,12 +1,25 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: AGPL-3.0-or-later
 # Hook pre-commit Flâne : recherche de secrets dans les fichiers indexés avec
-# gitleaks (version épinglée dans tools/dev/setup.sh). En cas de doute, on
+# gitleaks (version épinglée dans tools/dev/gitleaks.env). En cas de doute, on
 # refuse : gitleaks absent ou en erreur = commit refusé. Le secret lui-même
 # n'est jamais affiché.
 set -u
 
-EXPECTED_VERSION="8.30.1"
+root="$(git rev-parse --show-toplevel 2>/dev/null)" || {
+  echo "pre-commit : pas dans un dépôt git. Commit refusé." >&2
+  exit 1
+}
+cd "$root" || exit 1
+
+GITLEAKS_VERSION=""
+# shellcheck source=tools/dev/gitleaks.env
+. tools/dev/gitleaks.env 2>/dev/null
+EXPECTED_VERSION="$GITLEAKS_VERSION"
+if [ -z "$EXPECTED_VERSION" ]; then
+  echo "pre-commit : tools/dev/gitleaks.env illisible ou sans GITLEAKS_VERSION. Commit refusé." >&2
+  exit 1
+fi
 
 find_gitleaks() {
   if command -v gitleaks >/dev/null 2>&1; then
@@ -31,12 +44,6 @@ if [ "$version" != "$EXPECTED_VERSION" ]; then
   echo "pre-commit : gitleaks $version détecté, $EXPECTED_VERSION attendue (avertissement, voir tools/dev/setup.sh)." >&2
 fi
 
-root="$(git rev-parse --show-toplevel 2>/dev/null)" || {
-  echo "pre-commit : pas dans un dépôt git. Commit refusé." >&2
-  exit 1
-}
-cd "$root" || exit 1
-
 # Une configuration gitleaks fournie par le dépôt neutraliserait la recherche :
 # refusée, qu'elle soit indexée ou déjà présente. Une exception se discute et se
 # consigne dans le journal ; elle ne se glisse pas dans un commit.
@@ -46,7 +53,7 @@ if printf '%s\n' "$staged" | grep -Eq '(^|/)\.gitleaks(\.toml|ignore)$' \
   echo "pre-commit : configuration gitleaks fournie par le dépôt (.gitleaks.toml ou .gitleaksignore). Commit refusé." >&2
   exit 1
 fi
-if git diff --cached -U0 -- . ':(exclude)docs' ':(exclude)*.md' | grep '^+' | grep -v '^+++' | grep -q 'gitleaks:''allow'; then
+if git diff --cached -U0 | grep '^+' | grep -v '^+++' | grep -q 'gitleaks:''allow'; then
   echo "pre-commit : annotation d'exception gitleaks dans le code. Commit refusé : une exception se consigne dans le journal, pas dans le code." >&2
   exit 1
 fi

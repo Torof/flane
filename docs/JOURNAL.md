@@ -4,6 +4,57 @@ Lu au début de chaque session (`/debut`), complété à la fin (`/fin`). Les en
 
 ---
 
+## 2026-10-21 — État des lieux du jalon 0, et la fiche du pilotage
+
+**Tranche** : T0.2 (toujours à la porte Observer) ; fiche de T0.4 en discussion.
+**Étape** : T0.2 Observer ; T0.4 Choisir (fiche corrigée, deux choix et le oui attendus).
+
+**Fait**
+- À la demande de l'utilisateur, état des lieux : l'atelier (méthode, garde-fous, vérifications, mises à jour instantanées) est en place, aucune fonction du produit n'existe encore. L'utilisateur l'accepte, à condition que le développement soit ensuite rapide, guidé, sûr, et qu'il voie tout.
+- Audit du système par Claude : six manques relevés et acceptés par l'utilisateur. Cycle trop lourd pour les petites tranches et budget non suivi ; vérifications qui n'assemblent pas l'appli ; aucune vue des erreurs sur le téléphone ; tranche de sécurité manquante avant la première donnée personnelle ; rien qui fait remonter les idées ; pas de direction d'interface.
+- Nouvelle demande de l'utilisateur : tout voir (fait, en cours, à venir, ce qui marche ou casse), droit de veto sur tout et à tout moment, remontée des remarques des agents (problèmes, réussites, idées), le tout automatisé, sans devoir être présent.
+- Fiche `docs/tranches/T0.4-pilotage.md` rédigée, attaquée par l'avocat du diable (14 objections, 3 bloquantes sur le veto : Claude poste avec le compte de l'utilisateur, lecture des commentaires incomplète, rien relu avant la fusion). Toutes retenues ; proposé : issue épinglée « État de Flâne », signaux de veto (fermer la pull request, la repasser en brouillon, commentaire « veto »/« stop »), points de contrôle avant commit, push, agent, publication, compilation et fusion, découpage en T0.4a (voir et arrêter) et T0.4b (vérifications, fiche courte).
+- Indiqué à l'utilisateur comment retirer la règle `ask` sur `gh pr merge` de `.claude/settings.json` ; il le fera lui-même.
+
+- Porte Observer de T0.2 passée : l'utilisateur a constaté la pull request 12 rouge et sa fusion bloquée. Fiche et backlog passés à « Faite », pull request 11 fusionnée par Claude (D-024), pull request 12 fermée.
+
+**Décisions** : D-026 (versions sans étiquettes ni historique des versions).
+
+**Exceptions à la méthode**
+- La fiche de T0.4 a été rédigée et attaquée pendant que T0.2 attend sa porte Observer : planifier la suivante n'est pas la construire. Elle est enregistrée en brouillon dans cette pull request, sans validation.
+
+**Questions ouvertes**
+- Porte Observer de T0.2 : constater que la pull request 12 est bloquée (bouton « Merge » grisé).
+- T0.4 : issue épinglée ou fichier pour l'état ; découpage en T0.4a et T0.4b ; oui sur la fiche.
+- Double authentification Expo et GitHub : intégrée à la future T2.0.
+
+**Prochaine étape**
+- `/debut`, porte Observer de T0.2 (pull request 12), fusion de la 11 et fermeture de la 12, puis les deux choix et le oui de T0.4, et la construction de T0.4a.
+
+## 2026-10-20 — T0.2 Vérifications automatiques : la machine relit avant la fusion
+
+**Tranche** : T0.2 — Vérifications automatiques (GitHub Actions), jalon 0.
+**Étape** : Observer (pull request 11 ouverte, « ne fusionnez pas encore » ; pull request jetable 12 rouge, à constater).
+
+**Fait**
+- `/debut` : deux runs Dependabot rouges sur `main` (mises à jour de sécurité automatiques, activées par défaut par GitHub, qui échouent sur `uuid` : le correctif existe mais la chaîne `xcode` le résout en 3.4.0). L'utilisateur a demandé T0.2 et la correction de ce problème.
+- Fiche T0.2 rédigée, attaquée par l'avocat du diable (21 objections, 5 bloquantes : faux secret de test qui aurait empoisonné `main` pour toujours, Observer impossible, Dependabot qui classe une rupture de `react-native` 0.x en « mineure », pull requests Dependabot sans processus, alertes hautes acceptées sans que l'utilisateur les voie). Toutes traitées ; quatre points soumis à l'utilisateur et acceptés à la porte Choisir : entrées initiales acceptées (`braces`, `node-forge`), **D-025** (une pull request Dependabot n'est jamais fusionnée telle quelle), exclusion de la famille Expo et React de Dependabot, une seule tranche avec ligne de coupe. Le contrôle « la version monte quand `app/` change » part en T0.4.
+- Livré : workflow `checks` (`app-check`, `secrets-check`, `deps-check`, actions GitHub épinglées par SHA, jeton en lecture, aucun secret, résumé d'échec qui nomme l'étape) ; `tools/dev/audit.mjs` (16 tests `node --test`) et `tools/dev/audit-accepted.json` ; `tools/dev/gitleaks.env` partagé par `setup.sh`, `pre-commit` et le workflow ; `.github/dependabot.yml` (mensuel, groupé, famille Expo et React exclue) ; `tools/dev/github-settings.sh` (réglages Actions : actions GitHub seulement, SHA obligatoire, approbation pour tout contributeur externe ; correctifs automatiques Dependabot désactivés ; trois vérifications obligatoires dans `protect-main` ; `--check` compare à l'état attendu). Réglages appliqués, diff dans la pull request. Documentation : conventions (section « Vérifications automatiques », alertes acceptées, D-025, sortie de secours), carte des risques et liste de contrôle, méthode, données, glossaire, README (badge), `/debut` (alertes et pull requests Dependabot). Rien dans `app/` : pas de version.
+- Sécuriser : audit « à corriger », aucun point bloquant (règle recopiée au lieu d'imposée, `deps-check` pas obligatoire, `persist-credentials`, expressions dans `run`, annotation tolérée dans `docs/`, entrées malformées non bloquées, preuve manquante pour `node-forge`) ; relecture « à corriger », un point bloquant (`grep -q` au bout d'un tube sous `pipefail` : SIGPIPE masquait une annotation d'exception). Tout corrigé, détail dans la fiche. `deps-check` est devenu obligatoire et calcule lui-même s'il bloque (fichiers de paquets touchés ou non).
+- Constaté par Claude : trois jobs verts sur la pull request 11 (une minute) ; pull request jetable 12 (erreur de type volontaire) rouge sur `app-check`, état `BLOCKED` ; `automated-security-fixes` à `enabled: false` ; GitHub a validé `dependabot.yml` ; `github-settings.sh --check` conforme.
+
+**Décisions** : D-025.
+
+**Exceptions à la méthode**
+- La branche jetable `chore/T0.2-red-check` a été poussée avec `--no-verify` : son erreur de type volontaire fait échouer le hook `pre-push` par construction. Jamais fusionnée ; fermée après la porte Observer.
+- Le critère « un contrôle Dependabot lancé à la main se termine sans erreur » n'a pas d'API : à faire par l'utilisateur dans l'interface (Insights → Dependency graph → Dependabot → Check for updates) après la fusion, ou constaté au premier rendez-vous mensuel.
+
+**Questions ouvertes**
+- Double authentification du compte Expo : inchangée (avant la première donnée personnelle stockée).
+
+**Prochaine étape**
+- Porte Observer : sur la pull request 12, constater le bouton « Merge » grisé et `app-check` rouge ; sur la pull request 11, les trois vérifications vertes. Puis porte Intégrer (Claude fusionne, D-024), fermeture de la 12, suppression de sa branche. Ensuite `/fin`, puis T0.4 dans une session neuve.
+
 ## 2026-10-20 — T0.5 Mises à jour instantanées : la boucle de test en quelques secondes
 
 **Tranche** : T0.5 — Mises à jour instantanées pour la version de test, et version par tranche (jalon 0).
