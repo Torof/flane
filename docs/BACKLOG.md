@@ -4,7 +4,7 @@ Statuses: **Idea** → **Ready** (sheet approved) → **In progress** → **To t
 
 ## In progress
 
-**T0.7** — The repository in English, sheet `docs/slices/T0.7-english.md`, approved 2026-10-21, branch `chore/T0.7-english`, pull request 23. Next: milestone 0 review, then milestone 1.
+No slice in progress. Next: milestone 0 review, then milestone 1.
 
 ## Open questions
 
@@ -30,7 +30,7 @@ Statuses: **Idea** → **Ready** (sheet approved) → **In progress** → **To t
 | T0.4a | Steering, seeing and stopping: pinned issue « État de Flâne », pull request followed live from the first commit, veto (signals read by `tools/dev/owner-signals.mjs` at each checkpoint), the agents' « Noticed on the way ». Sheet `docs/slices/T0.4-pilotage.md`; real veto postponed to T0.6 | Done |
 | T0.6 | Our method, live: a shared ritual and reflexes instead of gates, `METHOD.md` and `CLAUDE.md` in English, D-027 (language), D-028 (ritual), D-029 (named versions), descriptive commits, « État » issue removed, session-opening and veto hooks | Done |
 | T0.8 | Monthly dependencies, October 2026: `@types/node` 24.19.2 (Dependabot #13 redone, D-025). Sheet `docs/slices/T0.8-deps-2026-10.md` | Done |
-| T0.7 | Translate the rest of the repository into English (D-027): vision, security, data, conventions, glossary, backlog, journal, agents, scripts' messages | In progress |
+| T0.7 | Translate the rest of the repository into English (D-027): vision, security, data, conventions, glossary, backlog, journal, agents, scripts' messages | Done |
 | T0.4b | Full CI: the app assembles in `app-check`, `version-check` (version goes up when the app changes, every tool test on GitHub), required on `main`. Sheet `docs/slices/T0.4b-full-ci.md` | Done |
 | T0.4c | Type-only packages (`@types/*`, `undici-types`) do not count as an app change in `version-check`. Sheet `docs/slices/T0.4c-types-packages.md` | Done |
 

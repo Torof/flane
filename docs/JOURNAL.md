@@ -6,6 +6,29 @@ Entries before 2026-10-21 (T0.6) are kept in French, as written (D-027).
 
 ---
 
+## 2026-10-21 — T0.7: the repository in English
+
+**Slice**: T0.7 — The repository in English (D-027)
+**Moment of the ritual**: closing
+
+**Done**
+- Files, folders, agents (`devils-advocate`, `security-auditor`, `reviewer`), skills (`session-open`, `session-close`, `slice`, `milestone-review`) and issue templates renamed; links updated everywhere, history included (links only).
+- Living documents, agents, skills, workflow summaries, hooks and script messages translated by three agents in parallel with one shared vocabulary, then read through by Claude. History kept in French, with a note.
+- The session-state hook looked for the French backlog heading: fixed (found by a translating agent).
+
+**Version**: none (no app change).
+
+**What worked / what got stuck**
+- Worked: three translators in parallel with a shared vocabulary; tests guarded every script message; the renamed agents ran the security pass under their new names.
+- Stuck: two living files were missed by Claude's list (`dependabot.yml`, `.gitignore`); the review caught them.
+
+**Method**: for broad mechanical work, parallel agents plus one careful read-through by Claude was fast and kept quality.
+
+**Next step**
+- Milestone 0 review, then milestone 1.
+
+---
+
 ## 2026-10-21 — End of day: the owner's view on the method
 
 **Moment of the ritual**: closing
